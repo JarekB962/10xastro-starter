@@ -1,0 +1,3 @@
+# Pliki tekstowe zawsze z LF w repozytorium i w katalogu roboczym (także na Windows),
+# żeby lokalny lint (prettier) nie zgłaszał błędów CRLF, których nie widzi CI.
+* text=auto eol=lf
