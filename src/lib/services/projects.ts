@@ -42,7 +42,10 @@ export function formValues(form: FormData): Record<string, string> {
     const value = form.get(key);
     return typeof value === "string" ? value.slice(0, max) : "";
   };
-  return { name: pick("name", KEPT_NAME_LENGTH), description: pick("description", KEPT_DESCRIPTION_LENGTH) };
+  return {
+    project_name: pick("project_name", KEPT_NAME_LENGTH),
+    project_description: pick("project_description", KEPT_DESCRIPTION_LENGTH),
+  };
 }
 
 // Kody Postgres/PostgREST: 23505 unikalność, 23503 klucz obcy, 42501 naruszenie RLS, PGRST116 brak wiersza.

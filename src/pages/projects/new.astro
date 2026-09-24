@@ -5,7 +5,7 @@ import ProjectForm from "@/components/projects/ProjectForm";
 
 const params = Astro.url.searchParams;
 const error = params.get("error");
-const initial = { name: params.get("name") ?? "", description: params.get("description") ?? "" };
+const initial = { name: params.get("project_name") ?? "", description: params.get("project_description") ?? "" };
 ---
 
 <Layout title="Nowy projekt — Plan projektu (WBS)">

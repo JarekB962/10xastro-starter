@@ -18,8 +18,8 @@ const error = params.get("error");
 // Po błędzie serwera formularz wraca z tym, co użytkownik wpisał; bez błędu z zapisanymi danymi.
 const entered = error ? params : null;
 const initial = {
-  name: entered?.get("name") ?? project?.name ?? "",
-  description: entered?.get("description") ?? project?.description ?? "",
+  name: entered?.get("project_name") ?? project?.name ?? "",
+  description: entered?.get("project_description") ?? project?.description ?? "",
 };
 ---
 

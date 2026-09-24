@@ -22,7 +22,10 @@ export type ParsedProjectInput = { ok: true; data: ProjectInput } | { ok: false;
 
 /** Waliduje dane formularza projektu; pierwszy błąd wraca jako tekst do `?error=`. */
 export function parseProjectInput(form: FormData): ParsedProjectInput {
-  const result = projectInputSchema.safeParse({ name: form.get("name"), description: form.get("description") });
+  const result = projectInputSchema.safeParse({
+    name: form.get("project_name"),
+    description: form.get("project_description"),
+  });
   if (!result.success) {
     return { ok: false, message: result.error.issues[0]?.message ?? "Niepoprawne dane projektu." };
   }

@@ -43,7 +43,7 @@ export default function ProjectForm({ action, initial, serverError, submitLabel 
   return (
     <form method="POST" action={action} className="space-y-4" onSubmit={handleSubmit} noValidate>
       <FormField
-        id="name"
+        id="project_name"
         label="Nazwa projektu"
         value={name}
         onChange={(v) => {
@@ -51,18 +51,20 @@ export default function ProjectForm({ action, initial, serverError, submitLabel 
           if (errors.name) setErrors((prev) => ({ ...prev, name: undefined }));
         }}
         placeholder="np. Modernizacja instalacji"
+        autoComplete="off"
         error={errors.name}
         icon={<FolderKanban className="size-4" />}
       />
 
       <div>
-        <label htmlFor="description" className="mb-1 block text-sm text-blue-100/80">
+        <label htmlFor="project_description" className="mb-1 block text-sm text-blue-100/80">
           Opis (opcjonalnie)
         </label>
         <textarea
-          id="description"
-          name="description"
+          id="project_description"
+          name="project_description"
           rows={4}
+          autoComplete="off"
           value={description}
           onChange={(e) => {
             setDescription(e.target.value);

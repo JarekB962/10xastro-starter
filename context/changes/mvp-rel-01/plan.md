@@ -441,14 +441,14 @@ Zwykłe akcje muszą kończyć się widocznym wynikiem poniżej 1 sekundy (NFR z
 
 #### Automated
 
-- [ ] 4.1 Lint przechodzi: `npm run lint`
-- [ ] 4.2 Sprawdzenie typów przechodzi: `npx astro check`
-- [ ] 4.3 Build przechodzi: `npm run build`
+- [x] 4.1 Lint przechodzi: `npm run lint`
+- [x] 4.2 Sprawdzenie typów przechodzi: `npx astro check`
+- [x] 4.3 Build przechodzi: `npm run build`
 
 #### Manual
 
-- [ ] 4.4 Ekrany logowania, rejestracji i potwierdzenia wyświetlają się po polsku, a walidacja pokazuje polskie komunikaty
-- [ ] 4.5 Podpowiedź o brakujących znakach hasła ma poprawną odmianę dla 1, 2 i 5 brakujących znaków
+- [x] 4.4 Ekrany logowania, rejestracji i potwierdzenia wyświetlają się po polsku, a walidacja pokazuje polskie komunikaty
+- [x] 4.5 Podpowiedź o brakujących znakach hasła ma poprawną odmianę dla 1, 2 i 5 brakujących znaków
 
 ### Phase 5: Test smoke i weryfikacja
 
