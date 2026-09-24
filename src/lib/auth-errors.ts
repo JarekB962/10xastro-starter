@@ -13,12 +13,14 @@ const MESSAGES: Record<string, string> = {
 const FALLBACK_MESSAGE = "Nie udało się wykonać operacji. Spróbuj ponownie.";
 
 // Nieznany kod dostaje neutralny polski komunikat; surowy tekst Supabase jest po angielsku i może ujawniać szczegóły backendu,
-// dlatego trafia tylko do logów serwera (kod, status i komunikat; nigdy dane z formularza).
+// dlatego trafia tylko do logów serwera (kod, status i komunikat bez adresów email; nigdy dane z formularza).
 export function authErrorMessage(error: { code?: string; status?: number; message: string }): string {
   const translated = error.code ? MESSAGES[error.code] : undefined;
   if (translated) return translated;
 
+  // Niektóre komunikaty Supabase cytują adres email użytkownika, a logi nie powinny zawierać danych osobowych.
+  const message = error.message.replace(/[^\s"'<>]+@[^\s"'<>]+/g, "[email]");
   // eslint-disable-next-line no-console -- bez tego nieznany błąd Supabase jest niewidoczny: użytkownik dostaje tylko ogólny komunikat
-  console.error("auth: unmapped Supabase error", error.code, error.status, error.message);
+  console.error("auth: unmapped Supabase error", error.code, error.status, message);
   return FALLBACK_MESSAGE;
 }

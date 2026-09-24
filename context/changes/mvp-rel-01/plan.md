@@ -380,6 +380,17 @@ Zwykłe akcje muszą kończyć się widocznym wynikiem poniżej 1 sekundy (NFR z
 - Produkcyjną bazę trzeba zaktualizować ręcznie (`npx supabase db push`) **przed** wdrożeniem kodu; job `deploy` w CI tego nie robi, a wdrożenie kodu bez migracji zepsuje `/projects`.
 - Istniejące konta użytkowników pozostają bez zmian; wiersze `user_settings` powstają przy pierwszym wyborze projektu.
 
+## Post-plan changes
+
+Zmiany wprowadzone po napisaniu planu, na prośbę użytkownika lub po `/code-review` PR #4 i przeglądzie implementacji. Fazy i Progress zostają bez zmian; ta lista zastępuje tekst planu tam, gdzie się z nim różni.
+
+- **Strona główna i komunikaty Supabase po polsku** (wcześniej w „What We're NOT Doing"): `Welcome.astro` przepisany pod aplikację, a `src/lib/auth-errors.ts` mapuje kody błędów Supabase na polski; nieznany kod dostaje neutralny komunikat, a szczegóły (bez adresów email) trafiają do logów serwera.
+- **Dashboard bez przycisku „Wyloguj"** (Faza 3 pkt 4 mówiła „zostaje"): wylogowanie jest w Topbarze; link na dashboardzie brzmi „Wróć do listy projektów".
+- **Pola formularza projektu**: `project_name` i `project_description` zamiast `name` i `description` (przeglądarka brała ogólne nazwy za dane osobowe i podpowiadała imię i nazwisko); `autoComplete="off"` i fokus na nazwie w formularzu projektu.
+- **Poprawki po `/code-review`**: opis liczony z CRLF jako jeden znak; 500 zamiast 404 przy błędzie odczytu projektu; komunikat, gdy nie udało się wczytać wybranego projektu; trasy logowania z `readForm`, walidacją zod i `prerender = false`.
+- **Nowe moduły pomocnicze**: `lib/forms.ts` (`readForm`, `errorUrl`, `INVALID_FORM_MESSAGE`), `lib/services/project-routes.ts` (`requireSupabase`, `requireProjectId`), `lib/validation/auth.ts`, `getSelectedProjectId` (jedno zapytanie na liście projektów); typy wyników w `src/types.ts`.
+- **CI**: job `deploy` sprawdza po wdrożeniu, że produkcja łączy się z Supabase (logowanie nieistniejącym kontem musi zwrócić komunikat o złych danych).
+
 ## References
 
 - PRD: `context/foundation/prd.md` (FR-001, FR-002, FR-003, sekcje Access Control i Non-Functional Requirements)
