@@ -398,15 +398,15 @@ Zwykłe akcje muszą kończyć się widocznym wynikiem poniżej 1 sekundy (NFR z
 
 #### Automated
 
-- [x] 1.1 Migracja stosuje się na czystej bazie lokalnej: `npx supabase db reset`
-- [x] 1.2 Generowanie typów Astro i sprawdzenie typów przechodzi: `npx astro sync && npx astro check`
-- [x] 1.3 Lint przechodzi: `npm run lint`
-- [x] 1.4 Build przechodzi: `npm run build`
+- [x] 1.1 Migracja stosuje się na czystej bazie lokalnej: `npx supabase db reset` — e144395
+- [x] 1.2 Generowanie typów Astro i sprawdzenie typów przechodzi: `npx astro sync && npx astro check` — e144395
+- [x] 1.3 Lint przechodzi: `npm run lint` — e144395
+- [x] 1.4 Build przechodzi: `npm run build` — e144395
 
 #### Manual
 
-- [x] 1.5 W lokalnym Supabase Studio (lub przez `psql`) obie tabele mają włączone RLS, a `projects` ma cztery polityki dla `authenticated`
-- [x] 1.6 Dwie próby wstawienia projektu o tej samej nazwie (różna wielkość liter) tego samego użytkownika kończą się błędem unikalności
+- [x] 1.5 W lokalnym Supabase Studio (lub przez `psql`) obie tabele mają włączone RLS, a `projects` ma cztery polityki dla `authenticated` — e144395
+- [x] 1.6 Dwie próby wstawienia projektu o tej samej nazwie (różna wielkość liter) tego samego użytkownika kończą się błędem unikalności — e144395
 
 ### Phase 2: Warstwa serwera
 
