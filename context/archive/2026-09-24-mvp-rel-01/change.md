@@ -1,10 +1,10 @@
 ---
 change_id: mvp-rel-01
 title: Pierwsza wersja MVP: logowanie, projekty i sprawdzanie zależności
-status: impl_reviewed
+status: archived
 created: 2026-09-24
 updated: 2026-09-24
-archived_at: null
+archived_at: 2026-09-24T20:52:44Z
 ---
 
 ## Notes
