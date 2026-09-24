@@ -79,6 +79,8 @@ const scriptsConfig = defineConfig({
 
 export default defineConfig(
   includeIgnoreFile(gitignorePath),
+  // Agent tooling (skills, prompts) ships its own scripts that are not part of the app's tsconfig project.
+  { ignores: [".claude/**", ".cursor/**", ".agents/**"] },
   baseConfig,
   reactConfig,
   eslintPluginAstro.configs["flat/recommended"],
