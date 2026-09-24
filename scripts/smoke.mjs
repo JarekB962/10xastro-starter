@@ -145,6 +145,15 @@ const steps = [
     () => userA("/dashboard"),
     { status: 200, bodyIncludes: ["Nie wybrano projektu"], bodyExcludes: [renamedProject] },
   ],
+  [
+    "A adds a project whose CRLF description fits the limit once newlines count as one character",
+    () =>
+      userA(
+        "/api/projects",
+        post({ project_name: `Projekt Gamma ${stamp}`, project_description: "a\r\n".repeat(495) }),
+      ),
+    { status: 302, locationIs: "/projects" },
+  ],
   ["signout clears session", () => userA("/api/auth/signout", post()), { status: 302, location: "/" }],
   ["dashboard redirects after signout", () => userA("/dashboard"), { status: 302, location: "/auth/signin" }],
 ];
@@ -154,6 +163,9 @@ for (const [name, run, expected] of steps) {
   const actual = await run();
   const problems = [];
   if (actual.status !== expected.status) problems.push(`status ${actual.status}, expected ${expected.status}`);
+  if (expected.locationIs !== undefined && actual.location !== expected.locationIs) {
+    problems.push(`location "${actual.location.slice(0, 80)}", expected exactly "${expected.locationIs}"`);
+  }
   if (expected.location !== undefined && !actual.location.startsWith(expected.location)) {
     problems.push(`location "${actual.location}", expected "${expected.location}"`);
   }

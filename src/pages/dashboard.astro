@@ -6,6 +6,7 @@ import { getSelectedProject } from "@/lib/services/projects";
 const supabase = Astro.locals.supabase;
 const selected = supabase ? await getSelectedProject(supabase) : null;
 const project = selected?.ok ? selected.data : null;
+const loadError = supabase && selected && !selected.ok ? "Nie udało się wczytać wybranego projektu." : null;
 ---
 
 <Layout title="Szkielet roboczy — Plan projektu (WBS)">
@@ -13,6 +14,11 @@ const project = selected?.ok ? selected.data : null;
     <div class="mx-auto max-w-2xl">
       <Topbar />
       <div class="rounded-2xl border border-white/10 bg-white/10 p-8 text-white backdrop-blur-xl">
+        {loadError && (
+          <p class="mb-4 rounded-lg border border-red-500/30 bg-red-900/30 px-3 py-2 text-sm text-red-300">
+            {loadError}
+          </p>
+        )}
         {project ? (
           <>
             <p class="text-sm text-blue-100/60">Wybrany projekt</p>

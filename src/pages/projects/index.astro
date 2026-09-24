@@ -1,16 +1,17 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import Topbar from "@/components/Topbar.astro";
-import { SUPABASE_NOT_CONFIGURED, getSelectedProject, listProjects } from "@/lib/services/projects";
+import { SUPABASE_NOT_CONFIGURED, getSelectedProjectId, listProjects } from "@/lib/services/projects";
 
 const supabase = Astro.locals.supabase;
 const [projects, selected] = await Promise.all([
   supabase ? listProjects(supabase) : null,
-  supabase ? getSelectedProject(supabase) : null,
+  supabase ? getSelectedProjectId(supabase) : null,
 ]);
-const selectedId = selected?.ok ? selected.data?.id : undefined;
+const selectedId = selected?.ok ? (selected.data ?? undefined) : undefined;
 const loadError = supabase ? "Nie udało się wczytać projektów." : SUPABASE_NOT_CONFIGURED;
-const error = Astro.url.searchParams.get("error") ?? (projects?.ok ? null : loadError);
+const selectedError = supabase && selected && !selected.ok ? "Nie udało się wczytać wybranego projektu." : null;
+const error = Astro.url.searchParams.get("error") ?? (projects?.ok ? selectedError : loadError);
 ---
 
 <Layout title="Projekty — Plan projektu (WBS)">

@@ -1,13 +1,7 @@
 import type { APIRoute } from "astro";
-import {
-  INVALID_FORM_MESSAGE,
-  PROJECT_ERROR_MESSAGES,
-  SUPABASE_NOT_CONFIGURED,
-  createProject,
-  errorUrl,
-  formValues,
-  readForm,
-} from "@/lib/services/projects";
+import { INVALID_FORM_MESSAGE, errorUrl, readForm } from "@/lib/forms";
+import { requireSupabase } from "@/lib/services/project-routes";
+import { PROJECT_ERROR_MESSAGES, createProject, formValues } from "@/lib/services/projects";
 import { parseProjectInput } from "@/lib/validation/project";
 
 export const prerender = false;
@@ -15,13 +9,8 @@ export const prerender = false;
 export const POST: APIRoute = async (context) => {
   const back = "/projects/new";
 
-  const supabase = context.locals.supabase;
-  if (!supabase) {
-    return context.redirect(errorUrl(back, SUPABASE_NOT_CONFIGURED));
-  }
-  if (!context.locals.user) {
-    return context.redirect("/auth/signin");
-  }
+  const supabase = requireSupabase(context, back);
+  if (supabase instanceof Response) return supabase;
 
   const form = await readForm(context.request);
   if (!form) {

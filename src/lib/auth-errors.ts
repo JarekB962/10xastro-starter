@@ -10,7 +10,9 @@ const MESSAGES: Record<string, string> = {
   over_email_send_rate_limit: "Zbyt wiele prób, spróbuj ponownie za chwilę",
 };
 
-export function authErrorMessage(error: { code?: string; message: string }): string {
-  const translated = error.code ? MESSAGES[error.code] : undefined;
-  return translated ?? error.message;
+const FALLBACK_MESSAGE = "Nie udało się wykonać operacji. Spróbuj ponownie.";
+
+// Nieznany kod dostaje neutralny polski komunikat; surowy tekst Supabase jest po angielsku i może ujawniać szczegóły backendu.
+export function authErrorMessage(error: { code?: string }): string {
+  return (error.code ? MESSAGES[error.code] : undefined) ?? FALLBACK_MESSAGE;
 }

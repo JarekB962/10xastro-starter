@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { ProjectInput } from "@/types";
+import type { ParsedProjectInput } from "@/types";
 
 const nameSchema = z
   .string({ error: "Nazwa projektu jest wymagana." })
@@ -7,18 +7,20 @@ const nameSchema = z
   .min(1, "Nazwa projektu jest wymagana.")
   .max(100, "Nazwa projektu może mieć najwyżej 100 znaków.");
 
-const descriptionSchema = z
-  .string()
-  .trim()
-  .max(1000, "Opis może mieć najwyżej 1000 znaków.")
-  .nullish()
-  .transform((value) => (value?.length ? value : null));
+// Przeglądarka wysyła nowe linie jako CRLF; liczymy je jak jeden znak, tak jak walidacja w formularzu.
+const descriptionSchema = z.preprocess(
+  (value) => (typeof value === "string" ? value.replaceAll("\r\n", "\n") : value),
+  z
+    .string()
+    .trim()
+    .max(1000, "Opis może mieć najwyżej 1000 znaków.")
+    .nullish()
+    .transform((value) => (value?.length ? value : null)),
+);
 
 export const projectInputSchema = z.object({ name: nameSchema, description: descriptionSchema });
 
 export const projectIdSchema = z.uuid();
-
-export type ParsedProjectInput = { ok: true; data: ProjectInput } | { ok: false; message: string };
 
 /** Waliduje dane formularza projektu; pierwszy błąd wraca jako tekst do `?error=`. */
 export function parseProjectInput(form: FormData): ParsedProjectInput {
