@@ -454,12 +454,12 @@ Zwykłe akcje muszą kończyć się widocznym wynikiem poniżej 1 sekundy (NFR z
 
 #### Automated
 
-- [x] 5.1 Lint przechodzi (w tym `scripts/`): `npm run lint`
-- [x] 5.2 Build przechodzi: `npm run build`
-- [x] 5.3 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke`
-- [ ] 5.4 CI (`ci` i `smoke`) zielone na gałęzi z tą zmianą
+- [x] 5.1 Lint przechodzi (w tym `scripts/`): `npm run lint` — 51ff080
+- [x] 5.2 Build przechodzi: `npm run build` — 51ff080
+- [x] 5.3 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke` — 51ff080
+- [x] 5.4 CI (`ci` i `smoke`) zielone na gałęzi z tą zmianą
 
 #### Manual
 
-- [x] 5.5 Ręczny przebieg z przeglądarki zgadza się z krokami smoke (dodanie, edycja, wybór, usunięcie po potwierdzeniu)
-- [ ] 5.6 Migracja jest zastosowana w docelowej bazie Supabase przed wdrożeniem kodu (`npx supabase db push`)
+- [x] 5.5 Ręczny przebieg z przeglądarki zgadza się z krokami smoke (dodanie, edycja, wybór, usunięcie po potwierdzeniu) — 51ff080
+- [x] 5.6 Migracja jest zastosowana w docelowej bazie Supabase przed wdrożeniem kodu (`npx supabase db push`)
