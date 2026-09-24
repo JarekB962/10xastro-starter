@@ -1,0 +1,92 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Topbar from "@/components/Topbar.astro";
+import { SUPABASE_NOT_CONFIGURED, getSelectedProjectId, listProjects } from "@/lib/services/projects";
+
+const supabase = Astro.locals.supabase;
+const [projects, selected] = await Promise.all([
+  supabase ? listProjects(supabase) : null,
+  supabase ? getSelectedProjectId(supabase) : null,
+]);
+const selectedId = selected?.ok ? (selected.data ?? undefined) : undefined;
+const loadError = supabase ? "Nie udało się wczytać projektów." : SUPABASE_NOT_CONFIGURED;
+const selectedError = supabase && selected && !selected.ok ? "Nie udało się wczytać wybranego projektu." : null;
+const error = Astro.url.searchParams.get("error") ?? (projects?.ok ? selectedError : loadError);
+---
+
+<Layout title="Projekty — Plan projektu (WBS)">
+  <div class="bg-cosmic min-h-screen p-4">
+    <div class="mx-auto max-w-2xl">
+      <Topbar />
+      <div class="rounded-2xl border border-white/10 bg-white/10 p-8 text-white backdrop-blur-xl">
+        <div class="mb-6 flex items-center justify-between gap-4">
+          <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-2xl font-bold text-transparent">
+            Twoje projekty
+          </h1>
+          <a
+            href="/projects/new"
+            class="rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium transition-colors hover:bg-purple-500"
+          >
+            Nowy projekt
+          </a>
+        </div>
+
+        {error && (
+          <p class="mb-4 rounded-lg border border-red-500/30 bg-red-900/30 px-3 py-2 text-sm text-red-300">{error}</p>
+        )}
+
+        {projects?.ok && projects.data.length === 0 && (
+          <p class="text-blue-100/70">Nie masz jeszcze żadnego projektu. Dodaj pierwszy, aby zacząć.</p>
+        )}
+
+        {projects?.ok && projects.data.length > 0 && (
+          <ul class="space-y-3">
+            {projects.data.map((project) => (
+              <li class="rounded-xl border border-white/10 bg-white/5 p-4">
+                <div class="flex items-start justify-between gap-4">
+                  <div class="min-w-0">
+                    <h2 class="truncate font-semibold">
+                      {project.name}
+                      {project.id === selectedId && (
+                        <span class="ml-2 rounded-full bg-purple-500/30 px-2 py-0.5 text-xs font-normal text-purple-100">
+                          wybrany
+                        </span>
+                      )}
+                    </h2>
+                    {project.description && (
+                      <p class="mt-1 text-sm break-words text-blue-100/70">{project.description}</p>
+                    )}
+                  </div>
+                  <div class="flex shrink-0 items-center gap-3 text-sm">
+                    {project.id !== selectedId && (
+                      <form method="POST" action={`/api/projects/${project.id}/select`}>
+                        <button
+                          type="submit"
+                          class="text-purple-300 transition-colors hover:text-purple-100 hover:underline"
+                        >
+                          Wybierz
+                        </button>
+                      </form>
+                    )}
+                    <a
+                      href={`/projects/${project.id}/edit`}
+                      class="text-purple-300 transition-colors hover:text-purple-100 hover:underline"
+                    >
+                      Edytuj
+                    </a>
+                    <a
+                      href={`/projects/${project.id}/delete`}
+                      class="text-red-300 transition-colors hover:text-red-200 hover:underline"
+                    >
+                      Usuń
+                    </a>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  </div>
+</Layout>

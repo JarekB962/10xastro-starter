@@ -74,3 +74,10 @@ export interface ProjectInput {
   name: string;
   description: string | null;
 }
+
+/** Wynik operacji usługi projektów: dane albo jednoznaczny kod błędu. */
+export type ProjectError = "duplicate_name" | "not_found" | "unexpected";
+export type ProjectResult<T> = { ok: true; data: T } | { ok: false; error: ProjectError };
+
+/** Wynik walidacji formularza projektu: dane albo pierwszy komunikat błędu. */
+export type ParsedProjectInput = { ok: true; data: ProjectInput } | { ok: false; message: string };

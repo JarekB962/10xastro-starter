@@ -412,54 +412,54 @@ Zwykłe akcje muszą kończyć się widocznym wynikiem poniżej 1 sekundy (NFR z
 
 #### Automated
 
-- [ ] 2.1 Sprawdzenie typów przechodzi: `npx astro check`
-- [ ] 2.2 Lint przechodzi: `npm run lint`
-- [ ] 2.3 Build przechodzi: `npm run build`
+- [x] 2.1 Sprawdzenie typów przechodzi: `npx astro check` — c7a163d
+- [x] 2.2 Lint przechodzi: `npm run lint` — c7a163d
+- [x] 2.3 Build przechodzi: `npm run build` — c7a163d
 
 #### Manual
 
-- [ ] 2.4 Bez logowania `curl -i -X POST http://localhost:4321/api/projects` odsyła 302 na `/auth/signin`
-- [ ] 2.5 Po zalogowaniu (ciasteczko z przeglądarki) `POST /api/projects` z poprawnymi danymi tworzy wiersz widoczny w Studio z właściwym `owner_id`
+- [x] 2.4 Bez logowania `curl -i -X POST http://localhost:4321/api/projects` odsyła 302 na `/auth/signin` — c7a163d
+- [x] 2.5 Po zalogowaniu (ciasteczko z przeglądarki) `POST /api/projects` z poprawnymi danymi tworzy wiersz widoczny w Studio z właściwym `owner_id` — c7a163d
 
 ### Phase 3: Ekrany projektów po polsku
 
 #### Automated
 
-- [ ] 3.1 Sprawdzenie typów przechodzi: `npx astro check`
-- [ ] 3.2 Lint przechodzi: `npm run lint`
-- [ ] 3.3 Build przechodzi: `npm run build`
+- [x] 3.1 Sprawdzenie typów przechodzi: `npx astro check` — 19d400d
+- [x] 3.2 Lint przechodzi: `npm run lint` — 19d400d
+- [x] 3.3 Build przechodzi: `npm run build` — 19d400d
 
 #### Manual
 
-- [ ] 3.4 Po zalogowaniu widać `/projects`; dodanie projektu, zmiana nazwy i opisu oraz wybór projektu działają, a `/dashboard` pokazuje wybrany projekt
-- [ ] 3.5 Dodanie drugiego projektu o tej samej nazwie (inna wielkość liter) pokazuje czytelny komunikat, dane w formularzu nie znikają
-- [ ] 3.6 Usunięcie przechodzi przez stronę potwierdzenia; po usunięciu wybranego projektu `/dashboard` pokazuje stan pusty
-- [ ] 3.7 Drugi użytkownik wpisujący adres cudzego `/projects/[id]/edit` dostaje 404
-- [ ] 3.8 Zwykłe akcje (zapis, wybór, usunięcie) kończą się widocznym wynikiem w czasie poniżej 1 sekundy
+- [x] 3.4 Po zalogowaniu widać `/projects`; dodanie projektu, zmiana nazwy i opisu oraz wybór projektu działają, a `/dashboard` pokazuje wybrany projekt — 19d400d
+- [x] 3.5 Dodanie drugiego projektu o tej samej nazwie (inna wielkość liter) pokazuje czytelny komunikat, dane w formularzu nie znikają — 19d400d
+- [x] 3.6 Usunięcie przechodzi przez stronę potwierdzenia; po usunięciu wybranego projektu `/dashboard` pokazuje stan pusty — 19d400d
+- [x] 3.7 Drugi użytkownik wpisujący adres cudzego `/projects/[id]/edit` dostaje 404 — 19d400d
+- [x] 3.8 Zwykłe akcje (zapis, wybór, usunięcie) kończą się widocznym wynikiem w czasie poniżej 1 sekundy — 19d400d
 
 ### Phase 4: Polskie ekrany logowania
 
 #### Automated
 
-- [ ] 4.1 Lint przechodzi: `npm run lint`
-- [ ] 4.2 Sprawdzenie typów przechodzi: `npx astro check`
-- [ ] 4.3 Build przechodzi: `npm run build`
+- [x] 4.1 Lint przechodzi: `npm run lint` — 450dfab
+- [x] 4.2 Sprawdzenie typów przechodzi: `npx astro check` — 450dfab
+- [x] 4.3 Build przechodzi: `npm run build` — 450dfab
 
 #### Manual
 
-- [ ] 4.4 Ekrany logowania, rejestracji i potwierdzenia wyświetlają się po polsku, a walidacja pokazuje polskie komunikaty
-- [ ] 4.5 Podpowiedź o brakujących znakach hasła ma poprawną odmianę dla 1, 2 i 5 brakujących znaków
+- [x] 4.4 Ekrany logowania, rejestracji i potwierdzenia wyświetlają się po polsku, a walidacja pokazuje polskie komunikaty — 450dfab
+- [x] 4.5 Podpowiedź o brakujących znakach hasła ma poprawną odmianę dla 1, 2 i 5 brakujących znaków — 450dfab
 
 ### Phase 5: Test smoke i weryfikacja
 
 #### Automated
 
-- [ ] 5.1 Lint przechodzi (w tym `scripts/`): `npm run lint`
-- [ ] 5.2 Build przechodzi: `npm run build`
-- [ ] 5.3 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke`
-- [ ] 5.4 CI (`ci` i `smoke`) zielone na gałęzi z tą zmianą
+- [x] 5.1 Lint przechodzi (w tym `scripts/`): `npm run lint` — 51ff080
+- [x] 5.2 Build przechodzi: `npm run build` — 51ff080
+- [x] 5.3 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke` — 51ff080
+- [x] 5.4 CI (`ci` i `smoke`) zielone na gałęzi z tą zmianą
 
 #### Manual
 
-- [ ] 5.5 Ręczny przebieg z przeglądarki zgadza się z krokami smoke (dodanie, edycja, wybór, usunięcie po potwierdzeniu)
-- [ ] 5.6 Migracja jest zastosowana w docelowej bazie Supabase przed wdrożeniem kodu (`npx supabase db push`)
+- [x] 5.5 Ręczny przebieg z przeglądarki zgadza się z krokami smoke (dodanie, edycja, wybór, usunięcie po potwierdzeniu) — 51ff080
+- [x] 5.6 Migracja jest zastosowana w docelowej bazie Supabase przed wdrożeniem kodu (`npx supabase db push`)

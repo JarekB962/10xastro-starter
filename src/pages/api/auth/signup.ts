@@ -1,19 +1,25 @@
 import type { APIRoute } from "astro";
 import { createClient } from "@/lib/supabase";
+import { authErrorMessage } from "@/lib/auth-errors";
+import { errorUrl, readForm } from "@/lib/forms";
+import { parseCredentials } from "@/lib/validation/auth";
+
+export const prerender = false;
 
 export const POST: APIRoute = async (context) => {
-  const form = await context.request.formData();
-  const email = form.get("email") as string;
-  const password = form.get("password") as string;
+  const parsed = parseCredentials(await readForm(context.request));
+  if (!parsed.ok) {
+    return context.redirect(errorUrl("/auth/signup", parsed.message));
+  }
 
   const supabase = createClient(context.request.headers, context.cookies);
   if (!supabase) {
-    return context.redirect(`/auth/signup?error=${encodeURIComponent("Supabase is not configured")}`);
+    return context.redirect(errorUrl("/auth/signup", "Supabase nie jest skonfigurowany"));
   }
-  const { error } = await supabase.auth.signUp({ email, password });
+  const { error } = await supabase.auth.signUp({ email: parsed.email, password: parsed.password });
 
   if (error) {
-    return context.redirect(`/auth/signup?error=${encodeURIComponent(error.message)}`);
+    return context.redirect(errorUrl("/auth/signup", authErrorMessage(error)));
   }
 
   return context.redirect("/auth/confirm-email");

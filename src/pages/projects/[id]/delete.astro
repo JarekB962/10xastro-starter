@@ -1,0 +1,64 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Topbar from "@/components/Topbar.astro";
+import { SUPABASE_NOT_CONFIGURED, getProject } from "@/lib/services/projects";
+import { parseProjectId } from "@/lib/validation/project";
+
+const supabase = Astro.locals.supabase;
+// Nieistniejący i cudzy projekt wyglądają tak samo: 404. Bez klienta Supabase: 503 z komunikatem o konfiguracji,
+// a błąd bazy przy odczycie: 500 (nie udajemy, że projektu nie ma).
+const id = parseProjectId(Astro.params.id);
+const result = supabase && id ? await getProject(supabase, id) : null;
+const project = result?.ok ? result.data : null;
+const loadFailed = result !== null && !result.ok && result.error !== "not_found";
+const notFoundMessage = !supabase
+  ? SUPABASE_NOT_CONFIGURED
+  : loadFailed
+    ? "Nie udało się wczytać projektu"
+    : "Nie znaleziono projektu";
+if (!project) Astro.response.status = !supabase ? 503 : loadFailed ? 500 : 404;
+---
+
+<Layout title="Usuwanie projektu — Plan projektu (WBS)">
+  <div class="bg-cosmic min-h-screen p-4">
+    <div class="mx-auto max-w-md">
+      <Topbar />
+      <div class="rounded-2xl border border-white/10 bg-white/10 p-8 text-white backdrop-blur-xl">
+        <h1 class="mb-4 bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-center text-2xl font-bold text-transparent">
+          {project ? "Usunąć projekt?" : notFoundMessage}
+        </h1>
+        {project ? (
+          <>
+            <p class="text-center text-blue-100/80">
+              Projekt <span class="font-semibold text-white">{project.name}</span> zostanie usunięty na stałe.
+            </p>
+            <p class="mt-2 text-center text-sm text-blue-100/60">
+              Razem z nim zostaną usunięte jego specjalności i zadania. Tej operacji nie można cofnąć.
+            </p>
+            <form
+              method="POST"
+              action={`/api/projects/${project.id}/delete`}
+              class="mt-6 flex items-center justify-center gap-4"
+            >
+              <button
+                type="submit"
+                class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium transition-colors hover:bg-red-500"
+              >
+                Usuń projekt
+              </button>
+              <a href="/projects" class="text-sm text-purple-300 hover:underline">
+                Anuluj
+              </a>
+            </form>
+          </>
+        ) : (
+          <p class="text-center text-sm text-blue-100/60">
+            <a href="/projects" class="text-purple-300 hover:underline">
+              Wróć do listy projektów
+            </a>
+          </p>
+        )}
+      </div>
+    </div>
+  </div>
+</Layout>
