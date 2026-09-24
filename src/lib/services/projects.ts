@@ -16,9 +16,19 @@ export const PROJECT_ERROR_MESSAGES: Record<ProjectError, string> = {
   unexpected: "Coś poszło nie tak. Spróbuj ponownie.",
 };
 
-/** Adres przekierowania z komunikatem błędu w `?error=` (wzorzec z tras logowania). */
-export function errorUrl(path: string, message: string): string {
-  return `${path}?error=${encodeURIComponent(message)}`;
+/** Adres przekierowania z komunikatem błędu w `?error=` (wzorzec z tras logowania); `keep` odsyła wpisane wartości formularza. */
+export function errorUrl(path: string, message: string, keep?: Record<string, string>): string {
+  const params = new URLSearchParams({ error: message, ...keep });
+  return `${path}?${params.toString()}`;
+}
+
+/** Wartości pól formularza projektu do odesłania razem z błędem, żeby dane nie znikały. */
+export function formValues(form: FormData): Record<string, string> {
+  const pick = (key: string) => {
+    const value = form.get(key);
+    return typeof value === "string" ? value : "";
+  };
+  return { name: pick("name"), description: pick("description") };
 }
 
 // Kody Postgres/PostgREST: 23505 unikalność, 23503 klucz obcy, 42501 naruszenie RLS, PGRST116 brak wiersza.

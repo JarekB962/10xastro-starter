@@ -1,6 +1,12 @@
 import type { APIRoute } from "astro";
 import { createClient } from "@/lib/supabase";
-import { PROJECT_ERROR_MESSAGES, SUPABASE_NOT_CONFIGURED, errorUrl, updateProject } from "@/lib/services/projects";
+import {
+  PROJECT_ERROR_MESSAGES,
+  SUPABASE_NOT_CONFIGURED,
+  errorUrl,
+  formValues,
+  updateProject,
+} from "@/lib/services/projects";
 import { parseProjectId, parseProjectInput } from "@/lib/validation/project";
 
 export const prerender = false;
@@ -20,15 +26,18 @@ export const POST: APIRoute = async (context) => {
   }
 
   const back = `/projects/${id}/edit`;
-  const parsed = parseProjectInput(await context.request.formData());
+  const form = await context.request.formData();
+  const parsed = parseProjectInput(form);
   if (!parsed.ok) {
-    return context.redirect(errorUrl(back, parsed.message));
+    return context.redirect(errorUrl(back, parsed.message, formValues(form)));
   }
 
   const result = await updateProject(supabase, id, parsed.data);
   if (!result.ok) {
-    const target = result.error === "not_found" ? "/projects" : back;
-    return context.redirect(errorUrl(target, PROJECT_ERROR_MESSAGES[result.error]));
+    if (result.error === "not_found") {
+      return context.redirect(errorUrl("/projects", PROJECT_ERROR_MESSAGES.not_found));
+    }
+    return context.redirect(errorUrl(back, PROJECT_ERROR_MESSAGES[result.error], formValues(form)));
   }
 
   return context.redirect("/projects");

@@ -412,30 +412,30 @@ Zwykłe akcje muszą kończyć się widocznym wynikiem poniżej 1 sekundy (NFR z
 
 #### Automated
 
-- [x] 2.1 Sprawdzenie typów przechodzi: `npx astro check`
-- [x] 2.2 Lint przechodzi: `npm run lint`
-- [x] 2.3 Build przechodzi: `npm run build`
+- [x] 2.1 Sprawdzenie typów przechodzi: `npx astro check` — c7a163d
+- [x] 2.2 Lint przechodzi: `npm run lint` — c7a163d
+- [x] 2.3 Build przechodzi: `npm run build` — c7a163d
 
 #### Manual
 
-- [x] 2.4 Bez logowania `curl -i -X POST http://localhost:4321/api/projects` odsyła 302 na `/auth/signin`
-- [x] 2.5 Po zalogowaniu (ciasteczko z przeglądarki) `POST /api/projects` z poprawnymi danymi tworzy wiersz widoczny w Studio z właściwym `owner_id`
+- [x] 2.4 Bez logowania `curl -i -X POST http://localhost:4321/api/projects` odsyła 302 na `/auth/signin` — c7a163d
+- [x] 2.5 Po zalogowaniu (ciasteczko z przeglądarki) `POST /api/projects` z poprawnymi danymi tworzy wiersz widoczny w Studio z właściwym `owner_id` — c7a163d
 
 ### Phase 3: Ekrany projektów po polsku
 
 #### Automated
 
-- [ ] 3.1 Sprawdzenie typów przechodzi: `npx astro check`
-- [ ] 3.2 Lint przechodzi: `npm run lint`
-- [ ] 3.3 Build przechodzi: `npm run build`
+- [x] 3.1 Sprawdzenie typów przechodzi: `npx astro check`
+- [x] 3.2 Lint przechodzi: `npm run lint`
+- [x] 3.3 Build przechodzi: `npm run build`
 
 #### Manual
 
-- [ ] 3.4 Po zalogowaniu widać `/projects`; dodanie projektu, zmiana nazwy i opisu oraz wybór projektu działają, a `/dashboard` pokazuje wybrany projekt
-- [ ] 3.5 Dodanie drugiego projektu o tej samej nazwie (inna wielkość liter) pokazuje czytelny komunikat, dane w formularzu nie znikają
-- [ ] 3.6 Usunięcie przechodzi przez stronę potwierdzenia; po usunięciu wybranego projektu `/dashboard` pokazuje stan pusty
-- [ ] 3.7 Drugi użytkownik wpisujący adres cudzego `/projects/[id]/edit` dostaje 404
-- [ ] 3.8 Zwykłe akcje (zapis, wybór, usunięcie) kończą się widocznym wynikiem w czasie poniżej 1 sekundy
+- [x] 3.4 Po zalogowaniu widać `/projects`; dodanie projektu, zmiana nazwy i opisu oraz wybór projektu działają, a `/dashboard` pokazuje wybrany projekt
+- [x] 3.5 Dodanie drugiego projektu o tej samej nazwie (inna wielkość liter) pokazuje czytelny komunikat, dane w formularzu nie znikają
+- [x] 3.6 Usunięcie przechodzi przez stronę potwierdzenia; po usunięciu wybranego projektu `/dashboard` pokazuje stan pusty
+- [x] 3.7 Drugi użytkownik wpisujący adres cudzego `/projects/[id]/edit` dostaje 404
+- [x] 3.8 Zwykłe akcje (zapis, wybór, usunięcie) kończą się widocznym wynikiem w czasie poniżej 1 sekundy
 
 ### Phase 4: Polskie ekrany logowania
 

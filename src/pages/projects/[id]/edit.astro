@@ -1,0 +1,53 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Topbar from "@/components/Topbar.astro";
+import ProjectForm from "@/components/projects/ProjectForm";
+import { createClient } from "@/lib/supabase";
+import { SUPABASE_NOT_CONFIGURED, getProject } from "@/lib/services/projects";
+import { parseProjectId } from "@/lib/validation/project";
+
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+// Middleware przekierowuje niezalogowanych, więc bez klienta Supabase ta strona się nie wyrenderuje.
+if (!supabase) throw new Error(SUPABASE_NOT_CONFIGURED);
+
+// Nieistniejący i cudzy projekt wyglądają tak samo: 404.
+const id = parseProjectId(Astro.params.id);
+const result = id ? await getProject(supabase, id) : null;
+const project = result?.ok ? result.data : null;
+if (!project) Astro.response.status = 404;
+
+const params = Astro.url.searchParams;
+const error = params.get("error");
+// Po błędzie serwera formularz wraca z tym, co użytkownik wpisał; bez błędu z zapisanymi danymi.
+const initial = {
+  name: params.get("name") ?? project?.name ?? "",
+  description: params.get("description") ?? project?.description ?? "",
+};
+---
+
+<Layout title="Edycja projektu — Plan projektu (WBS)">
+  <div class="bg-cosmic min-h-screen p-4">
+    <div class="mx-auto max-w-md">
+      <Topbar />
+      <div class="rounded-2xl border border-white/10 bg-white/10 p-8 text-white backdrop-blur-xl">
+        <h1 class="mb-6 bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-center text-2xl font-bold text-transparent">
+          {project ? "Edycja projektu" : "Nie znaleziono projektu"}
+        </h1>
+        {project && (
+          <ProjectForm
+            action={`/api/projects/${project.id}`}
+            initial={initial}
+            serverError={error}
+            submitLabel="Zapisz zmiany"
+            client:load
+          />
+        )}
+        <p class="mt-4 text-center text-sm text-blue-100/60">
+          <a href="/projects" class="text-purple-300 hover:underline">
+            Wróć do listy projektów
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+</Layout>
