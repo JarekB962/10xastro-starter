@@ -1,16 +1,16 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import Topbar from "@/components/Topbar.astro";
-import { createClient } from "@/lib/supabase";
 import { SUPABASE_NOT_CONFIGURED, getSelectedProject, listProjects } from "@/lib/services/projects";
 
-const supabase = createClient(Astro.request.headers, Astro.cookies);
-// Middleware przekierowuje niezalogowanych, więc bez klienta Supabase ta strona się nie wyrenderuje.
-if (!supabase) throw new Error(SUPABASE_NOT_CONFIGURED);
-
-const [projects, selected] = await Promise.all([listProjects(supabase), getSelectedProject(supabase)]);
-const selectedId = selected.ok ? selected.data?.id : undefined;
-const error = Astro.url.searchParams.get("error") ?? (projects.ok ? null : "Nie udało się wczytać projektów.");
+const supabase = Astro.locals.supabase;
+const [projects, selected] = await Promise.all([
+  supabase ? listProjects(supabase) : null,
+  supabase ? getSelectedProject(supabase) : null,
+]);
+const selectedId = selected?.ok ? selected.data?.id : undefined;
+const loadError = supabase ? "Nie udało się wczytać projektów." : SUPABASE_NOT_CONFIGURED;
+const error = Astro.url.searchParams.get("error") ?? (projects?.ok ? null : loadError);
 ---
 
 <Layout title="Projekty — Plan projektu (WBS)">
@@ -34,11 +34,11 @@ const error = Astro.url.searchParams.get("error") ?? (projects.ok ? null : "Nie 
           <p class="mb-4 rounded-lg border border-red-500/30 bg-red-900/30 px-3 py-2 text-sm text-red-300">{error}</p>
         )}
 
-        {projects.ok && projects.data.length === 0 && (
+        {projects?.ok && projects.data.length === 0 && (
           <p class="text-blue-100/70">Nie masz jeszcze żadnego projektu. Dodaj pierwszy, aby zacząć.</p>
         )}
 
-        {projects.ok && projects.data.length > 0 && (
+        {projects?.ok && projects.data.length > 0 && (
           <ul class="space-y-3">
             {projects.data.map((project) => (
               <li class="rounded-xl border border-white/10 bg-white/5 p-4">

@@ -4,7 +4,9 @@ import { createClient } from "@/lib/supabase";
 const PROTECTED_ROUTES = ["/dashboard", "/projects", "/api/projects"];
 
 export const onRequest = defineMiddleware(async (context, next) => {
+  // Jeden klient na żądanie: odświeżona sesja z getUser() jest widoczna też w trasach i stronach.
   const supabase = createClient(context.request.headers, context.cookies);
+  context.locals.supabase = supabase;
 
   if (supabase) {
     const {

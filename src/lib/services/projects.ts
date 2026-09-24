@@ -9,6 +9,7 @@ export type ProjectResult<T> = { ok: true; data: T } | { ok: false; error: Proje
 const PROJECT_COLUMNS = "id, name, description, created_at, updated_at";
 
 export const SUPABASE_NOT_CONFIGURED = "Supabase nie jest skonfigurowany";
+export const INVALID_FORM_MESSAGE = "Niepoprawne dane formularza.";
 
 export const PROJECT_ERROR_MESSAGES: Record<ProjectError, string> = {
   duplicate_name: "Projekt o takiej nazwie już istnieje.",
@@ -22,23 +23,38 @@ export function errorUrl(path: string, message: string, keep?: Record<string, st
   return `${path}?${params.toString()}`;
 }
 
+/** Odczytuje dane formularza; `null`, gdy treść żądania nie jest formularzem (zamiast wyjątku i błędu 500). */
+export async function readForm(request: Request): Promise<FormData | null> {
+  try {
+    return await request.formData();
+  } catch {
+    return null;
+  }
+}
+
+// Limity z zapasem ponad walidację (100 i 1000 znaków), żeby adres przekierowania nie urósł bez końca.
+const KEPT_NAME_LENGTH = 200;
+const KEPT_DESCRIPTION_LENGTH = 1100;
+
 /** Wartości pól formularza projektu do odesłania razem z błędem, żeby dane nie znikały. */
 export function formValues(form: FormData): Record<string, string> {
-  const pick = (key: string) => {
+  const pick = (key: string, max: number) => {
     const value = form.get(key);
-    return typeof value === "string" ? value : "";
+    return typeof value === "string" ? value.slice(0, max) : "";
   };
-  return { name: pick("name"), description: pick("description") };
+  return { name: pick("name", KEPT_NAME_LENGTH), description: pick("description", KEPT_DESCRIPTION_LENGTH) };
 }
 
 // Kody Postgres/PostgREST: 23505 unikalność, 23503 klucz obcy, 42501 naruszenie RLS, PGRST116 brak wiersza.
-// Cudzy lub nieistniejący projekt wygląda tak samo: baza ukrywa cudze wiersze, więc to zawsze "nie znaleziono".
-function toError(error: { code?: string }): ProjectError {
+// Cudzy lub nieistniejący projekt wygląda tak samo: baza ukrywa cudze wiersze, więc to "nie znaleziono".
+// Wyjątek: przy dodawaniu nie ma czego szukać, więc 23503/42501 (np. usunięty użytkownik z ważnym tokenem) to błąd niespodziewany.
+function toError(error: { code?: string }, creating: boolean): ProjectError {
   switch (error.code) {
     case "23505":
       return "duplicate_name";
     case "23503":
     case "42501":
+      return creating ? "unexpected" : "not_found";
     case "PGRST116":
       return "not_found";
     default:
@@ -46,8 +62,13 @@ function toError(error: { code?: string }): ProjectError {
   }
 }
 
-function fail(error: { code?: string }): { ok: false; error: ProjectError } {
-  return { ok: false, error: toError(error) };
+function fail(error: { code?: string; message?: string }, creating = false): { ok: false; error: ProjectError } {
+  const result = toError(error, creating);
+  if (result === "unexpected") {
+    // eslint-disable-next-line no-console -- surowy błąd bazy trafia do logów serwera, użytkownik dostaje ogólny komunikat
+    console.error("projects: unexpected database error", error.code, error.message);
+  }
+  return { ok: false, error: result };
 }
 
 export async function listProjects(db: Db): Promise<ProjectResult<Project[]>> {
@@ -89,13 +110,15 @@ export async function createProject(db: Db, input: ProjectInput): Promise<Projec
     .insert({ name: input.name, description: input.description })
     .select(PROJECT_COLUMNS)
     .single();
-  if (error) return fail(error);
+  if (error) return fail(error, true);
 
   // Bez wybranego projektu pierwszy dodany staje się bieżącym; niepowodzenie wyboru nie cofa dodania.
-  const selected = await getSelectedProject(db);
-  if (selected.ok && selected.data === null) {
-    await selectProject(db, data.id);
-  }
+  // Dwa atomowe kroki zamiast "odczytaj, potem zapisz", żeby równoległe dodania nie nadpisywały sobie wyboru:
+  // 1) wstaw wiersz ustawień, jeśli go nie ma; 2) ustaw wybór tylko tam, gdzie jest jeszcze pusty.
+  await db
+    .from("user_settings")
+    .upsert({ selected_project_id: data.id }, { onConflict: "user_id", ignoreDuplicates: true, defaultToNull: false });
+  await db.from("user_settings").update({ selected_project_id: data.id }).is("selected_project_id", null);
   return { ok: true, data };
 }
 

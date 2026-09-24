@@ -425,17 +425,17 @@ Zwykłe akcje muszą kończyć się widocznym wynikiem poniżej 1 sekundy (NFR z
 
 #### Automated
 
-- [x] 3.1 Sprawdzenie typów przechodzi: `npx astro check`
-- [x] 3.2 Lint przechodzi: `npm run lint`
-- [x] 3.3 Build przechodzi: `npm run build`
+- [x] 3.1 Sprawdzenie typów przechodzi: `npx astro check` — 19d400d
+- [x] 3.2 Lint przechodzi: `npm run lint` — 19d400d
+- [x] 3.3 Build przechodzi: `npm run build` — 19d400d
 
 #### Manual
 
-- [x] 3.4 Po zalogowaniu widać `/projects`; dodanie projektu, zmiana nazwy i opisu oraz wybór projektu działają, a `/dashboard` pokazuje wybrany projekt
-- [x] 3.5 Dodanie drugiego projektu o tej samej nazwie (inna wielkość liter) pokazuje czytelny komunikat, dane w formularzu nie znikają
-- [x] 3.6 Usunięcie przechodzi przez stronę potwierdzenia; po usunięciu wybranego projektu `/dashboard` pokazuje stan pusty
-- [x] 3.7 Drugi użytkownik wpisujący adres cudzego `/projects/[id]/edit` dostaje 404
-- [x] 3.8 Zwykłe akcje (zapis, wybór, usunięcie) kończą się widocznym wynikiem w czasie poniżej 1 sekundy
+- [x] 3.4 Po zalogowaniu widać `/projects`; dodanie projektu, zmiana nazwy i opisu oraz wybór projektu działają, a `/dashboard` pokazuje wybrany projekt — 19d400d
+- [x] 3.5 Dodanie drugiego projektu o tej samej nazwie (inna wielkość liter) pokazuje czytelny komunikat, dane w formularzu nie znikają — 19d400d
+- [x] 3.6 Usunięcie przechodzi przez stronę potwierdzenia; po usunięciu wybranego projektu `/dashboard` pokazuje stan pusty — 19d400d
+- [x] 3.7 Drugi użytkownik wpisujący adres cudzego `/projects/[id]/edit` dostaje 404 — 19d400d
+- [x] 3.8 Zwykłe akcje (zapis, wybór, usunięcie) kończą się widocznym wynikiem w czasie poniżej 1 sekundy — 19d400d
 
 ### Phase 4: Polskie ekrany logowania
 

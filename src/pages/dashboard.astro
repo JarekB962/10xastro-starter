@@ -1,10 +1,9 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import Topbar from "@/components/Topbar.astro";
-import { createClient } from "@/lib/supabase";
 import { getSelectedProject } from "@/lib/services/projects";
 
-const supabase = createClient(Astro.request.headers, Astro.cookies);
+const supabase = Astro.locals.supabase;
 const selected = supabase ? await getSelectedProject(supabase) : null;
 const project = selected?.ok ? selected.data : null;
 ---
@@ -33,6 +32,14 @@ const project = selected?.ok ? selected.data : null;
         <a href="/projects" class="mt-6 inline-block text-sm text-purple-300 hover:underline">
           Przejdź do listy projektów
         </a>
+        <form method="POST" action="/api/auth/signout" class="mt-6">
+          <button
+            type="submit"
+            class="rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm transition-colors hover:bg-white/20"
+          >
+            Wyloguj
+          </button>
+        </form>
       </div>
     </div>
   </div>

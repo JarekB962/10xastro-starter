@@ -1,12 +1,11 @@
 import type { APIRoute } from "astro";
-import { createClient } from "@/lib/supabase";
 import { PROJECT_ERROR_MESSAGES, SUPABASE_NOT_CONFIGURED, deleteProject, errorUrl } from "@/lib/services/projects";
 import { parseProjectId } from "@/lib/validation/project";
 
 export const prerender = false;
 
 export const POST: APIRoute = async (context) => {
-  const supabase = createClient(context.request.headers, context.cookies);
+  const supabase = context.locals.supabase;
   if (!supabase) {
     return context.redirect(errorUrl("/projects", SUPABASE_NOT_CONFIGURED));
   }
