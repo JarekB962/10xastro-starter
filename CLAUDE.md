@@ -44,6 +44,7 @@ Full server-side rendering (`output: "server"` in astro.config.mjs). All pages a
 
 ### Environment
 
+- Python 3.13 (see `.python-version`) managed by `uv`; used only for helper tooling in `scripts/py/`, never in the Astro/Workers runtime. Run scripts with `uv run python scripts/py/<file>.py`, add deps with `uv add <pkg>`; do not install globally or with bare `pip`. Commit `pyproject.toml` and `uv.lock`; `.venv/` is gitignored.
 - Node.js v22.14.0 (see `.nvmrc`)
 - Env vars: `SUPABASE_URL`, `SUPABASE_KEY` (copy `.env.example` to `.env` for Node, or `.dev.vars` for Cloudflare local dev)
 - Local Supabase: `npx supabase start` (requires Docker)

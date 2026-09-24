@@ -31,3 +31,8 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# AI agent tooling (skills installed by the 10x CLI; restored with the CLI from skills-lock.json)
+.claude/
+.cursor/
+.agents/
