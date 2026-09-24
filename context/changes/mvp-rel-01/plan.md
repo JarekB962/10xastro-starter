@@ -412,14 +412,14 @@ Zwykłe akcje muszą kończyć się widocznym wynikiem poniżej 1 sekundy (NFR z
 
 #### Automated
 
-- [ ] 2.1 Sprawdzenie typów przechodzi: `npx astro check`
-- [ ] 2.2 Lint przechodzi: `npm run lint`
-- [ ] 2.3 Build przechodzi: `npm run build`
+- [x] 2.1 Sprawdzenie typów przechodzi: `npx astro check`
+- [x] 2.2 Lint przechodzi: `npm run lint`
+- [x] 2.3 Build przechodzi: `npm run build`
 
 #### Manual
 
-- [ ] 2.4 Bez logowania `curl -i -X POST http://localhost:4321/api/projects` odsyła 302 na `/auth/signin`
-- [ ] 2.5 Po zalogowaniu (ciasteczko z przeglądarki) `POST /api/projects` z poprawnymi danymi tworzy wiersz widoczny w Studio z właściwym `owner_id`
+- [x] 2.4 Bez logowania `curl -i -X POST http://localhost:4321/api/projects` odsyła 302 na `/auth/signin`
+- [x] 2.5 Po zalogowaniu (ciasteczko z przeglądarki) `POST /api/projects` z poprawnymi danymi tworzy wiersz widoczny w Studio z właściwym `owner_id`
 
 ### Phase 3: Ekrany projektów po polsku
 
