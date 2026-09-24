@@ -24,7 +24,7 @@ function createSession() {
     }
   }
 
-  return async function request(path, { method = "GET", form } = {}) {
+  return async function request(path, { method = "GET", form, json } = {}) {
     const response = await fetch(BASE_URL + path, {
       method,
       redirect: "manual",
@@ -32,8 +32,9 @@ function createSession() {
         Cookie: [...jar.entries()].map(([k, v]) => `${k}=${v}`).join("; "),
         Origin: BASE_URL,
         ...(form ? { "Content-Type": "application/x-www-form-urlencoded" } : {}),
+        ...(json ? { "Content-Type": "application/json" } : {}),
       },
-      body: form ? new URLSearchParams(form).toString() : undefined,
+      body: form ? new URLSearchParams(form).toString() : json ? JSON.stringify(json) : undefined,
     });
     storeCookies(response);
     return {
@@ -153,6 +154,16 @@ const steps = [
         post({ project_name: `Projekt Gamma ${stamp}`, project_description: "a\r\n".repeat(495) }),
       ),
     { status: 302, locationIs: "/projects" },
+  ],
+  [
+    "a non-form body on signin redirects with an error instead of failing",
+    () => anon("/api/auth/signin", { method: "POST", json: { email: emailA } }),
+    { status: 302, location: "/auth/signin?error=Niepoprawne" },
+  ],
+  [
+    "a malformed project id counts as not found",
+    () => userA("/api/projects/nie-uuid/delete", post()),
+    { status: 302, location: "/projects?error=" },
   ],
   ["signout clears session", () => userA("/api/auth/signout", post()), { status: 302, location: "/" }],
   ["dashboard redirects after signout", () => userA("/dashboard"), { status: 302, location: "/auth/signin" }],
