@@ -18,6 +18,7 @@ interface FormFieldProps {
   icon: ReactNode;
   endContent?: ReactNode;
   autoComplete?: string;
+  autoFocus?: boolean;
 }
 
 export function FormField({
@@ -33,6 +34,7 @@ export function FormField({
   icon,
   endContent,
   autoComplete,
+  autoFocus,
 }: FormFieldProps) {
   return (
     <div>
@@ -51,6 +53,7 @@ export function FormField({
           }}
           placeholder={placeholder}
           autoComplete={autoComplete}
+          autoFocus={autoFocus}
           className={cn(
             inputBase,
             error ? "border-red-400/60 focus:ring-red-400" : "border-white/20 focus:ring-purple-400",

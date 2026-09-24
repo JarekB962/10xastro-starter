@@ -52,6 +52,7 @@ export default function ProjectForm({ action, initial, serverError, submitLabel 
         }}
         placeholder="np. Modernizacja instalacji"
         autoComplete="off"
+        autoFocus
         error={errors.name}
         icon={<FolderKanban className="size-4" />}
       />

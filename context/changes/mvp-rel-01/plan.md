@@ -441,25 +441,25 @@ Zwykłe akcje muszą kończyć się widocznym wynikiem poniżej 1 sekundy (NFR z
 
 #### Automated
 
-- [x] 4.1 Lint przechodzi: `npm run lint`
-- [x] 4.2 Sprawdzenie typów przechodzi: `npx astro check`
-- [x] 4.3 Build przechodzi: `npm run build`
+- [x] 4.1 Lint przechodzi: `npm run lint` — 450dfab
+- [x] 4.2 Sprawdzenie typów przechodzi: `npx astro check` — 450dfab
+- [x] 4.3 Build przechodzi: `npm run build` — 450dfab
 
 #### Manual
 
-- [x] 4.4 Ekrany logowania, rejestracji i potwierdzenia wyświetlają się po polsku, a walidacja pokazuje polskie komunikaty
-- [x] 4.5 Podpowiedź o brakujących znakach hasła ma poprawną odmianę dla 1, 2 i 5 brakujących znaków
+- [x] 4.4 Ekrany logowania, rejestracji i potwierdzenia wyświetlają się po polsku, a walidacja pokazuje polskie komunikaty — 450dfab
+- [x] 4.5 Podpowiedź o brakujących znakach hasła ma poprawną odmianę dla 1, 2 i 5 brakujących znaków — 450dfab
 
 ### Phase 5: Test smoke i weryfikacja
 
 #### Automated
 
-- [ ] 5.1 Lint przechodzi (w tym `scripts/`): `npm run lint`
-- [ ] 5.2 Build przechodzi: `npm run build`
-- [ ] 5.3 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke`
+- [x] 5.1 Lint przechodzi (w tym `scripts/`): `npm run lint`
+- [x] 5.2 Build przechodzi: `npm run build`
+- [x] 5.3 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke`
 - [ ] 5.4 CI (`ci` i `smoke`) zielone na gałęzi z tą zmianą
 
 #### Manual
 
-- [ ] 5.5 Ręczny przebieg z przeglądarki zgadza się z krokami smoke (dodanie, edycja, wybór, usunięcie po potwierdzeniu)
+- [x] 5.5 Ręczny przebieg z przeglądarki zgadza się z krokami smoke (dodanie, edycja, wybór, usunięcie po potwierdzeniu)
 - [ ] 5.6 Migracja jest zastosowana w docelowej bazie Supabase przed wdrożeniem kodu (`npx supabase db push`)
