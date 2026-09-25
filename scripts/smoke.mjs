@@ -72,8 +72,47 @@ const validTaskNameB = `Zadanie B ${stamp}`;
 let projectIdB = "";
 let specialtyIdB = "";
 const unknownTaskId = "00000000-0000-4000-8000-000000000000";
+// Stan projektu: "Stan projektu: zweryfikowany" nie jest podciągiem "Stan projektu: niezweryfikowany".
+const VERIFIED = "Stan projektu: zweryfikowany";
+const UNVERIFIED = "Stan projektu: niezweryfikowany";
+const secondTaskNameB = `Zadanie B drugie ${stamp}`;
+const secondSpecialtyNameB = `Murarz ${stamp}`;
+const renamedSecondSpecialtyB = `Tynkarz ${stamp}`;
+let secondTaskIdB = "";
+let secondSpecialtyIdB = "";
 
 const post = (form = {}) => ({ method: "POST", form });
+
+// B sprawdza listę i oczekuje stanu zweryfikowanego; pulpit i lista zadań pokazują ten sam stan.
+const unverifiedAfter = (name) => [
+  [
+    `B's dashboard is unverified after ${name}`,
+    () => userB("/dashboard"),
+    { status: 200, bodyIncludes: [UNVERIFIED], bodyExcludes: [VERIFIED] },
+  ],
+  [
+    `B's task list is unverified after ${name}`,
+    () => userB("/tasks"),
+    { status: 200, bodyIncludes: [UNVERIFIED], bodyExcludes: [VERIFIED] },
+  ],
+];
+const verifiedAfterCheck = (name) => [
+  [
+    `B's check after ${name} finds no problems and marks the project verified`,
+    () => userB("/tasks/check"),
+    { status: 200, bodyIncludes: ["Nie znaleziono problem", VERIFIED], bodyExcludes: [UNVERIFIED] },
+  ],
+  [
+    `B's dashboard is verified after ${name}`,
+    () => userB("/dashboard"),
+    { status: 200, bodyIncludes: [VERIFIED], bodyExcludes: [UNVERIFIED] },
+  ],
+  [
+    `B's task list is verified after ${name}`,
+    () => userB("/tasks"),
+    { status: 200, bodyIncludes: [VERIFIED], bodyExcludes: [UNVERIFIED] },
+  ],
+];
 
 const steps = [
   ["home renders", () => anon("/"), { status: 200 }],
@@ -603,6 +642,11 @@ const steps = [
     { status: 302, locationIs: "/tasks" },
   ],
   [
+    "a new project is unverified on B's dashboard",
+    () => userB("/dashboard"),
+    { status: 200, bodyIncludes: [UNVERIFIED], bodyExcludes: [VERIFIED] },
+  ],
+  [
     "B's check finds no problems including cycles and does not show A's tasks",
     () => userB("/tasks/check"),
     {
@@ -620,6 +664,79 @@ const steps = [
         missingPredTaskName,
       ],
     },
+  ],
+  ...verifiedAfterCheck("the first check"),
+  [
+    "B adds a second valid task",
+    () =>
+      userB(
+        "/api/tasks",
+        post({ task_number: "2", task_name: secondTaskNameB, task_specialty: specialtyIdB, task_effort: "1" }),
+      ),
+    { status: 302, locationIs: "/tasks" },
+  ],
+  ...unverifiedAfter("adding a task"),
+  ...verifiedAfterCheck("adding a task"),
+  [
+    "B finds the second task id on the list",
+    async () => {
+      const list = await userB("/tasks");
+      const start = list.body.indexOf(secondTaskNameB);
+      secondTaskIdB = /\/tasks\/([0-9a-f-]{36})\/edit/.exec(start < 0 ? "" : list.body.slice(start))?.[1] ?? "";
+      return { ...list, status: secondTaskIdB ? list.status : 0 };
+    },
+    { status: 200 },
+  ],
+  [
+    "B edits only the predecessors of the second task",
+    () =>
+      userB(
+        `/api/tasks/${secondTaskIdB}`,
+        post({
+          task_name: secondTaskNameB,
+          task_specialty: specialtyIdB,
+          task_effort: "1",
+          task_predecessors: "1",
+        }),
+      ),
+    { status: 302, locationIs: "/tasks" },
+  ],
+  ...unverifiedAfter("editing a task"),
+  ...verifiedAfterCheck("editing a task"),
+  [
+    "B adds a second specialty",
+    () => userB("/api/specialties", post({ specialty_name: secondSpecialtyNameB })),
+    { status: 302, locationIs: "/specialties" },
+  ],
+  ...unverifiedAfter("adding a specialty"),
+  ...verifiedAfterCheck("adding a specialty"),
+  [
+    "B finds the second specialty id on the list",
+    async () => {
+      const list = await userB("/specialties");
+      const start = list.body.indexOf(secondSpecialtyNameB);
+      secondSpecialtyIdB =
+        /\/specialties\/([0-9a-f-]{36})\/edit/.exec(start < 0 ? "" : list.body.slice(start))?.[1] ?? "";
+      return { ...list, status: secondSpecialtyIdB ? list.status : 0 };
+    },
+    { status: 200 },
+  ],
+  [
+    "B renames the second specialty",
+    () => userB(`/api/specialties/${secondSpecialtyIdB}`, post({ specialty_name: renamedSecondSpecialtyB })),
+    { status: 302, locationIs: "/specialties" },
+  ],
+  ...unverifiedAfter("renaming a specialty"),
+  ...verifiedAfterCheck("renaming a specialty"),
+  [
+    "A's check with problems leaves the project unverified",
+    () => userA("/tasks/check"),
+    { status: 200, bodyIncludes: [UNVERIFIED, "Zadania z problemami"], bodyExcludes: [VERIFIED] },
+  ],
+  [
+    "A's dashboard stays unverified after the check with problems, independent of B",
+    () => userA("/dashboard"),
+    { status: 200, bodyIncludes: [UNVERIFIED], bodyExcludes: [VERIFIED] },
   ],
   [
     "A sees the delete confirmation page",

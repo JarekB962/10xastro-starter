@@ -158,6 +158,32 @@ export type Database = {
           },
         ];
       };
+      project_states: {
+        Row: {
+          project_id: string;
+          data_revision: number;
+          verified_revision: number | null;
+        };
+        Insert: {
+          project_id: string;
+          data_revision?: number;
+          verified_revision?: number | null;
+        };
+        Update: {
+          project_id?: string;
+          data_revision?: number;
+          verified_revision?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "project_states_project_id_fkey";
+            columns: ["project_id"];
+            isOneToOne: true;
+            referencedRelation: "projects";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -181,6 +207,13 @@ export type Database = {
           p_predecessors: number[] | null;
         };
         Returns: Database["public"]["Tables"]["tasks"]["Row"];
+      };
+      verify_project: {
+        Args: {
+          p_project_id: string;
+          p_revision: number;
+        };
+        Returns: boolean;
       };
     };
     Enums: Record<string, never>;
@@ -280,3 +313,9 @@ export interface TaskUpdateInput {
 
 /** Wynik walidacji formularza poprawki zadania: dane albo pierwszy komunikat błędu. */
 export type ParsedTaskUpdateInput = { ok: true; data: TaskUpdateInput } | { ok: false; message: string };
+
+/** Stan projektu: `revision` to licznik zmian danych z chwili odczytu, `verified` to sprawdzenie bez problemów po ostatniej zmianie danych. */
+export interface ProjectState {
+  revision: number;
+  verified: boolean;
+}

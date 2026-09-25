@@ -1,11 +1,14 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import Topbar from "@/components/Topbar.astro";
+import ProjectStateBadge from "@/components/projects/ProjectStateBadge.astro";
 import { getSelectedProject } from "@/lib/services/projects";
+import { PROJECT_STATE_LOAD_ERROR, getProjectState } from "@/lib/services/project-state";
 
 const supabase = Astro.locals.supabase;
 const selected = supabase ? await getSelectedProject(supabase) : null;
 const project = selected?.ok ? selected.data : null;
+const state = supabase && project ? await getProjectState(supabase, project.id) : null;
 const loadError = supabase && selected && !selected.ok ? "Nie udało się wczytać wybranego projektu." : null;
 ---
 
@@ -26,6 +29,13 @@ const loadError = supabase && selected && !selected.ok ? "Nie udało się wczyta
               {project.name}
             </h1>
             {project.description && <p class="mt-3 break-words text-blue-100/80">{project.description}</p>}
+            <div class="mt-4">
+              {state?.ok ? (
+                <ProjectStateBadge verified={state.data.verified} />
+              ) : (
+                <p class="text-sm text-red-300">{PROJECT_STATE_LOAD_ERROR}</p>
+              )}
+            </div>
           </>
         ) : (
           <>

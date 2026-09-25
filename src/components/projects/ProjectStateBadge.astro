@@ -1,0 +1,18 @@
+---
+interface Props {
+  verified: boolean;
+}
+
+const { verified } = Astro.props;
+---
+
+<p
+  class:list={[
+    "inline-block rounded-full border px-3 py-1 text-sm",
+    verified
+      ? "border-emerald-500/30 bg-emerald-900/30 text-emerald-300"
+      : "border-amber-500/30 bg-amber-900/30 text-amber-300",
+  ]}
+>
+  {verified ? "Stan projektu: zweryfikowany" : "Stan projektu: niezweryfikowany"}
+</p>
