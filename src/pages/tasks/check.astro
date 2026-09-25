@@ -37,6 +37,9 @@ function reasons(problem: TaskProblem): string[] {
   if (problem.duplicateOf.length > 0) {
     lines.push(`Duplikat nazwy: zadania ${problem.duplicateOf.join(", ")}`);
   }
+  if (problem.cycleWith.length > 0) {
+    lines.push(`Cykl zależności: zadania ${problem.cycleWith.join(", ")}`);
+  }
   return lines;
 }
 ---
@@ -69,9 +72,8 @@ function reasons(problem: TaskProblem): string[] {
           <>
             {result.problems.length === 0 ? (
               <p class="text-blue-100/70">
-                Nie znaleziono zadań z problemami w sprawdzanych kryteriach (nieistniejący poprzednik, brak
-                odpowiedzialności, duplikat). Cykle zależności nie są jeszcze sprawdzane, więc to nie potwierdza
-                poprawności listy.
+                Nie znaleziono problemów w sprawdzanych kryteriach (nieistniejący poprzednik, brak odpowiedzialności,
+                duplikat, cykl zależności).
               </p>
             ) : (
               <>
@@ -99,7 +101,6 @@ function reasons(problem: TaskProblem): string[] {
                     </li>
                   ))}
                 </ul>
-                <p class="mt-4 text-sm text-blue-100/60">Cykle zależności nie są jeszcze sprawdzane.</p>
               </>
             )}
             <a href="/tasks" class="mt-6 inline-block text-sm text-purple-300 hover:underline">

@@ -63,6 +63,9 @@ const dupTaskNameOtherCase = `KABLE ${stamp}`;
 const zeroEffortTaskName = `Zadanie zero ${stamp}`;
 const missingPredTaskName = `Zadanie sierota ${stamp}`;
 const validTaskName = `Zadanie poprawne ${stamp}`;
+// Zadania kontrolne cyklu (numery od 20): 20 <- 22, 21 <- 20, 22 <- 21 tworzą cykl, 23 zależy od 20 i leży poza nim.
+const cycleTaskNames = { 20: `Cykl pierwszy ${stamp}`, 21: `Cykl drugi ${stamp}`, 22: `Cykl trzeci ${stamp}` };
+const outsideCycleTaskName = `Zadanie za cyklem ${stamp}`;
 const projectNameB = `Projekt B ${stamp}`;
 const specialtyNameB = `Spawacz ${stamp}`;
 const validTaskNameB = `Zadanie B ${stamp}`;
@@ -388,9 +391,8 @@ const steps = [
         "Duplikat nazwy: zadania 10",
         "wny 0",
         "poprzednik: 999",
-        "Cykle zale",
       ],
-      bodyExcludes: [validTaskName, "wszystko w porz"],
+      bodyExcludes: [validTaskName, "wszystko w porz", "jeszcze sprawdzane"],
     },
   ],
   [
@@ -414,6 +416,94 @@ const steps = [
       return { ...page, body: at < 0 ? "" : page.body.slice(from, to) };
     },
     { status: 200, bodyIncludes: [zeroEffortTaskName, "wny 0", "poprzednik: 998"], bodyExcludes: ["Duplikat"] },
+  ],
+  [
+    "A adds a cycle task 20 whose predecessor 22 does not exist yet",
+    () =>
+      userA(
+        "/api/tasks",
+        post({
+          task_number: "20",
+          task_name: cycleTaskNames[20],
+          task_specialty: specialtyId,
+          task_effort: "1",
+          task_predecessors: "22",
+        }),
+      ),
+    { status: 302, locationIs: "/tasks" },
+  ],
+  [
+    "A adds a cycle task 21 depending on 20",
+    () =>
+      userA(
+        "/api/tasks",
+        post({
+          task_number: "21",
+          task_name: cycleTaskNames[21],
+          task_specialty: specialtyId,
+          task_effort: "1",
+          task_predecessors: "20",
+        }),
+      ),
+    { status: 302, locationIs: "/tasks" },
+  ],
+  [
+    "A adds a cycle task 22 with effort 0 depending on 21, closing the cycle",
+    () =>
+      userA(
+        "/api/tasks",
+        post({
+          task_number: "22",
+          task_name: cycleTaskNames[22],
+          task_specialty: specialtyId,
+          task_effort: "0",
+          task_predecessors: "21",
+        }),
+      ),
+    { status: 302, locationIs: "/tasks" },
+  ],
+  [
+    "A adds task 23 depending on the cycle but lying outside it",
+    () =>
+      userA(
+        "/api/tasks",
+        post({
+          task_number: "23",
+          task_name: outsideCycleTaskName,
+          task_specialty: specialtyId,
+          task_effort: "1",
+          task_predecessors: "20",
+        }),
+      ),
+    { status: 302, locationIs: "/tasks" },
+  ],
+  [
+    "A's check marks the three cycle tasks with the whole group and not the task that only depends on the cycle",
+    () => userA("/tasks/check"),
+    {
+      status: 200,
+      bodyIncludes: [...Object.values(cycleTaskNames), "Cykl zale", "ci: zadania 20, 21, 22"],
+      bodyExcludes: [outsideCycleTaskName, "jeszcze sprawdzane"],
+    },
+  ],
+  [
+    "A's check labels exactly the three cycle tasks with the group",
+    async () => {
+      const page = await userA("/tasks/check");
+      return { ...page, body: `labels=${page.body.split("ci: zadania 20, 21, 22").length - 1}.` };
+    },
+    { status: 200, bodyIncludes: ["labels=3."] },
+  ],
+  [
+    "A's check shows the cycle and the effort 0 reason in one block for a cycle task",
+    async () => {
+      const page = await userA("/tasks/check");
+      const at = page.body.indexOf(cycleTaskNames[22]);
+      const from = page.body.lastIndexOf("<li", at);
+      const to = page.body.indexOf("</ul>", at);
+      return { ...page, body: at < 0 ? "" : page.body.slice(from, to) };
+    },
+    { status: 200, bodyIncludes: [cycleTaskNames[22], "wny 0", "Cykl zale", "ci: zadania 20, 21, 22"] },
   ],
   [
     "signup creates account B",
@@ -513,12 +603,22 @@ const steps = [
     { status: 302, locationIs: "/tasks" },
   ],
   [
-    "B's check finds no problems, warns about cycles and does not show A's tasks",
+    "B's check finds no problems including cycles and does not show A's tasks",
     () => userB("/tasks/check"),
     {
       status: 200,
-      bodyIncludes: ["Nie znaleziono zad", "Cykle zale"],
-      bodyExcludes: ["wszystko w porz", validTaskNameB, dupTaskName, zeroEffortTaskName, missingPredTaskName],
+      bodyIncludes: ["Nie znaleziono problem", "cykl zale"],
+      bodyExcludes: [
+        "wszystko w porz",
+        "jeszcze sprawdzane",
+        "Cykl zale",
+        ...Object.values(cycleTaskNames),
+        outsideCycleTaskName,
+        validTaskNameB,
+        dupTaskName,
+        zeroEffortTaskName,
+        missingPredTaskName,
+      ],
     },
   ],
   [
