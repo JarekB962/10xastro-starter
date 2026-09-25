@@ -42,7 +42,7 @@ Kierownik projektu na starcie dostaje listę zadań (specjalność wykonawcy, na
 | ID   | Change ID           | Outcome (user can …)                                                                                       | Prerequisites                      | PRD refs      | Status   |
 | ---- | ------------------- | ---------------------------------------------------------------------------------------------------------- | ---------------------------------- | ------------- | -------- |
 | S-01 | project-specialties | dodać i edytować specjalności wykonawców w wybranym projekcie                                              | wybrany projekt (FR-003, wdrożone) | FR-004, US-01 | done |
-| S-02 | task-add            | dodać zadanie (numer, nazwa, specjalność, nakład, poprzednicy jako numery) i zobaczyć listę zadań projektu | S-01                               | FR-006, US-01 | in-progress |
+| S-02 | task-add            | dodać zadanie (numer, nazwa, specjalność, nakład, poprzednicy jako numery) i zobaczyć listę zadań projektu | S-01                               | FR-006, US-01 | done |
 | S-03 | task-edit           | poprawić zadanie (nazwa, specjalność, nakład, poprzednicy)                                                 | S-02                               | FR-006        | proposed |
 
 ## Baseline
@@ -89,7 +89,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
   - Czy specjalność i nakład mogą pozostać puste przy zapisie (PRD: braki wykrywa dopiero sprawdzenie, FR-008, które jest odłożone)? — Owner: user. Block: no.
   - Zapis poprzednika o numerze, którego jeszcze nie ma, jest dozwolony (PRD v2), ale bez sprawdzania (FR-008) taki błąd pozostanie niewidoczny. Czy pokazywać go już na liście? — Owner: user. Block: no.
 - **Risk:** Łączy najwięcej reguł z PRD v2 naraz: unikalny numer w projekcie, poprzednik jako numer, blokada wskazania samego siebie. Błąd w modelu danych tutaj kosztuje każdy późniejszy wycinek.
-- **Status:** in-progress
+- **Status:** done
 
 ### S-03: Poprawa zadania
 
@@ -142,3 +142,4 @@ Foundations below assume these are present and do NOT re-scaffold them.
 ## Done
 
 - **S-01: Kierownik dodaje i edytuje specjalności wykonawców w wybranym projekcie** — Archived 2026-09-25 → `context/archive/2026-09-25-project-specialties/`. Lesson: —.
+- **S-02: kierownik dodaje zadanie (numer, nazwa, specjalność, nakład, poprzednicy jako numery) i widzi listę zadań projektu** — Archived 2026-09-25 → `context/archive/2026-09-25-task-add/`. Lesson: —.
