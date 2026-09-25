@@ -57,6 +57,17 @@ const duplicateTaskName = `Zadanie duplikat ${stamp}`;
 const plainTaskName = `Zadanie proste ${stamp}`;
 const editedTaskName = `Zadanie poprawione ${stamp}`;
 let taskId = "";
+// Zadania kontrolne sprawdzenia listy (numery od 10, poza użytymi wcześniej).
+const dupTaskName = `Kable ${stamp}`;
+const dupTaskNameOtherCase = `KABLE ${stamp}`;
+const zeroEffortTaskName = `Zadanie zero ${stamp}`;
+const missingPredTaskName = `Zadanie sierota ${stamp}`;
+const validTaskName = `Zadanie poprawne ${stamp}`;
+const projectNameB = `Projekt B ${stamp}`;
+const specialtyNameB = `Spawacz ${stamp}`;
+const validTaskNameB = `Zadanie B ${stamp}`;
+let projectIdB = "";
+let specialtyIdB = "";
 const unknownTaskId = "00000000-0000-4000-8000-000000000000";
 
 const post = (form = {}) => ({ method: "POST", form });
@@ -92,6 +103,7 @@ const steps = [
     () => anon(`/api/tasks/${unknownTaskId}`, post({ task_name: "Anon" })),
     { status: 302, location: "/auth/signin" },
   ],
+  ["task check redirects anonymous user", () => anon("/tasks/check"), { status: 302, location: "/auth/signin" }],
   [
     "signup creates account A",
     () => userA("/api/auth/signup", post({ email: emailA, password })),
@@ -295,6 +307,115 @@ const steps = [
     { status: 302, location: "/tasks/", locationIncludes: ["/edit?error=", "wymagana", "task_name="] },
   ],
   [
+    "A adds a check task with a specialty and effort",
+    () =>
+      userA(
+        "/api/tasks",
+        post({ task_number: "10", task_name: dupTaskName, task_specialty: specialtyId, task_effort: "1" }),
+      ),
+    { status: 302, locationIs: "/tasks" },
+  ],
+  [
+    "A adds a check task with the same name in another letter case and a trailing space",
+    () =>
+      userA(
+        "/api/tasks",
+        post({
+          task_number: "11",
+          task_name: `${dupTaskNameOtherCase} `,
+          task_specialty: specialtyId,
+          task_effort: "1",
+        }),
+      ),
+    { status: 302, locationIs: "/tasks" },
+  ],
+  [
+    "A adds a check task with effort 0",
+    () =>
+      userA(
+        "/api/tasks",
+        post({
+          task_number: "12",
+          task_name: zeroEffortTaskName,
+          task_specialty: specialtyId,
+          task_effort: "0",
+          task_predecessors: "998",
+        }),
+      ),
+    { status: 302, locationIs: "/tasks" },
+  ],
+  [
+    "A adds a check task with a predecessor that does not exist",
+    () =>
+      userA(
+        "/api/tasks",
+        post({
+          task_number: "13",
+          task_name: missingPredTaskName,
+          task_specialty: specialtyId,
+          task_effort: "1",
+          task_predecessors: "999",
+        }),
+      ),
+    { status: 302, locationIs: "/tasks" },
+  ],
+  [
+    "A adds a valid check task",
+    () =>
+      userA(
+        "/api/tasks",
+        post({
+          task_number: "14",
+          task_name: validTaskName,
+          task_specialty: specialtyId,
+          task_effort: "1",
+          task_predecessors: "10",
+        }),
+      ),
+    { status: 302, locationIs: "/tasks" },
+  ],
+  [
+    "A's check lists duplicates, effort 0 and the missing predecessor, and not the valid task",
+    () => userA("/tasks/check"),
+    {
+      status: 200,
+      bodyIncludes: [
+        dupTaskName,
+        dupTaskNameOtherCase,
+        zeroEffortTaskName,
+        missingPredTaskName,
+        "Duplikat nazwy: zadania 11",
+        "Duplikat nazwy: zadania 10",
+        "wny 0",
+        "poprzednik: 999",
+        "Cykle zale",
+      ],
+      bodyExcludes: [validTaskName, "wszystko w porz"],
+    },
+  ],
+  [
+    "A's check shows several reasons at once for a task without specialty and effort",
+    async () => {
+      const page = await userA("/tasks/check");
+      const at = page.body.indexOf(plainTaskName);
+      const from = page.body.lastIndexOf("<li", at);
+      const to = page.body.indexOf("</ul>", at);
+      return { ...page, body: at < 0 ? "" : page.body.slice(from, to) };
+    },
+    { status: 200, bodyIncludes: [plainTaskName, "brak specjalno", "nak", "pusty"] },
+  ],
+  [
+    "A's check shows reasons from two categories as separate lines for one task",
+    async () => {
+      const page = await userA("/tasks/check");
+      const at = page.body.indexOf(zeroEffortTaskName);
+      const from = page.body.lastIndexOf("<li", at);
+      const to = page.body.indexOf("</ul>", at);
+      return { ...page, body: at < 0 ? "" : page.body.slice(from, to) };
+    },
+    { status: 200, bodyIncludes: [zeroEffortTaskName, "wny 0", "poprzednik: 998"], bodyExcludes: ["Duplikat"] },
+  ],
+  [
     "signup creates account B",
     () => userB("/api/auth/signup", post({ email: emailB, password })),
     { status: 302, location: "/auth/confirm-email" },
@@ -343,6 +464,62 @@ const steps = [
     "B cannot edit A's task",
     () => userB(`/api/tasks/${taskId}`, post({ task_name: "Przejete" })),
     { status: 302, location: "/tasks?error=" },
+  ],
+  [
+    "B without a selected project sees the empty state on /tasks/check",
+    () => userB("/tasks/check"),
+    { status: 200, bodyIncludes: ["Nie wybrano projektu"], bodyExcludes: [dupTaskName, zeroEffortTaskName] },
+  ],
+  [
+    "B adds a project",
+    () => userB("/api/projects", post({ project_name: projectNameB })),
+    { status: 302, location: "/projects" },
+  ],
+  [
+    "B finds the project id on the list",
+    async () => {
+      const list = await userB("/projects");
+      projectIdB = /\/projects\/([0-9a-f-]{36})\/edit/.exec(list.body)?.[1] ?? "";
+      return { ...list, status: projectIdB ? list.status : 0 };
+    },
+    { status: 200 },
+  ],
+  [
+    "B selects the project",
+    () => userB(`/api/projects/${projectIdB}/select`, post()),
+    { status: 302, locationIs: "/dashboard" },
+  ],
+  [
+    "B adds a specialty to the selected project",
+    () => userB("/api/specialties", post({ specialty_name: specialtyNameB })),
+    { status: 302, locationIs: "/specialties" },
+  ],
+  [
+    "B finds the specialty id on the list",
+    async () => {
+      const list = await userB("/specialties");
+      specialtyIdB = /\/specialties\/([0-9a-f-]{36})\/edit/.exec(list.body)?.[1] ?? "";
+      return { ...list, status: specialtyIdB ? list.status : 0 };
+    },
+    { status: 200 },
+  ],
+  [
+    "B adds a valid task",
+    () =>
+      userB(
+        "/api/tasks",
+        post({ task_number: "1", task_name: validTaskNameB, task_specialty: specialtyIdB, task_effort: "2" }),
+      ),
+    { status: 302, locationIs: "/tasks" },
+  ],
+  [
+    "B's check finds no problems, warns about cycles and does not show A's tasks",
+    () => userB("/tasks/check"),
+    {
+      status: 200,
+      bodyIncludes: ["Nie znaleziono zad", "Cykle zale"],
+      bodyExcludes: ["wszystko w porz", validTaskNameB, dupTaskName, zeroEffortTaskName, missingPredTaskName],
+    },
   ],
   [
     "A sees the delete confirmation page",

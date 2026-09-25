@@ -252,6 +252,22 @@ export interface TaskInput {
 /** Wynik walidacji formularza zadania: dane albo pierwszy komunikat błędu. */
 export type ParsedTaskInput = { ok: true; data: TaskInput } | { ok: false; message: string };
 
+/** Powody braku odpowiedzialności za zadanie: brak specjalności, nakład pusty albo równy 0. */
+export type NoResponsibilityReason = "no_specialty" | "effort_empty" | "effort_zero";
+
+/** Zadanie z problemami; puste tablice oznaczają brak danego powodu, `duplicateOf` to numery pozostałych zadań o tej samej nazwie. */
+export interface TaskProblem {
+  task: Task;
+  missingPredecessors: number[];
+  noResponsibility: NoResponsibilityReason[];
+  duplicateOf: number[];
+}
+
+/** Wynik sprawdzenia listy zadań: tylko zadania z co najmniej jednym powodem, rosnąco po numerze. */
+export interface TaskCheckResult {
+  problems: TaskProblem[];
+}
+
 /** Dane poprawki zadania po walidacji (bez numeru, który jest niezmienny). */
 export interface TaskUpdateInput {
   name: string;
