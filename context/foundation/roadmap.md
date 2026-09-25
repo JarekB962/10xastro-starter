@@ -7,8 +7,8 @@ updated: 2026-09-25
 prd_version: 2
 main_goal: speed
 top_blocker: time
-milestone_id: task-data-entry
-milestone_seq: 1
+milestone_id: consistency-check-and-safe-delete
+milestone_seq: 2
 milestone_status: open
 ---
 
@@ -20,12 +20,12 @@ milestone_status: open
 
 ## Milestone
 
-**M-1: Wprowadzanie specjalności i zadań** — Status: open
+**M-2: Sprawdzanie spójności i bezpieczne usuwanie** — Status: open
 
-- **Intent:** Kierownik projektu może w wybranym projekcie zdefiniować specjalności wykonawców i wpisać ręcznie zadania (numer, nazwa, specjalność, nakład, poprzednicy). Kamień milowy kończy się na wprowadzaniu i poprawianiu danych; sprawdzanie ich spójności jest świadomie odłożone (patrz `## Parked`).
-- **Source materials:** `context/foundation/prd.md` (v2)
+- **Intent:** Kierownik projektu uruchamia sprawdzenie listy zadań, widzi zadania z problemami i stan projektu (zweryfikowany lub nie), a przy tym może bezpiecznie usuwać specjalności i zadania oraz zmieniać numer zadania bez wiszących odwołań. Kamień milowy domyka pierwszy przepływ MVP z PRD (US-01) i główne kryterium sukcesu produktu.
+- **Source materials:** `context/foundation/prd.md` (v2); zakres wybrany przez użytkownika: FR-005, FR-007, FR-008, FR-009, FR-011.
 - **Done when:** every F-NN and S-NN below is `done`.
-- **Scope anchors:** FR-004 (specjalności: dodanie i edycja), FR-006 (zadania: dodanie i poprawa); US-01 dotyczy tylko kroków „zdefiniował specjalności i wpisał zadania".
+- **Scope anchors:** FR-005 (usunięcie specjalności), FR-007 (usunięcie zadania i zmiana numeru z poprawką poprzedników), FR-008 (sprawdzenie: cykle, nieistniejący poprzednik, brak odpowiedzialności, duplikaty), FR-009 (lista zadań z problemami), FR-011 (stan projektu); US-01 w pełni.
 
 ## Vision recap
 
@@ -33,28 +33,41 @@ Kierownik projektu na starcie dostaje listę zadań (specjalność wykonawcy, na
 
 ## North star
 
-**S-01: Kierownik dodaje i edytuje specjalności wykonawców w wybranym projekcie** — pierwszy i najmniejszy wycinek kamienia milowego, od którego zależą zadania; przy celu „szybkość" (`main_goal: speed`) daje najkrótszą ścieżkę do działającego wprowadzania danych.
+**S-04: Kierownik uruchamia sprawdzenie i widzi zadania z problemami** — pierwsza historia, która pokazuje, że produkt robi to, do czego powstał, i stoi najwcześniej, jak pozwalają zależności; przy celu „szybkość” (`main_goal: speed`) daje najkrótszą ścieżkę do działającego sprawdzania.
 
-> "North star" (gwiazda przewodnia) oznacza tu najmniejszy wycinek od początku do końca, którego ukończenie pokazuje, że kamień milowy jest wykonalny, i który stoi jak najwcześniej w kolejności, bo reszta ma sens tylko wtedy, gdy on działa.
+> „Gwiazda przewodnia” to tu najmniejszy przepływ od początku do końca, którego dostarczenie dowodzi, że główna hipoteza produktu jest prawdziwa; stawiamy go możliwie najwcześniej, bo reszta ma sens tylko wtedy, gdy on działa.
 
 ## At a glance
 
-| ID   | Change ID           | Outcome (user can …)                                                                                       | Prerequisites                      | PRD refs      | Status   |
-| ---- | ------------------- | ---------------------------------------------------------------------------------------------------------- | ---------------------------------- | ------------- | -------- |
-| S-01 | project-specialties | dodać i edytować specjalności wykonawców w wybranym projekcie                                              | wybrany projekt (FR-003, wdrożone) | FR-004, US-01 | done |
-| S-02 | task-add            | dodać zadanie (numer, nazwa, specjalność, nakład, poprzednicy jako numery) i zobaczyć listę zadań projektu | S-01                               | FR-006, US-01 | done |
-| S-03 | task-edit           | poprawić zadanie (nazwa, specjalność, nakład, poprzednicy)                                                 | S-02                               | FR-006        | done |
+| ID   | Change ID              | Outcome (user can …)                                                                                                       | Prerequisites | PRD refs               | Status   |
+| ---- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------- | ---------------------- | -------- |
+| S-04 | task-check-problems    | uruchomić sprawdzenie i zobaczyć zadania z nieistniejącym poprzednikiem, brakiem odpowiedzialności i duplikatem oraz powód | S-03 (done)   | FR-008, FR-009, US-01  | ready    |
+| S-05 | task-check-cycles      | zobaczyć w sprawdzeniu zadania leżące na cyklu zależności i dostać komunikat „nie znaleziono problemów” tylko wtedy, gdy ich naprawdę nie ma | S-04          | FR-008, FR-009, US-01  | proposed |
+| S-06 | project-verified-state | zobaczyć stan projektu (zweryfikowany lub niezweryfikowany), który cofa się po każdej zmianie danych                       | S-05          | FR-011, US-01          | proposed |
+| S-07 | task-delete            | usunąć zadanie, o ile nie jest poprzednikiem innego zadania                                                                | S-06          | FR-007, US-01          | proposed |
+| S-08 | task-renumber          | zmienić numer zadania, a aplikacja poprawi go automatycznie u zadań, które mają je jako poprzednika                        | S-06          | FR-007, US-01          | proposed |
+| S-09 | specialty-delete       | usunąć specjalność, o ile nie występuje w zadaniach tego projektu                                                          | S-06          | FR-005, US-01          | proposed |
+
+## Streams
+
+Navigation aid — groups items that share a Prerequisites chain. Canonical ordering still lives in the dependency graph below; this table is the proposed reading order across parallel tracks.
+
+| Stream | Theme                  | Chain                    | Note                                                                                          |
+| ------ | ---------------------- | ------------------------ | --------------------------------------------------------------------------------------------- |
+| A      | Sprawdzanie i stan     | `S-04` → `S-05` → `S-06` | Ścieżka krytyczna produktu; przy celu „szybkość” idzie pierwsza i jako jedyna nie ma równoległej pary. |
+| B      | Bezpieczna edycja zadań | `S-07` → `S-08`          | Dołącza do strumienia A w `S-06` (zapisy muszą cofać stan projektu).                          |
+| C      | Bezpieczna edycja specjalności | `S-09`             | Dołącza do strumienia A w `S-06`; niezależny od B.                                            |
 
 ## Baseline
 
 What's already in place in the codebase as of `2026-09-25` (auto-researched + user-confirmed).
 Foundations below assume these are present and do NOT re-scaffold them.
 
-- **Frontend:** present — Astro + React + Tailwind + shadcn/ui, strony `src/pages/projects/`, formularze w `src/components/projects/`.
-- **Backend / API:** present — trasy `POST` w `src/pages/api/projects/`, usługi w `src/lib/services/`, walidacja zod w `src/lib/validation/`.
-- **Data:** present — Supabase, migracja `20260924120000_create_projects_and_user_settings.sql`, reguły dostępu na tabelach `projects` i `user_settings`.
+- **Frontend:** present — Astro + React + Tailwind + shadcn/ui; ekrany projektów, specjalności i zadań (lista, dodawanie, edycja) w `src/pages/` i `src/components/`.
+- **Backend / API:** present — trasy `POST` dla projektów, specjalności i zadań, usługi w `src/lib/services/`, walidacja zod w `src/lib/validation/`.
+- **Data:** present — Supabase; tabele `projects`, `specialties`, `tasks`, `task_predecessors` z regułami dostępu, funkcje `create_task` i `update_task`, wyzwalacze niezmienności numeru i projektu zadania.
 - **Auth:** present — logowanie i rejestracja, middleware chroniący trasy (`src/middleware.ts`), sesja w ciasteczkach.
-- **Deploy / infra:** present — CI (`ci`, `smoke`, `deploy`), Cloudflare Workers, krok sprawdzający po wdrożeniu, że produkcja łączy się z Supabase.
+- **Deploy / infra:** present — CI (`ci`, `smoke`, `deploy`), Cloudflare Workers, krok sprawdzający po wdrożeniu, że produkcja łączy się z Supabase; migracje zastosowane na produkcji ręcznie (`supabase db push`).
 - **Observability:** partial — `observability` włączone w `wrangler.jsonc` i logi błędów `console.error`; brak metryk i śledzenia błędów.
 
 ## Foundations
@@ -63,71 +76,103 @@ Foundations below assume these are present and do NOT re-scaffold them.
 
 ## Slices
 
-### S-01: Specjalności wykonawców
+### S-04: Sprawdzenie listy zadań: proste kryteria
 
-- **Outcome:** kierownik dodaje i edytuje specjalności wykonawców w wybranym projekcie.
-- **Change ID:** project-specialties
-- **PRD refs:** FR-004, US-01
-- **Prerequisites:** wybrany projekt (FR-003, wdrożone)
+- **Outcome:** kierownik uruchamia sprawdzenie listy zadań wybranego projektu i widzi zadania z problemami: nieistniejący poprzednik (numer, którego nie ma w projekcie), brak odpowiedzialności (brak specjalności albo nakład pusty lub równy 0) i duplikat (ta sama nazwa po obcięciu spacji, bez rozróżniania wielkości liter; oznaczane są wszystkie zadania o tej nazwie), każde z powodem.
+- **Change ID:** task-check-problems
+- **PRD refs:** FR-008, FR-009, US-01
+- **Prerequisites:** S-03 (done)
 - **Parallel with:** —
 - **Blockers:** —
 - **Unknowns:**
-  - Czy nazwa specjalności jest unikalna w projekcie (tak jak nazwa projektu)? — Owner: user. Block: no.
-- **Risk:** Najmniejszy wycinek i jedyny bez zależności, więc idzie pierwszy (cel: szybkość). Ustala wzorzec danych podrzędnych względem projektu, który powtórzą zadania.
-- **Status:** done
+  - Czy wynik sprawdzenia jest liczony na żądanie przy każdym otwarciu, czy zapamiętywany (potrzebne później dla stanu projektu, S-06)? — Owner: user. Block: no.
+- **Risk:** Bez wykrywania cykli (S-05) pusta lista nie może mówić „wszystko w porządku” (PRD zabrania fałszywego „OK”), więc ten wycinek tylko wypisuje znalezione problemy i nie pokazuje komunikatu o braku problemów; jest to świadome ograniczenie, nie wdrażamy go jako gotowej funkcji przed S-05.
+- **Status:** ready
 
-### S-02: Dodawanie zadania
+### S-05: Sprawdzenie listy zadań: cykle zależności
 
-- **Outcome:** kierownik dodaje zadanie (numer, nazwa, specjalność, nakład, poprzednicy jako numery) i widzi listę zadań projektu.
-- **Change ID:** task-add
-- **PRD refs:** FR-006, US-01
-- **Prerequisites:** S-01
+- **Outcome:** kierownik widzi w sprawdzeniu wszystkie zadania leżące na cyklu zależności (co najmniej dwa zadania zależne od siebie bezpośrednio lub pośrednio) i dostaje komunikat „nie znaleziono problemów” wyłącznie wtedy, gdy żadne z czterech kryteriów nie znalazło problemu.
+- **Change ID:** task-check-cycles
+- **PRD refs:** FR-008, FR-009, US-01
+- **Prerequisites:** S-04
+- **Parallel with:** —
+- **Blockers:** —
+- **Unknowns:** —
+- **Risk:** Najtrudniejsze kryterium (wykrywanie cykli w grafie, w którym poprzednik może wskazywać nieistniejący numer); błąd daje fałszywe „OK”, czyli dokładnie to, przed czym PRD chroni. Idzie zaraz po S-04, żeby komunikat o braku problemów pojawił się dopiero, gdy wszystkie cztery kryteria działają.
+- **Status:** proposed
+
+### S-06: Stan projektu
+
+- **Outcome:** kierownik widzi stan projektu: „zweryfikowany” wyłącznie wtedy, gdy ostatnie sprawdzenie nie znalazło problemów, w przeciwnym razie „niezweryfikowany”; każda zmiana danych po sprawdzeniu (dodanie lub poprawa zadania, zmiana specjalności) cofa projekt do „niezweryfikowany”.
+- **Change ID:** project-verified-state
+- **PRD refs:** FR-011, US-01
+- **Prerequisites:** S-05
 - **Parallel with:** —
 - **Blockers:** —
 - **Unknowns:**
-  - Jaka jest jednostka nakładu (godziny, osobodni)? — Owner: user. Block: no.
-  - Czy specjalność i nakład mogą pozostać puste przy zapisie (PRD: braki wykrywa dopiero sprawdzenie, FR-008, które jest odłożone)? — Owner: user. Block: no.
-  - Zapis poprzednika o numerze, którego jeszcze nie ma, jest dozwolony (PRD v2), ale bez sprawdzania (FR-008) taki błąd pozostanie niewidoczny. Czy pokazywać go już na liście? — Owner: user. Block: no.
-- **Risk:** Łączy najwięcej reguł z PRD v2 naraz: unikalny numer w projekcie, poprzednik jako numer, blokada wskazania samego siebie. Błąd w modelu danych tutaj kosztuje każdy późniejszy wycinek.
-- **Status:** done
+  - Czy „zmiana specjalności” oznacza też edycję nazwy specjalności w projekcie, czy tylko przypisanie innej specjalności do zadania? — Owner: user. Block: no.
+- **Risk:** Stan „zweryfikowany” po zmianie danych to fałszywe „OK” (guardrail z PRD); wycinek musi objąć zapisy z już wdrożonych wycinków (dodanie i poprawa zadania, specjalności), a każdy kolejny wycinek zapisujący dane (S-07, S-08, S-09) musi go respektować, dlatego stoją za nim.
+- **Status:** proposed
 
-### S-03: Poprawa zadania
+### S-07: Usunięcie zadania
 
-- **Outcome:** kierownik poprawia zadanie (nazwa, specjalność, nakład, poprzednicy).
-- **Change ID:** task-edit
-- **PRD refs:** FR-006
-- **Prerequisites:** S-02
-- **Parallel with:** —
+- **Outcome:** kierownik usuwa zadanie, jeśli nie jest ono poprzednikiem innego zadania; próba usunięcia takiego zadania kończy się komunikatem, które zadania na nie wskazują.
+- **Change ID:** task-delete
+- **PRD refs:** FR-007, US-01
+- **Prerequisites:** S-06
+- **Parallel with:** S-09
+- **Blockers:** —
+- **Unknowns:** —
+- **Risk:** Usunięcie zadania jest zmianą danych, więc musi cofać stan projektu (S-06); stąd kolejność. Wprowadza też pierwsze usuwanie zadań, którego dziś nie ma w regułach dostępu.
+- **Status:** proposed
+
+### S-08: Zmiana numeru zadania
+
+- **Outcome:** kierownik zmienia numer zadania, a aplikacja automatycznie poprawia ten numer u wszystkich zadań, które mają je jako poprzednika; zajęty numer jest odrzucany.
+- **Change ID:** task-renumber
+- **PRD refs:** FR-007, US-01
+- **Prerequisites:** S-06
+- **Parallel with:** S-09
 - **Blockers:** —
 - **Unknowns:**
-  - Numer zadania po utworzeniu: niezmienny do czasu FR-007 (automatyczna zmiana numeru u poprzedników jest odłożona), czy edytowalny mimo to? — Owner: user. Block: no.
-- **Risk:** Zmiana numeru zadania bez aktualizacji poprzedników zostawia wiszące odwołania. Stąd propozycja, by w tym kamieniu numer był niezmienny (do potwierdzenia przy planowaniu).
-- **Status:** done
+  - Co, gdy nowy numer jest wpisany jako „nieistniejący poprzednik” u innych zadań (literówka, która po zmianie numeru zaczęłaby wskazywać to zadanie)? Poprawiać tylko poprzedników, którzy wskazywali stary numer, czy też przepinać te? — Owner: user. Block: no.
+- **Risk:** Zdejmuje zabezpieczenie z S-03 (wyzwalacz niezmienności numeru), więc zmiana numeru i poprawa poprzedników muszą zapisać się razem albo wcale, bez wiszących odwołań; błąd daje zadania wskazujące na niewłaściwe zadanie.
+- **Status:** proposed
+
+### S-09: Usunięcie specjalności
+
+- **Outcome:** kierownik usuwa specjalność, jeśli nie występuje w zadaniach tego projektu; użyta specjalność zostaje w projekcie z czytelnym komunikatem.
+- **Change ID:** specialty-delete
+- **PRD refs:** FR-005, US-01
+- **Prerequisites:** S-06
+- **Parallel with:** S-07, S-08
+- **Blockers:** —
+- **Unknowns:** —
+- **Risk:** Najmniejszy wycinek; baza już blokuje usunięcie używanej specjalności, więc ryzykiem jest tylko brakująca polityka usuwania i cofnięcie stanu projektu (S-06).
+- **Status:** proposed
 
 ## Backlog Handoff
 
-| Roadmap ID | Change ID           | Suggested issue title                               | Ready for `/10x-plan` | Notes                               |
-| ---------- | ------------------- | --------------------------------------------------- | --------------------- | ----------------------------------- |
-| S-01       | project-specialties | Specjalności wykonawców w projekcie (dodaj, edytuj) | yes                   | Run `/10x-plan project-specialties` |
-| S-02       | task-add            | Dodawanie zadania z numerem i poprzednikami         | no                    | Czeka na S-01                       |
-| S-03       | task-edit           | Poprawa zadania                                     | no                    | Czeka na S-02                       |
+| Roadmap ID | Change ID              | Suggested issue title                                        | Ready for `/10x-plan` | Notes                        |
+| ---------- | ---------------------- | ------------------------------------------------------------ | --------------------- | ---------------------------- |
+| S-04       | task-check-problems    | Sprawdzenie zadań: nieistniejący poprzednik, brak odpowiedzialności, duplikaty | yes                   | Run `/10x-plan task-check-problems` |
+| S-05       | task-check-cycles      | Sprawdzenie zadań: cykle zależności i komunikat „brak problemów” | no                    | Czeka na S-04                |
+| S-06       | project-verified-state | Stan projektu (zweryfikowany / niezweryfikowany)             | no                    | Czeka na S-05                |
+| S-07       | task-delete            | Usunięcie zadania, które nie jest poprzednikiem              | no                    | Czeka na S-06                |
+| S-08       | task-renumber          | Zmiana numeru zadania z poprawką poprzedników                | no                    | Czeka na S-06                |
+| S-09       | specialty-delete       | Usunięcie specjalności nieużywanej w zadaniach               | no                    | Czeka na S-06                |
 
 ## Open Roadmap Questions
 
 1. **Jakie są drugorzędne kryteria sukcesu (Secondary)?** — Owner: user. Block: no.
 2. **Jakie są `target_scale.qps` i `target_scale.data_volume`?** — Owner: user. Block: no.
-3. **Zakres kontra czas.** — `mvp_weeks: 5` to własny szacunek, do `hard_deadline` 2026-11-04 zostaje około 6 tygodni pracy po godzinach. Owner: user. Block: roadmap-wide.
+3. **Zakres kontra czas.** — `mvp_weeks: 5` to własny szacunek, do `hard_deadline` 2026-11-04 zostaje około 6 tygodni pracy po godzinach; M-2 ma sześć wycinków, z czego trzy ostatnie (bezpieczna edycja) są rozszerzeniem ponad główne kryterium sukcesu. Owner: user. Block: roadmap-wide.
 4. **Kim są odbiorcy udostępnionego projektu (FR-010) i czy udostępnianie zostaje w produkcie?** — Owner: user. Block: no.
-5. **Jaka jest rola oszacowań nakładu i specjalności poza kontrolą kompletności?** — Owner: user. Block: no (dotyczy S-02).
-6. **Kiedy otwieramy kolejny kamień milowy: sprawdzanie (FR-008, 009, 011) czy bezpieczna edycja (FR-005, 007)?** — Sprawdzanie jest głównym kryterium sukcesu z PRD i po M-1 nadal nie działa; jeśli termin 2026-11-04 się zbliża, ten wybór jest ważniejszy niż kolejność wycinków w M-1. Owner: user. Block: roadmap-wide.
+5. **Jaka jest rola oszacowań nakładu i specjalności poza kontrolą kompletności?** — Owner: user. Block: no.
+6. **Co po M-2: nice-to-have (FR-010 udostępnianie, FR-012 klonowanie), czy uznajemy MVP za domknięte?** — Owner: user. Block: no.
 
 ## Parked
 
-- **FR-005: usunięcie specjalności, jeśli nie występuje w zadaniach** — Why parked: poza pierwszym kamieniem milowym (decyzja użytkownika 2026-09-25); ma sens po zadaniach.
-- **FR-007: usunięcie zadania i automatyczna zmiana numeru u poprzedników** — Why parked: jak wyżej; w M-1 numer zadania proponowany jako niezmienny (S-03).
-- **FR-008: sprawdzenie listy zadań (cykle, nieistniejący poprzednik, brak odpowiedzialności, duplikaty)** — Why parked: jak wyżej. To główne kryterium sukcesu PRD, więc do niego wraca kolejny kamień milowy.
-- **FR-009: lista zadań z problemami** — Why parked: zależy od FR-008.
-- **FR-011: stan projektu (zweryfikowany lub niezweryfikowany)** — Why parked: zależy od FR-008.
 - **FR-010: udostępnianie projektu do podglądu** — Why parked: nice-to-have, poza pierwszym przepływem (PRD Non-Goals).
 - **FR-012: klonowanie projektu** — Why parked: nice-to-have, poza pierwszym przepływem (PRD Non-Goals).
 - **Wykrywanie pominiętych zadań w zakresie** — Why parked: PRD Non-Goals.
@@ -138,6 +183,8 @@ Foundations below assume these are present and do NOT re-scaffold them.
 ## Milestone History
 
 (Append-only. Carried forward verbatim into each successor milestone's roadmap; empty on the very first milestone.)
+
+- **M-1: Wprowadzanie specjalności i zadań** (`task-data-entry`) — closed 2026-09-25. Kierownik dodaje i edytuje specjalności oraz dodaje i poprawia zadania w wybranym projekcie (S-01, S-02, S-03; FR-004, FR-006); wdrożone na produkcji.
 
 ## Done
 
