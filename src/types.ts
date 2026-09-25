@@ -261,6 +261,8 @@ export interface TaskProblem {
   missingPredecessors: number[];
   noResponsibility: NoResponsibilityReason[];
   duplicateOf: number[];
+  /** Numery wszystkich zadań grupy wzajemnie zależnych (co najmniej 2, rosnąco, razem z tym zadaniem); [] = brak cyklu. */
+  cycleWith: number[];
 }
 
 /** Wynik sprawdzenia listy zadań: tylko zadania z co najmniej jednym powodem, rosnąco po numerze. */
