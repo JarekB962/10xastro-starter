@@ -55,6 +55,9 @@ const renamedSpecialty = `Hydraulik ${stamp}`;
 const taskName = `Zadanie glowne ${stamp}`;
 const duplicateTaskName = `Zadanie duplikat ${stamp}`;
 const plainTaskName = `Zadanie proste ${stamp}`;
+const editedTaskName = `Zadanie poprawione ${stamp}`;
+let taskId = "";
+const unknownTaskId = "00000000-0000-4000-8000-000000000000";
 
 const post = (form = {}) => ({ method: "POST", form });
 
@@ -77,6 +80,16 @@ const steps = [
   [
     "creating a task requires signin",
     () => anon("/api/tasks", post({ task_number: "1", task_name: "Anon" })),
+    { status: 302, location: "/auth/signin" },
+  ],
+  [
+    "task edit page redirects anonymous user",
+    () => anon(`/tasks/${unknownTaskId}/edit`),
+    { status: 302, location: "/auth/signin" },
+  ],
+  [
+    "editing a task requires signin",
+    () => anon(`/api/tasks/${unknownTaskId}`, post({ task_name: "Anon" })),
     { status: 302, location: "/auth/signin" },
   ],
   [
@@ -217,6 +230,71 @@ const steps = [
     { status: 302, locationIs: "/tasks" },
   ],
   [
+    "A finds the main task id on the list",
+    async () => {
+      const list = await userA("/tasks");
+      const start = list.body.indexOf(taskName);
+      taskId = /\/tasks\/([0-9a-f-]{36})\/edit/.exec(start < 0 ? "" : list.body.slice(start))?.[1] ?? "";
+      return { ...list, status: taskId ? list.status : 0 };
+    },
+    { status: 200 },
+  ],
+  [
+    "A opens the task edit page with the current name and a fixed number",
+    () => userA(`/tasks/${taskId}/edit`),
+    { status: 200, bodyIncludes: [taskName, "Numer zadania"] },
+  ],
+  [
+    "A edits the task: new name, no specialty, effort 7, predecessor 3, number in the form ignored",
+    () =>
+      userA(
+        `/api/tasks/${taskId}`,
+        post({
+          task_number: "99",
+          task_name: editedTaskName,
+          task_specialty: "",
+          task_effort: "7",
+          task_predecessors: "3",
+        }),
+      ),
+    { status: 302, locationIs: "/tasks" },
+  ],
+  [
+    "A's list shows the edited task with the same number, no specialty and the new predecessor",
+    async () => {
+      const list = await userA("/tasks");
+      const at = list.body.indexOf(editedTaskName);
+      const from = list.body.lastIndexOf("<li", at);
+      const to = list.body.indexOf("</li>", at);
+      return { ...list, body: at < 0 ? "" : list.body.slice(from, to) };
+    },
+    {
+      status: 200,
+      bodyIncludes: [editedTaskName, "1.", "<dd>3</dd>", "<dd>7</dd>"],
+      bodyExcludes: [renamedSpecialty, "99.", "2, 99"],
+    },
+  ],
+  ["the old task name is gone from A's list", () => userA("/tasks"), { status: 200, bodyExcludes: [taskName] }],
+  [
+    "A cannot make a task its own predecessor on edit and keeps the typed name",
+    () => userA(`/api/tasks/${taskId}`, post({ task_name: `Nie ${stamp}`, task_predecessors: "1" })),
+    {
+      status: 302,
+      location: "/tasks/",
+      locationIncludes: ["/edit?error=", "poprzednikiem", "task_name=", String(stamp)],
+    },
+  ],
+  [
+    "A cannot save a task with a non-numeric effort and keeps the typed name",
+    () => userA(`/api/tasks/${taskId}`, post({ task_name: `Nie ${stamp}`, task_effort: "abc" })),
+    { status: 302, location: "/tasks/", locationIncludes: ["/edit?error=", "task_name=", String(stamp)] },
+  ],
+  [
+    "A cannot save a task with an empty name",
+    () => userA(`/api/tasks/${taskId}`, post({ task_name: "" })),
+    { status: 302, location: "/tasks/", locationIncludes: ["/edit?error=", "wymagana", "task_name="] },
+  ],
+  [
     "signup creates account B",
     () => userB("/api/auth/signup", post({ email: emailB, password })),
     { status: 302, location: "/auth/confirm-email" },
@@ -260,6 +338,12 @@ const steps = [
     () => userB("/api/tasks", post({ task_number: "1", task_name: "Nie dla B" })),
     { status: 302, location: "/tasks?error=" },
   ],
+  ["B gets 404 on A's task edit page", () => userB(`/tasks/${taskId}/edit`), { status: 404 }],
+  [
+    "B cannot edit A's task",
+    () => userB(`/api/tasks/${taskId}`, post({ task_name: "Przejete" })),
+    { status: 302, location: "/tasks?error=" },
+  ],
   [
     "A sees the delete confirmation page",
     () => userA(`/projects/${projectId}/delete`),
@@ -290,6 +374,7 @@ const steps = [
     () => userA(`/specialties/${specialtyId}/edit`),
     { status: 404 },
   ],
+  ["the task edit page is gone after its project is deleted", () => userA(`/tasks/${taskId}/edit`), { status: 404 }],
   [
     "A adds a project whose CRLF description fits the limit once newlines count as one character",
     () =>

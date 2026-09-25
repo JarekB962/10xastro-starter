@@ -172,6 +172,16 @@ export type Database = {
         };
         Returns: Database["public"]["Tables"]["tasks"]["Row"];
       };
+      update_task: {
+        Args: {
+          p_id: string;
+          p_name: string;
+          p_specialty_id: string | null;
+          p_effort: number | null;
+          p_predecessors: number[] | null;
+        };
+        Returns: Database["public"]["Tables"]["tasks"]["Row"];
+      };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
@@ -219,9 +229,11 @@ export type ParsedSpecialtyInput = { ok: true; data: SpecialtyInput } | { ok: fa
 /** Zadanie projektu widoczne w interfejsie: specjalność jako nazwa, poprzednicy jako numery zadań. */
 export interface Task {
   id: string;
+  project_id: string;
   number: number;
   name: string;
   effort: number | null;
+  specialty_id: string | null;
   specialty: string | null;
   predecessors: number[];
   created_at: string;
@@ -239,3 +251,14 @@ export interface TaskInput {
 
 /** Wynik walidacji formularza zadania: dane albo pierwszy komunikat błędu. */
 export type ParsedTaskInput = { ok: true; data: TaskInput } | { ok: false; message: string };
+
+/** Dane poprawki zadania po walidacji (bez numeru, który jest niezmienny). */
+export interface TaskUpdateInput {
+  name: string;
+  specialtyId: string | null;
+  effort: number | null;
+  predecessors: number[];
+}
+
+/** Wynik walidacji formularza poprawki zadania: dane albo pierwszy komunikat błędu. */
+export type ParsedTaskUpdateInput = { ok: true; data: TaskUpdateInput } | { ok: false; message: string };

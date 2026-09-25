@@ -1,7 +1,9 @@
 import { failWith, type Db } from "@/lib/services/db-errors";
-import type { ServiceResult, Task, TaskInput, TaskServiceError } from "@/types";
+import type { ServiceResult, Task, TaskInput, TaskServiceError, TaskUpdateInput } from "@/types";
 
 export { NO_PROJECT_SELECTED_MESSAGE } from "@/lib/services/specialties";
+
+export const TASK_NOT_FOUND_MESSAGE = "Nie znaleziono zadania.";
 
 export const TASK_ERROR_MESSAGES: Record<TaskServiceError, string> = {
   duplicate_number: "Zadanie o takim numerze już istnieje.",
@@ -11,12 +13,13 @@ export const TASK_ERROR_MESSAGES: Record<TaskServiceError, string> = {
 };
 
 // 23505 zajęty numer, 23503 specjalność spoza projektu, 23514 wyzwalacz "własny poprzednik" (zod łapie to wcześniej),
-// 42501 cudzy projekt (RLS).
+// 42501 cudzy projekt (RLS), P0002 brak zadania w `update_task`.
 const TASK_DB_ERRORS: Record<string, TaskServiceError> = {
   "23505": "duplicate_number",
   "23503": "invalid_specialty",
   "23514": "unexpected",
   "42501": "not_found",
+  P0002: "not_found",
 };
 
 // Limit z zapasem ponad walidację, żeby adres przekierowania nie urósł bez końca.
@@ -33,24 +36,69 @@ export function formValues(form: FormData): Record<string, string> {
   return values;
 }
 
+/** Jak `formValues`, ale bez numeru: numer zadania jest przy poprawce niezmienny. */
+export function editFormValues(form: FormData): Record<string, string> {
+  const values = formValues(form);
+  delete values.task_number;
+  return values;
+}
+
 const TASK_SELECT =
-  "id, number, name, effort, created_at, updated_at, specialties(name), task_predecessors(predecessor_number)";
+  "id, project_id, number, name, effort, specialty_id, created_at, updated_at, specialties(name), task_predecessors(predecessor_number)";
 
-export async function listTasks(db: Db, projectId: string): Promise<ServiceResult<Task[], TaskServiceError>> {
-  const { data, error } = await db.from("tasks").select(TASK_SELECT).eq("project_id", projectId).order("number");
-  if (error) return failWith("tasks", error, TASK_DB_ERRORS);
-
-  const tasks = data.map((row) => ({
+function toTask(row: {
+  id: string;
+  project_id: string;
+  number: number;
+  name: string;
+  effort: number | null;
+  specialty_id: string | null;
+  specialties: { name: string } | null;
+  task_predecessors: { predecessor_number: number }[];
+  created_at: string;
+  updated_at: string;
+}): Task {
+  return {
     id: row.id,
+    project_id: row.project_id,
     number: row.number,
     name: row.name,
     effort: row.effort,
+    specialty_id: row.specialty_id,
     specialty: row.specialties?.name ?? null,
     predecessors: row.task_predecessors.map((p) => p.predecessor_number).sort((a, b) => a - b),
     created_at: row.created_at,
     updated_at: row.updated_at,
-  }));
-  return { ok: true, data: tasks };
+  };
+}
+
+export async function listTasks(db: Db, projectId: string): Promise<ServiceResult<Task[], TaskServiceError>> {
+  const { data, error } = await db.from("tasks").select(TASK_SELECT).eq("project_id", projectId).order("number");
+  if (error) return failWith("tasks", error, TASK_DB_ERRORS);
+  return { ok: true, data: data.map(toTask) };
+}
+
+export async function getTask(db: Db, id: string): Promise<ServiceResult<Task, TaskServiceError>> {
+  const { data, error } = await db.from("tasks").select(TASK_SELECT).eq("id", id).maybeSingle();
+  if (error) return failWith("tasks", error, TASK_DB_ERRORS);
+  if (!data) return { ok: false, error: "not_found" };
+  return { ok: true, data: toTask(data) };
+}
+
+export async function updateTask(
+  db: Db,
+  id: string,
+  input: TaskUpdateInput,
+): Promise<ServiceResult<{ id: string }, TaskServiceError>> {
+  const { data, error } = await db.rpc("update_task", {
+    p_id: id,
+    p_name: input.name,
+    p_specialty_id: input.specialtyId,
+    p_effort: input.effort,
+    p_predecessors: input.predecessors,
+  });
+  if (error) return failWith("tasks", error, TASK_DB_ERRORS);
+  return { ok: true, data: { id: data.id } };
 }
 
 export async function createTask(

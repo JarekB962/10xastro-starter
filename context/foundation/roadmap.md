@@ -43,7 +43,7 @@ Kierownik projektu na starcie dostaje listę zadań (specjalność wykonawcy, na
 | ---- | ------------------- | ---------------------------------------------------------------------------------------------------------- | ---------------------------------- | ------------- | -------- |
 | S-01 | project-specialties | dodać i edytować specjalności wykonawców w wybranym projekcie                                              | wybrany projekt (FR-003, wdrożone) | FR-004, US-01 | done |
 | S-02 | task-add            | dodać zadanie (numer, nazwa, specjalność, nakład, poprzednicy jako numery) i zobaczyć listę zadań projektu | S-01                               | FR-006, US-01 | done |
-| S-03 | task-edit           | poprawić zadanie (nazwa, specjalność, nakład, poprzednicy)                                                 | S-02                               | FR-006        | proposed |
+| S-03 | task-edit           | poprawić zadanie (nazwa, specjalność, nakład, poprzednicy)                                                 | S-02                               | FR-006        | in-progress |
 
 ## Baseline
 
@@ -102,7 +102,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - Numer zadania po utworzeniu: niezmienny do czasu FR-007 (automatyczna zmiana numeru u poprzedników jest odłożona), czy edytowalny mimo to? — Owner: user. Block: no.
 - **Risk:** Zmiana numeru zadania bez aktualizacji poprzedników zostawia wiszące odwołania. Stąd propozycja, by w tym kamieniu numer był niezmienny (do potwierdzenia przy planowaniu).
-- **Status:** proposed
+- **Status:** in-progress
 
 ## Backlog Handoff
 
