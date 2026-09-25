@@ -20,6 +20,25 @@ function toError(error: { code?: string }, creating: boolean): ServiceError {
   }
 }
 
+/**
+ * Wariant `fail` z własnym mapowaniem kodów bazy na `ServiceError` (np. zadania: 23505 to zajęty numer).
+ * Kod spoza mapy i wynik `unexpected` trafiają do logu serwera.
+ */
+export function failWith(
+  scope: string,
+  error: { code?: string; message?: string },
+  codes: Readonly<Record<string, ServiceError>>,
+): { ok: false; error: ServiceError } {
+  const code = error.code;
+  const mapped = code !== undefined && Object.hasOwn(codes, code) ? codes[code] : undefined;
+  if (mapped && mapped !== "unexpected") {
+    return { ok: false, error: mapped };
+  }
+  // eslint-disable-next-line no-console -- surowy błąd bazy trafia do logów serwera, użytkownik dostaje ogólny komunikat
+  console.error(`${scope}: unexpected database error`, error.code, error.message);
+  return { ok: false, error: "unexpected" };
+}
+
 /** Mapuje błąd bazy na wynik usługi; `scope` to prefiks komunikatu w logu serwera (np. "projects"). */
 export function fail(
   scope: string,

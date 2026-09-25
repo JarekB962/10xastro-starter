@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 import { CircleAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +19,7 @@ interface FormFieldProps {
   endContent?: ReactNode;
   autoComplete?: string;
   autoFocus?: boolean;
+  inputMode?: HTMLAttributes<HTMLInputElement>["inputMode"];
 }
 
 export function FormField({
@@ -35,6 +36,7 @@ export function FormField({
   endContent,
   autoComplete,
   autoFocus,
+  inputMode,
 }: FormFieldProps) {
   return (
     <div>
@@ -54,6 +56,7 @@ export function FormField({
           placeholder={placeholder}
           autoComplete={autoComplete}
           autoFocus={autoFocus}
+          inputMode={inputMode}
           className={cn(
             inputBase,
             error ? "border-red-400/60 focus:ring-red-400" : "border-white/20 focus:ring-purple-400",

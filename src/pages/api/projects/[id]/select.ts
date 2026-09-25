@@ -5,6 +5,11 @@ import { PROJECT_ERROR_MESSAGES, selectProject } from "@/lib/services/projects";
 
 export const prerender = false;
 
+const AFTER_SELECT_TARGETS = new Map([
+  ["specialties", "/specialties"],
+  ["tasks", "/tasks"],
+]);
+
 export const POST: APIRoute = async (context) => {
   const supabase = requireSupabase(context, "/projects");
   if (supabase instanceof Response) return supabase;
@@ -16,7 +21,10 @@ export const POST: APIRoute = async (context) => {
     return context.redirect(errorUrl("/projects", PROJECT_ERROR_MESSAGES[result.error]));
   }
 
-  // Link „Specjalności" na liście projektów wybiera projekt i od razu otwiera jego specjalności.
+  // Linki „Specjalności" i „Zadania" na liście projektów wybierają projekt i od razu otwierają jego ekran.
+  // Cel pochodzi z whitelisty; każda inna wartość (też klucz z prototypu obiektu) daje /dashboard.
   const form = await readForm(context.request);
-  return context.redirect(form?.get("after_select") === "specialties" ? "/specialties" : "/dashboard");
+  const afterSelect = form?.get("after_select");
+  const target = typeof afterSelect === "string" ? AFTER_SELECT_TARGETS.get(afterSelect) : undefined;
+  return context.redirect(target ?? "/dashboard");
 };

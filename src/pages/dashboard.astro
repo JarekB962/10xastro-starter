@@ -41,6 +41,11 @@ const loadError = supabase && selected && !selected.ok ? "Nie udało się wczyta
               Specjalności projektu
             </a>
           )}
+          {project && (
+            <a href="/tasks" class="text-purple-300 hover:underline">
+              Zadania projektu
+            </a>
+          )}
           <a href="/projects" class="text-purple-300 hover:underline">
             Wróć do listy projektów
           </a>

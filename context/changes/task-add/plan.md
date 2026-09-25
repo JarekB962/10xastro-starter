@@ -253,36 +253,36 @@ Zwykłe akcje mają kończyć się widocznym wynikiem poniżej 1 sekundy (NFR z 
 
 #### Automated
 
-- [x] 1.1 Migracja stosuje się na czystej bazie lokalnej: `npx supabase db reset`
-- [x] 1.2 Generowanie typów Astro i sprawdzenie typów przechodzi: `npx astro sync && npx astro check`
-- [x] 1.3 Lint przechodzi: `npm run lint`
-- [x] 1.4 Build przechodzi: `npm run build`
+- [x] 1.1 Migracja stosuje się na czystej bazie lokalnej: `npx supabase db reset` — 60c9565
+- [x] 1.2 Generowanie typów Astro i sprawdzenie typów przechodzi: `npx astro sync && npx astro check` — 60c9565
+- [x] 1.3 Lint przechodzi: `npm run lint` — 60c9565
+- [x] 1.4 Build przechodzi: `npm run build` — 60c9565
 
 #### Manual
 
-- [x] 1.5 W lokalnym Supabase (przez `psql`) obie tabele mają włączone RLS i polityki tylko dla `authenticated`, a `tasks` nie ma polityki `delete`
-- [x] 1.6 Dwa zadania z tym samym numerem w jednym projekcie kończą się błędem unikalności, a w dwóch różnych projektach są dozwolone
-- [x] 1.7 Zadanie ze specjalnością z innego projektu kończy się błędem klucza obcego; zadanie bez specjalności zapisuje się
-- [x] 1.8 Poprzednik równy numerowi zadania jest odrzucony przez wyzwalacz; `create_task` z błędnym poprzednikiem nie zostawia zadania w tabeli
-- [x] 1.9 Usunięcie projektu usuwa jego zadania i poprzedników (kaskada)
+- [x] 1.5 W lokalnym Supabase (przez `psql`) obie tabele mają włączone RLS i polityki tylko dla `authenticated`, a `tasks` nie ma polityki `delete` — 60c9565
+- [x] 1.6 Dwa zadania z tym samym numerem w jednym projekcie kończą się błędem unikalności, a w dwóch różnych projektach są dozwolone — 60c9565
+- [x] 1.7 Zadanie ze specjalnością z innego projektu kończy się błędem klucza obcego; zadanie bez specjalności zapisuje się — 60c9565
+- [x] 1.8 Poprzednik równy numerowi zadania jest odrzucony przez wyzwalacz; `create_task` z błędnym poprzednikiem nie zostawia zadania w tabeli — 60c9565
+- [x] 1.9 Usunięcie projektu usuwa jego zadania i poprzedników (kaskada) — 60c9565
 
 ### Phase 2: Warstwa serwera i ekrany
 
 #### Automated
 
-- [ ] 2.1 Sprawdzenie typów przechodzi: `npx astro check`
-- [ ] 2.2 Lint przechodzi: `npm run lint`
-- [ ] 2.3 Build przechodzi: `npm run build`
+- [x] 2.1 Sprawdzenie typów przechodzi: `npx astro check`
+- [x] 2.2 Lint przechodzi: `npm run lint`
+- [x] 2.3 Build przechodzi: `npm run build`
 
 #### Manual
 
-- [ ] 2.4 Bez logowania `curl -i -X POST http://localhost:4321/api/tasks` odsyła 302 na `/auth/signin`
-- [ ] 2.5 Bez wybranego projektu `/tasks` pokazuje „Nie wybrano projektu" z linkiem do listy projektów
-- [ ] 2.6 Po wyborze projektu (przycisk „Zadania" przy projekcie) dodanie zadania z numerem, nazwą, specjalnością, nakładem i poprzednikami działa, a wiersz jest na liście w kolejności numerów
-- [ ] 2.7 Zadanie tylko z numerem i nazwą zapisuje się (specjalność i nakład puste), a lista pokazuje „—"
-- [ ] 2.8 Zajęty numer, poprzednik równy własnemu numerowi i nakład „abc" pokazują czytelne komunikaty, a wpisane wartości zostają w formularzu
-- [ ] 2.9 Poprzednik o nieistniejącym numerze (np. 99) zapisuje się i jest widoczny na liście
-- [ ] 2.10 Kursor jest od razu w polu numeru, a zwykłe akcje (zapis) kończą się widocznym wynikiem w czasie poniżej 1 sekundy
+- [x] 2.4 Bez logowania `curl -i -X POST http://localhost:4321/api/tasks` odsyła 302 na `/auth/signin`
+- [x] 2.5 Bez wybranego projektu `/tasks` pokazuje „Nie wybrano projektu" z linkiem do listy projektów
+- [x] 2.6 Po wyborze projektu (przycisk „Zadania" przy projekcie) dodanie zadania z numerem, nazwą, specjalnością, nakładem i poprzednikami działa, a wiersz jest na liście w kolejności numerów
+- [x] 2.7 Zadanie tylko z numerem i nazwą zapisuje się (specjalność i nakład puste), a lista pokazuje „—"
+- [x] 2.8 Zajęty numer, poprzednik równy własnemu numerowi i nakład „abc" pokazują czytelne komunikaty, a wpisane wartości zostają w formularzu
+- [x] 2.9 Poprzednik o nieistniejącym numerze (np. 99) zapisuje się i jest widoczny na liście
+- [x] 2.10 Kursor jest od razu w polu numeru, a zwykłe akcje (zapis) kończą się widocznym wynikiem w czasie poniżej 1 sekundy
 
 ### Phase 3: Test smoke i weryfikacja
 
