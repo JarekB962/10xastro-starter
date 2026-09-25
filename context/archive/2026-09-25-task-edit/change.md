@@ -1,10 +1,10 @@
 ---
 change_id: task-edit
 title: Poprawa zadania
-status: impl_reviewed
+status: archived
 created: 2026-09-25
 updated: 2026-09-25
-archived_at: null
+archived_at: 2026-09-25T15:47:08Z
 ---
 
 ## Notes
