@@ -41,7 +41,7 @@ Kierownik projektu na starcie dostaje listę zadań (specjalność wykonawcy, na
 
 | ID   | Change ID              | Outcome (user can …)                                                                                                       | Prerequisites | PRD refs               | Status   |
 | ---- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------- | ---------------------- | -------- |
-| S-04 | task-check-problems    | uruchomić sprawdzenie i zobaczyć zadania z nieistniejącym poprzednikiem, brakiem odpowiedzialności i duplikatem oraz powód | S-03 (done)   | FR-008, FR-009, US-01  | ready    |
+| S-04 | task-check-problems    | uruchomić sprawdzenie i zobaczyć zadania z nieistniejącym poprzednikiem, brakiem odpowiedzialności i duplikatem oraz powód | S-03 (done)   | FR-008, FR-009, US-01  | in-progress |
 | S-05 | task-check-cycles      | zobaczyć w sprawdzeniu zadania leżące na cyklu zależności i dostać komunikat „nie znaleziono problemów” tylko wtedy, gdy ich naprawdę nie ma | S-04          | FR-008, FR-009, US-01  | proposed |
 | S-06 | project-verified-state | zobaczyć stan projektu (zweryfikowany lub niezweryfikowany), który cofa się po każdej zmianie danych                       | S-05          | FR-011, US-01          | proposed |
 | S-07 | task-delete            | usunąć zadanie, o ile nie jest poprzednikiem innego zadania                                                                | S-06          | FR-007, US-01          | proposed |
@@ -87,7 +87,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - Czy wynik sprawdzenia jest liczony na żądanie przy każdym otwarciu, czy zapamiętywany (potrzebne później dla stanu projektu, S-06)? — Owner: user. Block: no.
 - **Risk:** Bez wykrywania cykli (S-05) pusta lista nie może mówić „wszystko w porządku” (PRD zabrania fałszywego „OK”), więc ten wycinek tylko wypisuje znalezione problemy i nie pokazuje komunikatu o braku problemów; jest to świadome ograniczenie, nie wdrażamy go jako gotowej funkcji przed S-05.
-- **Status:** ready
+- **Status:** in-progress
 
 ### S-05: Sprawdzenie listy zadań: cykle zależności
 

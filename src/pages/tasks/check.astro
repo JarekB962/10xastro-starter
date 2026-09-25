@@ -1,0 +1,113 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Topbar from "@/components/Topbar.astro";
+import { SUPABASE_NOT_CONFIGURED, getSelectedProject } from "@/lib/services/projects";
+import { listTasks } from "@/lib/services/tasks";
+import { checkTasks } from "@/lib/task-check";
+import type { NoResponsibilityReason, TaskProblem } from "@/types";
+
+const supabase = Astro.locals.supabase;
+const selected = supabase ? await getSelectedProject(supabase) : null;
+const project = selected?.ok ? selected.data : null;
+const tasks = supabase && project ? await listTasks(supabase, project.id) : null;
+const result = tasks?.ok ? checkTasks(tasks.data) : null;
+
+const error = !supabase
+  ? SUPABASE_NOT_CONFIGURED
+  : selected && !selected.ok
+    ? "Nie udało się wczytać wybranego projektu."
+    : tasks && !tasks.ok
+      ? "Nie udało się wczytać zadań."
+      : null;
+
+const RESPONSIBILITY_LABELS: Record<NoResponsibilityReason, string> = {
+  no_specialty: "brak specjalności",
+  effort_empty: "nakład pusty",
+  effort_zero: "nakład równy 0",
+};
+
+function reasons(problem: TaskProblem): string[] {
+  const lines: string[] = [];
+  if (problem.missingPredecessors.length > 0) {
+    lines.push(`Nieistniejący poprzednik: ${problem.missingPredecessors.join(", ")}`);
+  }
+  if (problem.noResponsibility.length > 0) {
+    lines.push(`Brak odpowiedzialności: ${problem.noResponsibility.map((r) => RESPONSIBILITY_LABELS[r]).join(", ")}`);
+  }
+  if (problem.duplicateOf.length > 0) {
+    lines.push(`Duplikat nazwy: zadania ${problem.duplicateOf.join(", ")}`);
+  }
+  return lines;
+}
+---
+
+<Layout title="Sprawdzenie zadań — Plan projektu (WBS)">
+  <div class="bg-cosmic min-h-screen p-4">
+    <div class="mx-auto max-w-2xl">
+      <Topbar />
+      <div class="rounded-2xl border border-white/10 bg-white/10 p-8 text-white backdrop-blur-xl">
+        <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-2xl font-bold text-transparent">
+          Sprawdzenie zadań
+        </h1>
+        {project && <p class="mt-1 mb-6 text-sm break-words text-blue-100/60">Projekt: {project.name}</p>}
+        {!project && <div class="mb-6" />}
+
+        {error && (
+          <p class="mb-4 rounded-lg border border-red-500/30 bg-red-900/30 px-3 py-2 text-sm text-red-300">{error}</p>
+        )}
+
+        {supabase && selected?.ok && !project && (
+          <div>
+            <p class="text-blue-100/70">Nie wybrano projektu.</p>
+            <a href="/projects" class="mt-4 inline-block text-sm text-purple-300 hover:underline">
+              Przejdź do listy projektów
+            </a>
+          </div>
+        )}
+
+        {project && result && (
+          <>
+            {result.problems.length === 0 ? (
+              <p class="text-blue-100/70">
+                Nie znaleziono zadań z problemami w sprawdzanych kryteriach (nieistniejący poprzednik, brak
+                odpowiedzialności, duplikat). Cykle zależności nie są jeszcze sprawdzane, więc to nie potwierdza
+                poprawności listy.
+              </p>
+            ) : (
+              <>
+                <h2 class="mb-3 font-semibold">Zadania z problemami: {result.problems.length}</h2>
+                <ul class="space-y-3">
+                  {result.problems.map((problem) => (
+                    <li class="rounded-xl border border-white/10 bg-white/5 p-4">
+                      <div class="flex items-start justify-between gap-4">
+                        <h3 class="min-w-0 font-semibold break-words">
+                          <span class="mr-2 text-purple-300">{problem.task.number}.</span>
+                          {problem.task.name}
+                        </h3>
+                        <a
+                          href={`/tasks/${problem.task.id}/edit`}
+                          class="shrink-0 text-sm text-purple-300 transition-colors hover:text-purple-100 hover:underline"
+                        >
+                          Edytuj
+                        </a>
+                      </div>
+                      <ul class="mt-2 space-y-1 text-sm text-blue-100/70">
+                        {reasons(problem).map((line) => (
+                          <li>{line}</li>
+                        ))}
+                      </ul>
+                    </li>
+                  ))}
+                </ul>
+                <p class="mt-4 text-sm text-blue-100/60">Cykle zależności nie są jeszcze sprawdzane.</p>
+              </>
+            )}
+            <a href="/tasks" class="mt-6 inline-block text-sm text-purple-300 hover:underline">
+              Wróć do listy zadań
+            </a>
+          </>
+        )}
+      </div>
+    </div>
+  </div>
+</Layout>
