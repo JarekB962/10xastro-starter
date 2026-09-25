@@ -1,6 +1,6 @@
 ---
 project: "Plan projektu (WBS)"
-version: 1
+version: 2
 status: draft
 created: 2026-09-23
 context_type: greenfield
@@ -32,7 +32,7 @@ Branża: dowolna.
 ## Success Criteria
 
 ### Primary
-- Pierwszy przepływ MVP: kierownik loguje się i wybiera projekt; definiuje specjalności wykonawców; wpisuje zadania ręcznie (typowo kilkadziesiąt): specjalność, nakład, poprzednicy; uruchamia sprawdzenie i widzi listę zadań z problemami.
+- Pierwszy przepływ MVP: kierownik loguje się i wybiera projekt; definiuje specjalności wykonawców; wpisuje zadania ręcznie (typowo kilkadziesiąt): numer, nazwa, specjalność, nakład, poprzednicy (numery zadań); uruchamia sprawdzenie i widzi listę zadań z problemami.
 - Sprawdzenie listy kilkudziesięciu zadań trwa od kilku do kilkunastu sekund (dziś: kilka godzin w arkuszu).
 - Sprawdzenie wykrywa wszystkie sprzeczności.
 
@@ -55,6 +55,8 @@ Branża: dowolna.
 - Wykrywa wszystkie cykle zależności, nieistniejące poprzedniki, brak odpowiedzialności i duplikaty
 - Gdy problem istnieje, wynik nigdy nie mówi „wszystko w porządku"
 - Zadanie, które jest poprzednikiem innego, nie może zostać usunięte
+- Zadanie nie może wskazywać samego siebie jako poprzednika (blokada przy zapisie)
+- Numer zadania jest unikalny w projekcie; zmiana numeru poprawia go u zadań, które mają je jako poprzednika
 - Specjalność użyta w zadaniach projektu nie może zostać usunięta
 - Wynik bez problemów to sam komunikat (bez dodatkowego raportu)
 
@@ -75,14 +77,14 @@ Branża: dowolna.
   > Socrates: Brak kontrargumentu; zostaje bez zmian.
 
 ### Zadania
-- FR-006: Kierownik projektu can ręcznie dodać zadanie (specjalność, nakład, poprzednicy) i poprawić je. Priority: must-have
-  > Socrates: Brak kontrargumentu; zostaje bez zmian.
-- FR-007: Kierownik projektu can usunąć zadanie, jeśli nie jest ono poprzednikiem dla innego zadania. Priority: must-have
-  > Socrates: Brak kontrargumentu; zostaje bez zmian.
+- FR-006: Kierownik projektu can ręcznie dodać zadanie (numer zadania, nazwa zadania, specjalność, nakład, poprzednicy) i poprawić je. Numer zadania jest liczbą całkowitą, niepowtarzalną w projekcie; numer i nazwa są wymagane. Poprzednicy są wpisywani jako numery zadań; zadanie nie może wskazywać samego siebie jako poprzednika (blokada przy zapisie). Poprzednik może wskazywać numer zadania, którego jeszcze nie ma (kontroluje to sprawdzenie, FR-008). Priority: must-have
+  > Socrates: Brak kontrargumentu; zostaje bez zmian. Ustalone 2026-09-25: dodano wymagane pola numer i nazwa; poprzednicy jako numery; blokada wskazania samego siebie.
+- FR-007: Kierownik projektu can usunąć zadanie, jeśli nie jest ono poprzednikiem dla innego zadania. Zmiana numeru zadania automatycznie aktualizuje numer u wszystkich zadań, dla których jest ono poprzednikiem. Priority: must-have
+  > Socrates: Brak kontrargumentu; zostaje bez zmian. Ustalone 2026-09-25: zmiana numeru poprawia poprzedników automatycznie (zamiast blokady).
 
 ### Sprawdzanie
-- FR-008: Kierownik projektu can uruchomić sprawdzenie listy zadań pod kątem: cykli zależności, nieistniejących poprzedników, braku odpowiedzialności (brak specjalności wykonawcy lub nakładu) i duplikatów zadań. Priority: must-have
-  > Socrates: Brak kontrargumentu; zostaje bez zmian.
+- FR-008: Kierownik projektu can uruchomić sprawdzenie listy zadań pod kątem: cykli zależności (co najmniej dwa zadania zależą od siebie nawzajem, pośrednio lub bezpośrednio; oznaczane są wszystkie zadania leżące na cyklu), nieistniejących poprzedników (numer, którego nie ma w projekcie), braku odpowiedzialności (brak specjalności wykonawcy albo nakład pusty lub równy 0) i duplikatów zadań (ta sama nazwa po obcięciu spacji, bez rozróżniania wielkości liter; oznaczane są wszystkie zadania o tej nazwie). Priority: must-have
+  > Socrates: Brak kontrargumentu; zostaje bez zmian. Ustalone 2026-09-25: doprecyzowano definicje czterech kryteriów (patrz Open Questions 5).
 - FR-009: Kierownik projektu can zobaczyć listę zadań z problemami. Priority: must-have
   > Socrates: Brak kontrargumentu; zostaje bez zmian.
 - FR-011: Kierownik projektu can zobaczyć stan projektu (zweryfikowany lub niezweryfikowany). Priority: must-have
@@ -107,12 +109,12 @@ Branża: dowolna.
 
 Sprawdzenie listy zadań oznacza zadania z błędami jako problematyczne, a sam projekt jako niezweryfikowany.
 
-Dane wejściowe: zadania projektu (specjalność, nakład, poprzednicy). Wynik: lista zadań oznaczonych jako problematyczne i stan projektu. Kryteria błędów: cykle zależności, nieistniejący poprzednik, brak odpowiedzialności, duplikaty (FR-008).
+Dane wejściowe: zadania projektu (numer, nazwa, specjalność, nakład, poprzednicy). Wynik: lista zadań oznaczonych jako problematyczne i stan projektu. Kryteria błędów: cykle zależności, nieistniejący poprzednik, brak odpowiedzialności, duplikaty (FR-008).
 
 Stan projektu:
 - Projekt jest „zweryfikowany" wyłącznie wtedy, gdy sprawdzenie nie znalazło problemów; kierownik nie ustawia go ręcznie. W przeciwnym razie jest „niezweryfikowany".
 - Każda zmiana danych po sprawdzeniu (dodanie lub edycja zadania, zmiana specjalności) cofa projekt do „niezweryfikowany" (chroni guardrail przed fałszywym „wszystko w porządku").
-- Kontrola „nieistniejący poprzednik" zostaje w MVP jako kontrola obronna, mimo że FR-007 blokuje usuwanie zadań będących poprzednikami.
+- Kontrola „nieistniejący poprzednik" jest pełnoprawna: poprzednika wpisuje się numerem, więc literówka lub odwołanie do zadania, którego jeszcze nie wpisano, jest zwykłym błędem wykrywanym przez sprawdzenie. Zapis takiego odwołania nie jest blokowany (blokowane jest tylko wskazanie samego siebie).
 
 Stan projektu jest widoczny dla kierownika (FR-011).
 
@@ -137,6 +139,6 @@ Stan projektu jest widoczny dla kierownika (FR-011).
 2. **Jakie są `target_scale.qps` i `target_scale.data_volume`?** — Nie podano; znana jest tylko liczba użytkowników (garstka osób). Owner: użytkownik. Block: no.
 3. **Zakres kontra czas.** — `mvp_weeks: 5` to własny szacunek użytkownika, a do `hard_deadline` 2026-11-04 zostaje około 6 tygodni pracy po godzinach. Użytkownik odmówił jawnego potwierdzenia kosztu stałego wysiłku i zdecydował zostawić 9 wymagań must-have bez zmian. Zakres i termin są w napięciu. Owner: użytkownik. By: przed planowaniem implementacji. Block: no.
 4. **Kim są odbiorcy udostępnionego projektu (FR-010) i jak kierownik ich wskazuje?** — Nie ustalono; niepewne też, czy udostępnianie zostaje w produkcie (alternatywa: eksport wyniku). Owner: użytkownik. Block: no (nice-to-have).
-5. **Jaka jest dokładna definicja „sprzeczności" i „duplikatu zadania"?** — W notatkach wskazane jako nierozstrzygnięte (m.in. czy zależność zadania od samego siebie liczy się jako cykl). Owner: użytkownik. Block: yes (kryterium „wykrywa wszystkie sprzeczności" jest niemierzalne bez definicji).
+5. **Jaka jest dokładna definicja „sprzeczności" i „duplikatu zadania"?** — Rozstrzygnięte 2026-09-25. „Sprzeczność" to dokładnie cztery kryteria z FR-008: cykl zależności (co najmniej dwa zadania; zadanie wskazujące samo siebie jest blokowane przy zapisie, więc nie trafia do sprawdzenia), nieistniejący poprzednik, brak odpowiedzialności (brak specjalności albo nakład pusty lub równy 0; zleceniodawca jest zwykłą specjalnością) i duplikat (ta sama nazwa po obcięciu spacji, bez rozróżniania wielkości liter). Numer zadania jest liczbą całkowitą, niepowtarzalną w projekcie, więc nie bywa duplikatem do wykrycia. Owner: użytkownik. Block: no.
 6. **Jaka jest rola oszacowań nakładu i specjalności poza kontrolą kompletności?** — W notatkach wskazane jako nierozstrzygnięte. Owner: użytkownik. Block: no.
 7. **Jak dokładnie przebiega usunięcie projektu (FR-002)?** — Notatki odsyłają szczegóły do planu (potwierdzenie przed skasowaniem, skasowanie specjalności i zadań razem z projektem). Owner: użytkownik. Block: no.
