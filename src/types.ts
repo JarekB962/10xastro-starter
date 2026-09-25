@@ -164,16 +164,9 @@ export type Database = {
           data_revision: number;
           verified_revision: number | null;
         };
-        Insert: {
-          project_id: string;
-          data_revision?: number;
-          verified_revision?: number | null;
-        };
-        Update: {
-          project_id?: string;
-          data_revision?: number;
-          verified_revision?: number | null;
-        };
+        // Zapis tylko przez funkcje bazy (wyzwalacze i verify_project), nie przez klienta.
+        Insert: Record<string, never>;
+        Update: Record<string, never>;
         Relationships: [
           {
             foreignKeyName: "project_states_project_id_fkey";
