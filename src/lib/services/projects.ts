@@ -1,7 +1,5 @@
-import type { createClient } from "@/lib/supabase";
+import { fail, type Db } from "@/lib/services/db-errors";
 import type { Project, ProjectError, ProjectInput, ProjectResult } from "@/types";
-
-type Db = NonNullable<ReturnType<typeof createClient>>;
 
 const PROJECT_COLUMNS = "id, name, description, created_at, updated_at";
 
@@ -29,41 +27,15 @@ export function formValues(form: FormData): Record<string, string> {
   };
 }
 
-// Kody Postgres/PostgREST: 23505 unikalność, 23503 klucz obcy, 42501 naruszenie RLS, PGRST116 brak wiersza.
-// Cudzy lub nieistniejący projekt wygląda tak samo: baza ukrywa cudze wiersze, więc to "nie znaleziono".
-// Wyjątek: przy dodawaniu nie ma czego szukać, więc 23503/42501 (np. usunięty użytkownik z ważnym tokenem) to błąd niespodziewany.
-function toError(error: { code?: string }, creating: boolean): ProjectError {
-  switch (error.code) {
-    case "23505":
-      return "duplicate_name";
-    case "23503":
-    case "42501":
-      return creating ? "unexpected" : "not_found";
-    case "PGRST116":
-      return "not_found";
-    default:
-      return "unexpected";
-  }
-}
-
-function fail(error: { code?: string; message?: string }, creating = false): { ok: false; error: ProjectError } {
-  const result = toError(error, creating);
-  if (result === "unexpected") {
-    // eslint-disable-next-line no-console -- surowy błąd bazy trafia do logów serwera, użytkownik dostaje ogólny komunikat
-    console.error("projects: unexpected database error", error.code, error.message);
-  }
-  return { ok: false, error: result };
-}
-
 export async function listProjects(db: Db): Promise<ProjectResult<Project[]>> {
   const { data, error } = await db.from("projects").select(PROJECT_COLUMNS).order("name");
-  if (error) return fail(error);
+  if (error) return fail("projects", error);
   return { ok: true, data };
 }
 
 export async function getProject(db: Db, id: string): Promise<ProjectResult<Project>> {
   const { data, error } = await db.from("projects").select(PROJECT_COLUMNS).eq("id", id).maybeSingle();
-  if (error) return fail(error);
+  if (error) return fail("projects", error);
   if (!data) return { ok: false, error: "not_found" };
   return { ok: true, data };
 }
@@ -72,7 +44,7 @@ export async function getProject(db: Db, id: string): Promise<ProjectResult<Proj
 export async function getSelectedProjectId(db: Db): Promise<ProjectResult<string | null>> {
   // Reguły dostępu ograniczają odczyt do własnego wiersza użytkownika.
   const { data, error } = await db.from("user_settings").select("selected_project_id").maybeSingle();
-  if (error) return fail(error);
+  if (error) return fail("projects", error);
   return { ok: true, data: data?.selected_project_id ?? null };
 }
 
@@ -91,7 +63,7 @@ export async function selectProject(db: Db, id: string): Promise<ProjectResult<n
   const { error } = await db
     .from("user_settings")
     .upsert({ selected_project_id: id }, { onConflict: "user_id", defaultToNull: false });
-  if (error) return fail(error);
+  if (error) return fail("projects", error);
   return { ok: true, data: null };
 }
 
@@ -125,7 +97,7 @@ export async function createProject(db: Db, input: ProjectInput): Promise<Projec
     .insert({ name: input.name, description: input.description })
     .select(PROJECT_COLUMNS)
     .single();
-  if (error) return fail(error, true);
+  if (error) return fail("projects", error, true);
 
   await selectIfNothingSelected(db, data.id);
   return { ok: true, data };
@@ -138,7 +110,7 @@ export async function updateProject(db: Db, id: string, input: ProjectInput): Pr
     .eq("id", id)
     .select(PROJECT_COLUMNS)
     .maybeSingle();
-  if (error) return fail(error);
+  if (error) return fail("projects", error);
   if (!data) return { ok: false, error: "not_found" };
   return { ok: true, data };
 }
@@ -146,7 +118,7 @@ export async function updateProject(db: Db, id: string, input: ProjectInput): Pr
 export async function deleteProject(db: Db, id: string): Promise<ProjectResult<null>> {
   // Klucz obcy `on delete set null` w user_settings sam czyści wybór, jeśli usunięto wybrany projekt.
   const { data, error } = await db.from("projects").delete().eq("id", id).select("id");
-  if (error) return fail(error);
+  if (error) return fail("projects", error);
   if (data.length === 0) return { ok: false, error: "not_found" };
   return { ok: true, data: null };
 }
