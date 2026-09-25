@@ -243,7 +243,7 @@ Rozszerza `scripts/smoke.mjs` o przepływ specjalności z dwoma użytkownikami, 
 
 **Intent**: Dodać kroki pokrywające FR-004 z perspektywy użytkownika, wkomponowane w istniejący przepływ (użytkownik A z wybranym projektem, użytkownik B bez wyboru).
 
-**Contract**: Nowe kroki: niezalogowany `GET /specialties` i `POST /api/specialties` przekierowują na `/auth/signin`; użytkownik A po wyborze projektu dodaje specjalność (przekierowanie `/specialties`); dodanie tej samej nazwy w innej wielkości liter daje przekierowanie z `?error=`; lista zawiera nazwę; identyfikator wyciągnięty z linku `/specialties/<uuid>/edit`; edycja zmienia nazwę, a lista pokazuje nową; użytkownik B (bez wybranego projektu) widzi na `/specialties` „Nie wybrano projektu", dostaje przekierowanie z `?error=` przy `POST /api/specialties` i 404 na `/specialties/<id>/edit` A, a `POST /api/specialties/<id>` B kończy się przekierowaniem z `?error=`; po usunięciu projektu przez A strona edycji tej specjalności zwraca 404. Kroki A wstaw po wyborze projektu i przed jego usunięciem; kroki B po logowaniu B. Tylko globale dozwolone w konfiguracji ESLint dla skryptów.
+**Contract**: Nowe kroki: niezalogowany `GET /specialties` i `POST /api/specialties` przekierowują na `/auth/signin`; użytkownik A po wyborze projektu dodaje specjalność (przekierowanie `/specialties`); dodanie tej samej nazwy w innej wielkości liter daje przekierowanie z `?error=`; lista zawiera nazwę; identyfikator wyciągnięty z linku `/specialties/<uuid>/edit`; edycja zmienia nazwę, a lista pokazuje nową; użytkownik B (bez wybranego projektu) widzi na `/specialties` „Nie wybrano projektu", dostaje przekierowanie z `?error=` przy `POST /api/specialties` i 404 na `/specialties/<id>/edit` A, a `POST /api/specialties/<id>` B kończy się przekierowaniem z `?error=`; po usunięciu projektu przez A strona edycji tej specjalności zwraca 404; `POST /api/projects/<id>/select` z polem `after_select=specialties` przekierowuje na `/specialties`, a z nieznaną wartością (np. adresem obcej domeny) na `/dashboard` (zob. „Post-plan changes"). Kroki A wstaw po wyborze projektu i przed jego usunięciem; kroki B po logowaniu B. Tylko globale dozwolone w konfiguracji ESLint dla skryptów.
 
 ### Success Criteria:
 
@@ -292,6 +292,14 @@ Zwykłe akcje mają kończyć się widocznym wynikiem poniżej 1 sekundy (NFR z 
 - Produkcyjną bazę trzeba zaktualizować ręcznie (`npx supabase db push`) **przed** wdrożeniem kodu; job `deploy` tego nie robi, a kod bez migracji zepsuje tylko nowe strony `/specialties` (istniejące przepływy nie zależą od nowej tabeli).
 - Istniejące dane nie wymagają zmian.
 
+## Post-plan changes
+
+Zmiany wprowadzone po napisaniu planu, na prośbę użytkownika w trakcie Fazy 3. Fazy i Progress zostają bez zmian; ta lista zastępuje tekst planu tam, gdzie się z nim różni.
+
+- **Link „Specjalności" jest przy każdym projekcie na liście projektów** (obok „Edytuj" i „Usuń"), a nie w pasku u góry (Faza 3, pkt 4 mówiła o Topbarze). Wybiera projekt i od razu otwiera `/specialties`, bo strona działa na wybranym projekcie.
+- **Trasa `POST /api/projects/[id]/select`** (`src/pages/api/projects/[id]/select.ts`) przyjmuje pole `after_select`: wartość `specialties` przekierowuje na `/specialties`, każda inna (lub brak pola) na `/dashboard`, więc nie da się przekierować na obcy adres.
+- Link „Specjalności projektu" na dashboardzie zostaje.
+
 ## References
 
 - Roadmap: `context/foundation/roadmap.md` (S-01, `project-specialties`)
@@ -338,30 +346,30 @@ Zwykłe akcje mają kończyć się widocznym wynikiem poniżej 1 sekundy (NFR z 
 
 #### Automated
 
-- [x] 3.1 Sprawdzenie typów przechodzi: `npx astro check`
-- [x] 3.2 Lint przechodzi: `npm run lint`
-- [x] 3.3 Build przechodzi: `npm run build`
+- [x] 3.1 Sprawdzenie typów przechodzi: `npx astro check` — 84d605b
+- [x] 3.2 Lint przechodzi: `npm run lint` — 84d605b
+- [x] 3.3 Build przechodzi: `npm run build` — 84d605b
 
 #### Manual
 
-- [x] 3.4 Bez wybranego projektu `/specialties` pokazuje pusty stan z linkiem do listy projektów
-- [x] 3.5 Po wyborze projektu dodanie specjalności działa, a nowa pozycja jest na liście (alfabetycznie)
-- [x] 3.6 Dodanie drugiej specjalności o tej samej nazwie (inna wielkość liter) pokazuje czytelny komunikat, a wpisana wartość zostaje w formularzu
-- [x] 3.7 Zmiana nazwy przez „Edytuj" działa, a kursor jest od razu w polu nazwy na stronach dodawania i edycji
-- [x] 3.8 Inny użytkownik wpisujący adres cudzego `/specialties/[id]/edit` dostaje 404
-- [x] 3.9 Zwykłe akcje (zapis) kończą się widocznym wynikiem w czasie poniżej 1 sekundy
+- [x] 3.4 Bez wybranego projektu `/specialties` pokazuje pusty stan z linkiem do listy projektów — 84d605b
+- [x] 3.5 Po wyborze projektu dodanie specjalności działa, a nowa pozycja jest na liście (alfabetycznie) — 84d605b
+- [x] 3.6 Dodanie drugiej specjalności o tej samej nazwie (inna wielkość liter) pokazuje czytelny komunikat, a wpisana wartość zostaje w formularzu — 84d605b
+- [x] 3.7 Zmiana nazwy przez „Edytuj" działa, a kursor jest od razu w polu nazwy na stronach dodawania i edycji — 84d605b
+- [x] 3.8 Inny użytkownik wpisujący adres cudzego `/specialties/[id]/edit` dostaje 404 — 84d605b
+- [x] 3.9 Zwykłe akcje (zapis) kończą się widocznym wynikiem w czasie poniżej 1 sekundy — 84d605b
 
 ### Phase 4: Test smoke i weryfikacja
 
 #### Automated
 
-- [ ] 4.1 Lint przechodzi (w tym `scripts/`): `npm run lint`
-- [ ] 4.2 Build przechodzi: `npm run build`
-- [ ] 4.3 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke`
+- [x] 4.1 Lint przechodzi (w tym `scripts/`): `npm run lint`
+- [x] 4.2 Build przechodzi: `npm run build`
+- [x] 4.3 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke`
 - [ ] 4.4 CI (`ci` i `smoke`) zielone na gałęzi z tą zmianą
 
 #### Manual
 
-- [ ] 4.5 Ręczny przebieg z przeglądarki zgadza się z krokami smoke (dodanie, duplikat, edycja, izolacja między kontami)
-- [ ] 4.6 Po usunięciu projektu jego specjalności znikają z bazy: `select count(*) from specialties where project_id = '<usunięty projekt>'` daje 0
+- [x] 4.5 Ręczny przebieg z przeglądarki zgadza się z krokami smoke (dodanie, duplikat, edycja, izolacja między kontami)
+- [x] 4.6 Po usunięciu projektu jego specjalności znikają z bazy: `select count(*) from specialties where project_id = '<usunięty projekt>'` daje 0
 - [ ] 4.7 Migracja jest zastosowana w docelowej bazie Supabase przed wdrożeniem kodu (`npx supabase db push`)

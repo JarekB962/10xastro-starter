@@ -49,6 +49,9 @@ const anon = createSession();
 const userA = createSession();
 const userB = createSession();
 let projectId = "";
+let specialtyId = "";
+const specialtyName = `Elektryk ${stamp}`;
+const renamedSpecialty = `Hydraulik ${stamp}`;
 
 const post = (form = {}) => ({ method: "POST", form });
 
@@ -59,6 +62,12 @@ const steps = [
   [
     "creating a project requires signin",
     () => anon("/api/projects", post({ project_name: "Anon" })),
+    { status: 302, location: "/auth/signin" },
+  ],
+  ["specialties redirects anonymous user", () => anon("/specialties"), { status: 302, location: "/auth/signin" }],
+  [
+    "creating a specialty requires signin",
+    () => anon("/api/specialties", post({ specialty_name: "Anon" })),
     { status: 302, location: "/auth/signin" },
   ],
   [
@@ -109,6 +118,50 @@ const steps = [
   ],
   ["dashboard shows the selected project", () => userA("/dashboard"), { status: 200, bodyIncludes: [renamedProject] }],
   [
+    "A adds a specialty to the selected project",
+    () => userA("/api/specialties", post({ specialty_name: specialtyName })),
+    { status: 302, locationIs: "/specialties" },
+  ],
+  [
+    "A cannot add the same specialty name in another letter case",
+    () => userA("/api/specialties", post({ specialty_name: specialtyName.toUpperCase() })),
+    { status: 302, location: "/specialties?error=" },
+  ],
+  [
+    "A's specialties list contains the specialty",
+    () => userA("/specialties"),
+    { status: 200, bodyIncludes: [specialtyName] },
+  ],
+  [
+    "A finds the specialty id on the list",
+    async () => {
+      const list = await userA("/specialties");
+      specialtyId = /\/specialties\/([0-9a-f-]{36})\/edit/.exec(list.body)?.[1] ?? "";
+      return { ...list, status: specialtyId ? list.status : 0 };
+    },
+    { status: 200 },
+  ],
+  [
+    "A edits the specialty name",
+    () => userA(`/api/specialties/${specialtyId}`, post({ specialty_name: renamedSpecialty })),
+    { status: 302, locationIs: "/specialties" },
+  ],
+  [
+    "the renamed specialty replaces the old name on the list",
+    () => userA("/specialties"),
+    { status: 200, bodyIncludes: [renamedSpecialty], bodyExcludes: [specialtyName] },
+  ],
+  [
+    "selecting a project with after_select=specialties opens the specialties page",
+    () => userA(`/api/projects/${projectId}/select`, post({ after_select: "specialties" })),
+    { status: 302, locationIs: "/specialties" },
+  ],
+  [
+    "an unknown after_select value falls back to the dashboard",
+    () => userA(`/api/projects/${projectId}/select`, post({ after_select: "https://evil.example" })),
+    { status: 302, locationIs: "/dashboard" },
+  ],
+  [
     "signup creates account B",
     () => userB("/api/auth/signup", post({ email: emailB, password })),
     { status: 302, location: "/auth/confirm-email" },
@@ -126,6 +179,22 @@ const steps = [
     { status: 302, location: "/projects?error=" },
   ],
   ["B's list does not contain A's project", () => userB("/projects"), { status: 200, bodyExcludes: [renamedProject] }],
+  [
+    "B without a selected project sees the empty state on /specialties",
+    () => userB("/specialties"),
+    { status: 200, bodyIncludes: ["Nie wybrano projektu"], bodyExcludes: [renamedSpecialty] },
+  ],
+  [
+    "B cannot add a specialty without a selected project",
+    () => userB("/api/specialties", post({ specialty_name: "Nie dla B" })),
+    { status: 302, location: "/specialties?error=" },
+  ],
+  ["B gets 404 on A's specialty edit page", () => userB(`/specialties/${specialtyId}/edit`), { status: 404 }],
+  [
+    "B cannot edit A's specialty",
+    () => userB(`/api/specialties/${specialtyId}`, post({ specialty_name: "Przejete" })),
+    { status: 302, location: "/specialties?error=" },
+  ],
   [
     "A sees the delete confirmation page",
     () => userA(`/projects/${projectId}/delete`),
@@ -145,6 +214,16 @@ const steps = [
     "dashboard is empty after deleting the selected project",
     () => userA("/dashboard"),
     { status: 200, bodyIncludes: ["Nie wybrano projektu"], bodyExcludes: [renamedProject] },
+  ],
+  [
+    "the specialties page shows the empty state after deleting the selected project",
+    () => userA("/specialties"),
+    { status: 200, bodyIncludes: ["Nie wybrano projektu"], bodyExcludes: [renamedSpecialty] },
+  ],
+  [
+    "the specialty edit page is gone after its project is deleted",
+    () => userA(`/specialties/${specialtyId}/edit`),
+    { status: 404 },
   ],
   [
     "A adds a project whose CRLF description fits the limit once newlines count as one character",
