@@ -197,4 +197,4 @@ Każdy zapis zadania, poprzednika lub specjalności dokłada jedno upsertowe pod
 - [x] 1.11 Sprawdzenie projektu z problemami nie ustawia „zweryfikowany” — 8a81018
 - [x] 1.12 Użytkownik zalogowany nie może zapisać ani zmienić stanu bezpośrednio (tabela `project_states` odrzuca zapis; próba `verify_project` na cudzym projekcie kończy się błędem) — 8a81018
 - [x] 1.13 Usunięcie projektu z zadaniami i specjalnościami działa jak dotąd (kaskada nie wysypuje wyzwalaczy) — 8a81018
-- [ ] 1.14 Po wdrożeniu na produkcji ten sam cykl działa na prawdziwych danych
+- [x] 1.14 Po wdrożeniu na produkcji ten sam cykl działa na prawdziwych danych — 8a81018
