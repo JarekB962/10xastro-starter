@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { errorUrl } from "@/lib/forms";
+import { errorUrl, readForm } from "@/lib/forms";
 import { requireProjectId, requireSupabase } from "@/lib/services/project-routes";
 import { PROJECT_ERROR_MESSAGES, selectProject } from "@/lib/services/projects";
 
@@ -16,5 +16,7 @@ export const POST: APIRoute = async (context) => {
     return context.redirect(errorUrl("/projects", PROJECT_ERROR_MESSAGES[result.error]));
   }
 
-  return context.redirect("/dashboard");
+  // Link „Specjalności" na liście projektów wybiera projekt i od razu otwiera jego specjalności.
+  const form = await readForm(context.request);
+  return context.redirect(form?.get("after_select") === "specialties" ? "/specialties" : "/dashboard");
 };

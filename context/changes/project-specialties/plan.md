@@ -325,31 +325,31 @@ Zwykłe akcje mają kończyć się widocznym wynikiem poniżej 1 sekundy (NFR z 
 
 #### Automated
 
-- [x] 2.1 Sprawdzenie typów przechodzi: `npx astro check`
-- [x] 2.2 Lint przechodzi: `npm run lint`
-- [x] 2.3 Build przechodzi: `npm run build`
+- [x] 2.1 Sprawdzenie typów przechodzi: `npx astro check` — 8e38b21
+- [x] 2.2 Lint przechodzi: `npm run lint` — 8e38b21
+- [x] 2.3 Build przechodzi: `npm run build` — 8e38b21
 
 #### Manual
 
-- [x] 2.4 Bez logowania `curl -i -X POST http://localhost:4321/api/specialties` odsyła 302 na `/auth/signin`
-- [x] 2.5 Po zalogowaniu (ciasteczko z przeglądarki) `POST /api/specialties` z poprawną nazwą tworzy wiersz widoczny w Studio z `project_id` wybranego projektu
+- [x] 2.4 Bez logowania `curl -i -X POST http://localhost:4321/api/specialties` odsyła 302 na `/auth/signin` — 8e38b21
+- [x] 2.5 Po zalogowaniu (ciasteczko z przeglądarki) `POST /api/specialties` z poprawną nazwą tworzy wiersz widoczny w Studio z `project_id` wybranego projektu — 8e38b21
 
 ### Phase 3: Ekrany specjalności po polsku
 
 #### Automated
 
-- [ ] 3.1 Sprawdzenie typów przechodzi: `npx astro check`
-- [ ] 3.2 Lint przechodzi: `npm run lint`
-- [ ] 3.3 Build przechodzi: `npm run build`
+- [x] 3.1 Sprawdzenie typów przechodzi: `npx astro check`
+- [x] 3.2 Lint przechodzi: `npm run lint`
+- [x] 3.3 Build przechodzi: `npm run build`
 
 #### Manual
 
-- [ ] 3.4 Bez wybranego projektu `/specialties` pokazuje pusty stan z linkiem do listy projektów
-- [ ] 3.5 Po wyborze projektu dodanie specjalności działa, a nowa pozycja jest na liście (alfabetycznie)
-- [ ] 3.6 Dodanie drugiej specjalności o tej samej nazwie (inna wielkość liter) pokazuje czytelny komunikat, a wpisana wartość zostaje w formularzu
-- [ ] 3.7 Zmiana nazwy przez „Edytuj" działa, a kursor jest od razu w polu nazwy na stronach dodawania i edycji
-- [ ] 3.8 Inny użytkownik wpisujący adres cudzego `/specialties/[id]/edit` dostaje 404
-- [ ] 3.9 Zwykłe akcje (zapis) kończą się widocznym wynikiem w czasie poniżej 1 sekundy
+- [x] 3.4 Bez wybranego projektu `/specialties` pokazuje pusty stan z linkiem do listy projektów
+- [x] 3.5 Po wyborze projektu dodanie specjalności działa, a nowa pozycja jest na liście (alfabetycznie)
+- [x] 3.6 Dodanie drugiej specjalności o tej samej nazwie (inna wielkość liter) pokazuje czytelny komunikat, a wpisana wartość zostaje w formularzu
+- [x] 3.7 Zmiana nazwy przez „Edytuj" działa, a kursor jest od razu w polu nazwy na stronach dodawania i edycji
+- [x] 3.8 Inny użytkownik wpisujący adres cudzego `/specialties/[id]/edit` dostaje 404
+- [x] 3.9 Zwykłe akcje (zapis) kończą się widocznym wynikiem w czasie poniżej 1 sekundy
 
 ### Phase 4: Test smoke i weryfikacja
 
