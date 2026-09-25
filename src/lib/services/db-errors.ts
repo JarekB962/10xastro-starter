@@ -1,12 +1,12 @@
 import type { createClient } from "@/lib/supabase";
-import type { ProjectError } from "@/types";
+import type { ServiceError } from "@/types";
 
 export type Db = NonNullable<ReturnType<typeof createClient>>;
 
 // Kody Postgres/PostgREST: 23505 unikalność, 23503 klucz obcy, 42501 naruszenie RLS, PGRST116 brak wiersza.
 // Cudzy lub nieistniejący projekt wygląda tak samo: baza ukrywa cudze wiersze, więc to "nie znaleziono".
 // Wyjątek: przy dodawaniu nie ma czego szukać, więc 23503/42501 (np. usunięty użytkownik z ważnym tokenem) to błąd niespodziewany.
-function toError(error: { code?: string }, creating: boolean): ProjectError {
+function toError(error: { code?: string }, creating: boolean): ServiceError {
   switch (error.code) {
     case "23505":
       return "duplicate_name";
@@ -25,7 +25,7 @@ export function fail(
   scope: string,
   error: { code?: string; message?: string },
   creating = false,
-): { ok: false; error: ProjectError } {
+): { ok: false; error: ServiceError } {
   const result = toError(error, creating);
   if (result === "unexpected") {
     // eslint-disable-next-line no-console -- surowy błąd bazy trafia do logów serwera, użytkownik dostaje ogólny komunikat

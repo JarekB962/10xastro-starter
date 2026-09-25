@@ -1,9 +1,9 @@
 import { fail, type Db } from "@/lib/services/db-errors";
-import type { ProjectError, ProjectResult, Specialty, SpecialtyInput } from "@/types";
+import type { ServiceError, ServiceResult, Specialty, SpecialtyInput } from "@/types";
 
 const SPECIALTY_COLUMNS = "id, name, created_at, updated_at";
 
-export const SPECIALTY_ERROR_MESSAGES: Record<ProjectError, string> = {
+export const SPECIALTY_ERROR_MESSAGES: Record<ServiceError, string> = {
   duplicate_name: "Specjalność o takiej nazwie już istnieje.",
   not_found: "Nie znaleziono specjalności.",
   unexpected: "Coś poszło nie tak. Spróbuj ponownie.",
@@ -20,7 +20,7 @@ export function formValues(form: FormData): Record<string, string> {
   return { specialty_name: typeof value === "string" ? value.slice(0, KEPT_NAME_LENGTH) : "" };
 }
 
-export async function listSpecialties(db: Db, projectId: string): Promise<ProjectResult<Specialty[]>> {
+export async function listSpecialties(db: Db, projectId: string): Promise<ServiceResult<Specialty[]>> {
   const { data, error } = await db
     .from("specialties")
     .select(SPECIALTY_COLUMNS)
@@ -30,7 +30,7 @@ export async function listSpecialties(db: Db, projectId: string): Promise<Projec
   return { ok: true, data };
 }
 
-export async function getSpecialty(db: Db, id: string): Promise<ProjectResult<Specialty>> {
+export async function getSpecialty(db: Db, id: string): Promise<ServiceResult<Specialty>> {
   const { data, error } = await db.from("specialties").select(SPECIALTY_COLUMNS).eq("id", id).maybeSingle();
   if (error) return fail("specialties", error);
   if (!data) return { ok: false, error: "not_found" };
@@ -42,7 +42,7 @@ export async function createSpecialty(
   db: Db,
   projectId: string,
   input: SpecialtyInput,
-): Promise<ProjectResult<Specialty>> {
+): Promise<ServiceResult<Specialty>> {
   const { data, error } = await db
     .from("specialties")
     .insert({ project_id: projectId, name: input.name })
@@ -52,7 +52,7 @@ export async function createSpecialty(
   return { ok: true, data };
 }
 
-export async function updateSpecialty(db: Db, id: string, input: SpecialtyInput): Promise<ProjectResult<Specialty>> {
+export async function updateSpecialty(db: Db, id: string, input: SpecialtyInput): Promise<ServiceResult<Specialty>> {
   const { data, error } = await db
     .from("specialties")
     .update({ name: input.name })

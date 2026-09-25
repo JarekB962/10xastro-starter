@@ -1,11 +1,11 @@
 import { fail, type Db } from "@/lib/services/db-errors";
-import type { Project, ProjectError, ProjectInput, ProjectResult } from "@/types";
+import type { Project, ServiceError, ProjectInput, ServiceResult } from "@/types";
 
 const PROJECT_COLUMNS = "id, name, description, created_at, updated_at";
 
 export const SUPABASE_NOT_CONFIGURED = "Supabase nie jest skonfigurowany";
 
-export const PROJECT_ERROR_MESSAGES: Record<ProjectError, string> = {
+export const PROJECT_ERROR_MESSAGES: Record<ServiceError, string> = {
   duplicate_name: "Projekt o takiej nazwie już istnieje.",
   not_found: "Nie znaleziono projektu.",
   unexpected: "Coś poszło nie tak. Spróbuj ponownie.",
@@ -27,13 +27,13 @@ export function formValues(form: FormData): Record<string, string> {
   };
 }
 
-export async function listProjects(db: Db): Promise<ProjectResult<Project[]>> {
+export async function listProjects(db: Db): Promise<ServiceResult<Project[]>> {
   const { data, error } = await db.from("projects").select(PROJECT_COLUMNS).order("name");
   if (error) return fail("projects", error);
   return { ok: true, data };
 }
 
-export async function getProject(db: Db, id: string): Promise<ProjectResult<Project>> {
+export async function getProject(db: Db, id: string): Promise<ServiceResult<Project>> {
   const { data, error } = await db.from("projects").select(PROJECT_COLUMNS).eq("id", id).maybeSingle();
   if (error) return fail("projects", error);
   if (!data) return { ok: false, error: "not_found" };
@@ -41,14 +41,14 @@ export async function getProject(db: Db, id: string): Promise<ProjectResult<Proj
 }
 
 /** Identyfikator wybranego projektu (jedno zapytanie); wystarcza tam, gdzie treść projektu jest już wczytana. */
-export async function getSelectedProjectId(db: Db): Promise<ProjectResult<string | null>> {
+export async function getSelectedProjectId(db: Db): Promise<ServiceResult<string | null>> {
   // Reguły dostępu ograniczają odczyt do własnego wiersza użytkownika.
   const { data, error } = await db.from("user_settings").select("selected_project_id").maybeSingle();
   if (error) return fail("projects", error);
   return { ok: true, data: data?.selected_project_id ?? null };
 }
 
-export async function getSelectedProject(db: Db): Promise<ProjectResult<Project | null>> {
+export async function getSelectedProject(db: Db): Promise<ServiceResult<Project | null>> {
   const selectedId = await getSelectedProjectId(db);
   if (!selectedId.ok) return selectedId;
   if (!selectedId.data) return { ok: true, data: null };
@@ -58,7 +58,7 @@ export async function getSelectedProject(db: Db): Promise<ProjectResult<Project 
   return project.error === "not_found" ? { ok: true, data: null } : project;
 }
 
-export async function selectProject(db: Db, id: string): Promise<ProjectResult<null>> {
+export async function selectProject(db: Db, id: string): Promise<ServiceResult<null>> {
   // `user_id` ma domyślną wartość auth.uid(); wiersz powstaje przy pierwszym wyborze projektu.
   const { error } = await db
     .from("user_settings")
@@ -91,7 +91,7 @@ async function selectIfNothingSelected(db: Db, projectId: string): Promise<void>
   }
 }
 
-export async function createProject(db: Db, input: ProjectInput): Promise<ProjectResult<Project>> {
+export async function createProject(db: Db, input: ProjectInput): Promise<ServiceResult<Project>> {
   const { data, error } = await db
     .from("projects")
     .insert({ name: input.name, description: input.description })
@@ -103,7 +103,7 @@ export async function createProject(db: Db, input: ProjectInput): Promise<Projec
   return { ok: true, data };
 }
 
-export async function updateProject(db: Db, id: string, input: ProjectInput): Promise<ProjectResult<Project>> {
+export async function updateProject(db: Db, id: string, input: ProjectInput): Promise<ServiceResult<Project>> {
   const { data, error } = await db
     .from("projects")
     .update({ name: input.name, description: input.description })
@@ -115,7 +115,7 @@ export async function updateProject(db: Db, id: string, input: ProjectInput): Pr
   return { ok: true, data };
 }
 
-export async function deleteProject(db: Db, id: string): Promise<ProjectResult<null>> {
+export async function deleteProject(db: Db, id: string): Promise<ServiceResult<null>> {
   // Klucz obcy `on delete set null` w user_settings sam czyści wybór, jeśli usunięto wybrany projekt.
   const { data, error } = await db.from("projects").delete().eq("id", id).select("id");
   if (error) return fail("projects", error);

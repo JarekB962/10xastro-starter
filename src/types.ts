@@ -107,9 +107,9 @@ export interface ProjectInput {
   description: string | null;
 }
 
-/** Wynik operacji usługi projektów: dane albo jednoznaczny kod błędu. */
-export type ProjectError = "duplicate_name" | "not_found" | "unexpected";
-export type ProjectResult<T> = { ok: true; data: T } | { ok: false; error: ProjectError };
+/** Wynik operacji usługi (projekty, specjalności): dane albo jednoznaczny kod błędu. */
+export type ServiceError = "duplicate_name" | "not_found" | "unexpected";
+export type ServiceResult<T> = { ok: true; data: T } | { ok: false; error: ServiceError };
 
 /** Wynik walidacji formularza projektu: dane albo pierwszy komunikat błędu. */
 export type ParsedProjectInput = { ok: true; data: ProjectInput } | { ok: false; message: string };
