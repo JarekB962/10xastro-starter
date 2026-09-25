@@ -310,29 +310,29 @@ Zwykłe akcje mają kończyć się widocznym wynikiem poniżej 1 sekundy (NFR z 
 
 #### Automated
 
-- [x] 1.1 Migracja stosuje się na czystej bazie lokalnej: `npx supabase db reset`
-- [x] 1.2 Generowanie typów Astro i sprawdzenie typów przechodzi: `npx astro sync && npx astro check`
-- [x] 1.3 Lint przechodzi: `npm run lint`
-- [x] 1.4 Build przechodzi: `npm run build`
+- [x] 1.1 Migracja stosuje się na czystej bazie lokalnej: `npx supabase db reset` — 8c8c415
+- [x] 1.2 Generowanie typów Astro i sprawdzenie typów przechodzi: `npx astro sync && npx astro check` — 8c8c415
+- [x] 1.3 Lint przechodzi: `npm run lint` — 8c8c415
+- [x] 1.4 Build przechodzi: `npm run build` — 8c8c415
 
 #### Manual
 
-- [x] 1.5 W lokalnym Supabase Studio (lub przez `psql`) `specialties` ma włączone RLS oraz polityki `select`, `insert`, `update` dla `authenticated` (bez `delete`)
-- [x] 1.6 Dwie specjalności o tej samej nazwie (różna wielkość liter) w jednym projekcie kończą się błędem unikalności, a w dwóch różnych projektach są dozwolone
-- [x] 1.7 Usunięcie projektu usuwa jego specjalności (kaskada)
+- [x] 1.5 W lokalnym Supabase Studio (lub przez `psql`) `specialties` ma włączone RLS oraz polityki `select`, `insert`, `update` dla `authenticated` (bez `delete`) — 8c8c415
+- [x] 1.6 Dwie specjalności o tej samej nazwie (różna wielkość liter) w jednym projekcie kończą się błędem unikalności, a w dwóch różnych projektach są dozwolone — 8c8c415
+- [x] 1.7 Usunięcie projektu usuwa jego specjalności (kaskada) — 8c8c415
 
 ### Phase 2: Warstwa serwera
 
 #### Automated
 
-- [ ] 2.1 Sprawdzenie typów przechodzi: `npx astro check`
-- [ ] 2.2 Lint przechodzi: `npm run lint`
-- [ ] 2.3 Build przechodzi: `npm run build`
+- [x] 2.1 Sprawdzenie typów przechodzi: `npx astro check`
+- [x] 2.2 Lint przechodzi: `npm run lint`
+- [x] 2.3 Build przechodzi: `npm run build`
 
 #### Manual
 
-- [ ] 2.4 Bez logowania `curl -i -X POST http://localhost:4321/api/specialties` odsyła 302 na `/auth/signin`
-- [ ] 2.5 Po zalogowaniu (ciasteczko z przeglądarki) `POST /api/specialties` z poprawną nazwą tworzy wiersz widoczny w Studio z `project_id` wybranego projektu
+- [x] 2.4 Bez logowania `curl -i -X POST http://localhost:4321/api/specialties` odsyła 302 na `/auth/signin`
+- [x] 2.5 Po zalogowaniu (ciasteczko z przeglądarki) `POST /api/specialties` z poprawną nazwą tworzy wiersz widoczny w Studio z `project_id` wybranego projektu
 
 ### Phase 3: Ekrany specjalności po polsku
 
