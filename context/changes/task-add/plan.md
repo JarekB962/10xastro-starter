@@ -270,31 +270,31 @@ Zwykłe akcje mają kończyć się widocznym wynikiem poniżej 1 sekundy (NFR z 
 
 #### Automated
 
-- [x] 2.1 Sprawdzenie typów przechodzi: `npx astro check`
-- [x] 2.2 Lint przechodzi: `npm run lint`
-- [x] 2.3 Build przechodzi: `npm run build`
+- [x] 2.1 Sprawdzenie typów przechodzi: `npx astro check` — 8027267
+- [x] 2.2 Lint przechodzi: `npm run lint` — 8027267
+- [x] 2.3 Build przechodzi: `npm run build` — 8027267
 
 #### Manual
 
-- [x] 2.4 Bez logowania `curl -i -X POST http://localhost:4321/api/tasks` odsyła 302 na `/auth/signin`
-- [x] 2.5 Bez wybranego projektu `/tasks` pokazuje „Nie wybrano projektu" z linkiem do listy projektów
-- [x] 2.6 Po wyborze projektu (przycisk „Zadania" przy projekcie) dodanie zadania z numerem, nazwą, specjalnością, nakładem i poprzednikami działa, a wiersz jest na liście w kolejności numerów
-- [x] 2.7 Zadanie tylko z numerem i nazwą zapisuje się (specjalność i nakład puste), a lista pokazuje „—"
-- [x] 2.8 Zajęty numer, poprzednik równy własnemu numerowi i nakład „abc" pokazują czytelne komunikaty, a wpisane wartości zostają w formularzu
-- [x] 2.9 Poprzednik o nieistniejącym numerze (np. 99) zapisuje się i jest widoczny na liście
-- [x] 2.10 Kursor jest od razu w polu numeru, a zwykłe akcje (zapis) kończą się widocznym wynikiem w czasie poniżej 1 sekundy
+- [x] 2.4 Bez logowania `curl -i -X POST http://localhost:4321/api/tasks` odsyła 302 na `/auth/signin` — 8027267
+- [x] 2.5 Bez wybranego projektu `/tasks` pokazuje „Nie wybrano projektu" z linkiem do listy projektów — 8027267
+- [x] 2.6 Po wyborze projektu (przycisk „Zadania" przy projekcie) dodanie zadania z numerem, nazwą, specjalnością, nakładem i poprzednikami działa, a wiersz jest na liście w kolejności numerów — 8027267
+- [x] 2.7 Zadanie tylko z numerem i nazwą zapisuje się (specjalność i nakład puste), a lista pokazuje „—" — 8027267
+- [x] 2.8 Zajęty numer, poprzednik równy własnemu numerowi i nakład „abc" pokazują czytelne komunikaty, a wpisane wartości zostają w formularzu — 8027267
+- [x] 2.9 Poprzednik o nieistniejącym numerze (np. 99) zapisuje się i jest widoczny na liście — 8027267
+- [x] 2.10 Kursor jest od razu w polu numeru, a zwykłe akcje (zapis) kończą się widocznym wynikiem w czasie poniżej 1 sekundy — 8027267
 
 ### Phase 3: Test smoke i weryfikacja
 
 #### Automated
 
-- [ ] 3.1 Lint przechodzi (w tym `scripts/`): `npm run lint`
-- [ ] 3.2 Build przechodzi: `npm run build`
-- [ ] 3.3 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke`
+- [x] 3.1 Lint przechodzi (w tym `scripts/`): `npm run lint`
+- [x] 3.2 Build przechodzi: `npm run build`
+- [x] 3.3 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke`
 - [ ] 3.4 CI (`ci` i `smoke`) zielone na gałęzi z tą zmianą
 
 #### Manual
 
-- [ ] 3.5 Ręczny przebieg z przeglądarki zgadza się z krokami smoke (dodanie, zajęty numer, poprzednicy, izolacja między kontami)
-- [ ] 3.6 Po usunięciu projektu jego zadania i poprzednicy znikają z bazy: `select count(*) from tasks where project_id = '<usunięty projekt>'` daje 0
+- [x] 3.5 Ręczny przebieg z przeglądarki zgadza się z krokami smoke (dodanie, zajęty numer, poprzednicy, izolacja między kontami)
+- [x] 3.6 Po usunięciu projektu jego zadania i poprzednicy znikają z bazy: `select count(*) from tasks where project_id = '<usunięty projekt>'` daje 0
 - [ ] 3.7 Migracja jest zastosowana w docelowej bazie Supabase przed wdrożeniem kodu (`npx supabase db push`)
