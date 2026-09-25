@@ -1,0 +1,55 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Topbar from "@/components/Topbar.astro";
+import SpecialtyForm from "@/components/specialties/SpecialtyForm";
+import { SUPABASE_NOT_CONFIGURED } from "@/lib/services/projects";
+import { getSpecialty } from "@/lib/services/specialties";
+import { parseSpecialtyId } from "@/lib/validation/specialty";
+
+const supabase = Astro.locals.supabase;
+// Nieistniejąca i cudza specjalność wyglądają tak samo: 404. Bez klienta Supabase: 503 z komunikatem o konfiguracji,
+// a błąd bazy przy odczycie: 500 (nie udajemy, że specjalności nie ma).
+const id = parseSpecialtyId(Astro.params.id);
+const result = supabase && id ? await getSpecialty(supabase, id) : null;
+const specialty = result?.ok ? result.data : null;
+const loadFailed = result !== null && !result.ok && result.error !== "not_found";
+const notFoundMessage = !supabase
+  ? SUPABASE_NOT_CONFIGURED
+  : loadFailed
+    ? "Nie udało się wczytać specjalności"
+    : "Nie znaleziono specjalności";
+if (!specialty) Astro.response.status = !supabase ? 503 : loadFailed ? 500 : 404;
+
+const params = Astro.url.searchParams;
+const error = params.get("error");
+// Po błędzie serwera formularz wraca z tym, co użytkownik wpisał; bez błędu z zapisaną nazwą.
+const entered = error ? params : null;
+const initial = { name: entered?.get("specialty_name") ?? specialty?.name ?? "" };
+---
+
+<Layout title="Edycja specjalności — Plan projektu (WBS)">
+  <div class="bg-cosmic min-h-screen p-4">
+    <div class="mx-auto max-w-md">
+      <Topbar />
+      <div class="rounded-2xl border border-white/10 bg-white/10 p-8 text-white backdrop-blur-xl">
+        <h1 class="mb-6 bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-center text-2xl font-bold text-transparent">
+          {specialty ? "Edycja specjalności" : notFoundMessage}
+        </h1>
+        {specialty && (
+          <SpecialtyForm
+            action={`/api/specialties/${specialty.id}`}
+            initial={initial}
+            serverError={error}
+            submitLabel="Zapisz zmiany"
+            client:load
+          />
+        )}
+        <p class="mt-4 text-center text-sm text-blue-100/60">
+          <a href="/specialties" class="text-purple-300 hover:underline">
+            Wróć do listy specjalności
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+</Layout>

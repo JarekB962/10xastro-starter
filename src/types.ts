@@ -55,6 +55,38 @@ export type Database = {
           },
         ];
       };
+      specialties: {
+        Row: {
+          id: string;
+          project_id: string;
+          name: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          project_id: string;
+          name: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          project_id?: string;
+          name?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "specialties_project_id_fkey";
+            columns: ["project_id"];
+            isOneToOne: false;
+            referencedRelation: "projects";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -75,9 +107,23 @@ export interface ProjectInput {
   description: string | null;
 }
 
-/** Wynik operacji usługi projektów: dane albo jednoznaczny kod błędu. */
-export type ProjectError = "duplicate_name" | "not_found" | "unexpected";
-export type ProjectResult<T> = { ok: true; data: T } | { ok: false; error: ProjectError };
+/** Wynik operacji usługi (projekty, specjalności): dane albo jednoznaczny kod błędu. */
+export type ServiceError = "duplicate_name" | "not_found" | "unexpected";
+export type ServiceResult<T> = { ok: true; data: T } | { ok: false; error: ServiceError };
 
 /** Wynik walidacji formularza projektu: dane albo pierwszy komunikat błędu. */
 export type ParsedProjectInput = { ok: true; data: ProjectInput } | { ok: false; message: string };
+
+/** Specjalność projektu widoczna w interfejsie (bez identyfikatora projektu). */
+export type Specialty = Pick<
+  Database["public"]["Tables"]["specialties"]["Row"],
+  "id" | "name" | "created_at" | "updated_at"
+>;
+
+/** Dane formularza specjalności po walidacji. */
+export interface SpecialtyInput {
+  name: string;
+}
+
+/** Wynik walidacji formularza specjalności: dane albo pierwszy komunikat błędu. */
+export type ParsedSpecialtyInput = { ok: true; data: SpecialtyInput } | { ok: false; message: string };

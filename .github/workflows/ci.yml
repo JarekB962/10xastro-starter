@@ -32,9 +32,10 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      # Przypięta wersja (jak lokalnie): "latest" wymaga zapytania do GitHub API i bywa odrzucane limitem zapytań.
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 2.117.0
       - run: npm ci
       - name: Start local Supabase
         run: |

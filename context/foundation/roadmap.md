@@ -41,7 +41,7 @@ Kierownik projektu na starcie dostaje listę zadań (specjalność wykonawcy, na
 
 | ID   | Change ID           | Outcome (user can …)                                                                                       | Prerequisites                      | PRD refs      | Status   |
 | ---- | ------------------- | ---------------------------------------------------------------------------------------------------------- | ---------------------------------- | ------------- | -------- |
-| S-01 | project-specialties | dodać i edytować specjalności wykonawców w wybranym projekcie                                              | wybrany projekt (FR-003, wdrożone) | FR-004, US-01 | ready    |
+| S-01 | project-specialties | dodać i edytować specjalności wykonawców w wybranym projekcie                                              | wybrany projekt (FR-003, wdrożone) | FR-004, US-01 | in-progress |
 | S-02 | task-add            | dodać zadanie (numer, nazwa, specjalność, nakład, poprzednicy jako numery) i zobaczyć listę zadań projektu | S-01                               | FR-006, US-01 | proposed |
 | S-03 | task-edit           | poprawić zadanie (nazwa, specjalność, nakład, poprzednicy)                                                 | S-02                               | FR-006        | proposed |
 
@@ -74,7 +74,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - Czy nazwa specjalności jest unikalna w projekcie (tak jak nazwa projektu)? — Owner: user. Block: no.
 - **Risk:** Najmniejszy wycinek i jedyny bez zależności, więc idzie pierwszy (cel: szybkość). Ustala wzorzec danych podrzędnych względem projektu, który powtórzą zadania.
-- **Status:** ready
+- **Status:** in-progress
 
 ### S-02: Dodawanie zadania
 
