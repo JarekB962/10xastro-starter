@@ -105,7 +105,15 @@ describe("checkTasks: cykle zależności", () => {
     const tasks = Array.from({ length: size }, (_, i) => task(i + 1, [i === 0 ? size : i]));
     const { problems } = checkTasks(tasks);
     assert.equal(problems.length, size);
-    assert.equal(problems[0].cycleWith.length, size);
+    assert.deepEqual(
+      problems[0].cycleWith,
+      Array.from({ length: size }, (_, i) => i + 1),
+    );
+  });
+
+  it("dwa cykle połączone jedną krawędzią jednokierunkową to dwie osobne grupy", () => {
+    const cycles = cyclesOf([task(1, [2]), task(2, [1]), task(3, [4, 1]), task(4, [3])]);
+    assert.deepEqual(cycles, { 1: [1, 2], 2: [1, 2], 3: [3, 4], 4: [3, 4] });
   });
 
   it("wynik jest posortowany po numerze zadania", () => {

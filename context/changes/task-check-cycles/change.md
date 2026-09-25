@@ -1,7 +1,7 @@
 ---
 change_id: task-check-cycles
 title: Sprawdzenie listy zadań: cykle zależności
-status: implemented
+status: impl_reviewed
 created: 2026-09-25
 updated: 2026-09-25
 archived_at: null

@@ -11,6 +11,7 @@ function nameKey(task: Task): string {
  * Wierzchołki to numery zadań, krawędź prowadzi z zadania do jego poprzednika istniejącego na liście.
  * Zwraca dla numeru zadania numery jego składowej rosnąco, tylko dla składowych o rozmiarze >= 2
  * (zadanie w składowej jednoelementowej, także z pętlą własną, nie leży na cyklu).
+ * Pętli własnej nie oznaczamy, bo warstwa walidacji (validation/task.ts) blokuje ją przy zapisie.
  */
 function cycleGroups(tasks: Task[]): Map<number, number[]> {
   const edges = new Map<number, number[]>();

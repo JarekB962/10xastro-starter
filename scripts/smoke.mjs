@@ -487,6 +487,14 @@ const steps = [
     },
   ],
   [
+    "A's check labels exactly the three cycle tasks with the group",
+    async () => {
+      const page = await userA("/tasks/check");
+      return { ...page, body: `labels=${page.body.split("ci: zadania 20, 21, 22").length - 1}.` };
+    },
+    { status: 200, bodyIncludes: ["labels=3."] },
+  ],
+  [
     "A's check shows the cycle and the effort 0 reason in one block for a cycle task",
     async () => {
       const page = await userA("/tasks/check");
