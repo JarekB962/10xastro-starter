@@ -235,17 +235,17 @@ Zwykłe akcje mają kończyć się widocznym wynikiem poniżej 1 sekundy (NFR z 
 
 #### Automated
 
-- [x] 2.1 Sprawdzenie typów przechodzi: `npx astro check`
-- [x] 2.2 Lint przechodzi (w tym `scripts/`): `npm run lint`
-- [x] 2.3 Build przechodzi: `npm run build`
-- [x] 2.4 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke`
-- [ ] 2.5 CI (`ci` i `smoke`) zielone na gałęzi z tą zmianą
+- [x] 2.1 Sprawdzenie typów przechodzi: `npx astro check` — 9455983
+- [x] 2.2 Lint przechodzi (w tym `scripts/`): `npm run lint` — 9455983
+- [x] 2.3 Build przechodzi: `npm run build` — 9455983
+- [x] 2.4 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke` — 9455983
+- [x] 2.5 CI (`ci` i `smoke`) zielone na gałęzi z tą zmianą — 9455983
 
 #### Manual
 
-- [x] 2.6 Na `/tasks` każde zadanie ma link „Edytuj”, a strona edycji pokazuje numer tylko do odczytu i aktualne wartości pól
-- [x] 2.7 Zmiana nazwy, specjalności (także na „Bez specjalności”), nakładu (także na pusty) i poprzedników (także na pustych) działa, a lista pokazuje nowe wartości po powrocie
-- [x] 2.8 Poprzednik równy numerowi zadania, nakład „abc” i pusta nazwa pokazują czytelne komunikaty, a wpisane wartości zostają w formularzu
-- [x] 2.9 Inny użytkownik wpisujący adres cudzej edycji zadania dostaje 404
-- [x] 2.10 Kursor jest od razu w polu nazwy, a zapis kończy się widocznym wynikiem w czasie poniżej 1 sekundy
-- [ ] 2.11 Migracja jest zastosowana w docelowej bazie Supabase przed wdrożeniem kodu (`npx supabase db push`)
+- [x] 2.6 Na `/tasks` każde zadanie ma link „Edytuj”, a strona edycji pokazuje numer tylko do odczytu i aktualne wartości pól — 9455983
+- [x] 2.7 Zmiana nazwy, specjalności (także na „Bez specjalności”), nakładu (także na pusty) i poprzedników (także na pustych) działa, a lista pokazuje nowe wartości po powrocie — 9455983
+- [x] 2.8 Poprzednik równy numerowi zadania, nakład „abc” i pusta nazwa pokazują czytelne komunikaty, a wpisane wartości zostają w formularzu — 9455983
+- [x] 2.9 Inny użytkownik wpisujący adres cudzej edycji zadania dostaje 404 — 9455983
+- [x] 2.10 Kursor jest od razu w polu nazwy, a zapis kończy się widocznym wynikiem w czasie poniżej 1 sekundy — 9455983
+- [x] 2.11 Migracja jest zastosowana w docelowej bazie Supabase przed wdrożeniem kodu (`npx supabase db push`) — 9455983
