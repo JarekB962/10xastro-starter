@@ -154,17 +154,17 @@ Wymaganie z PRD: sprawdzenie kilkudziesięciu zadań w kilka do kilkunastu sekun
 
 #### Automated
 
-- [x] 1.1 Testy jednostkowe algorytmu przechodzą: `npm run test:unit`
-- [x] 1.2 Sprawdzenie typów przechodzi: `npx astro check`
-- [x] 1.3 Lint przechodzi (w tym `scripts/` i `tests/`): `npm run lint`
-- [x] 1.4 Build przechodzi: `npm run build`
-- [x] 1.5 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke`
-- [ ] 1.6 CI (`ci` z krokiem testów jednostkowych i `smoke`) zielone na gałęzi z tą zmianą
+- [x] 1.1 Testy jednostkowe algorytmu przechodzą: `npm run test:unit` — 2e20a67
+- [x] 1.2 Sprawdzenie typów przechodzi: `npx astro check` — 2e20a67
+- [x] 1.3 Lint przechodzi (w tym `scripts/` i `tests/`): `npm run lint` — 2e20a67
+- [x] 1.4 Build przechodzi: `npm run build` — 2e20a67
+- [x] 1.5 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke` — 2e20a67
+- [x] 1.6 CI (`ci` z krokiem testów jednostkowych i `smoke`) zielone na gałęzi z tą zmianą — 2e20a67
 
 #### Manual
 
-- [x] 1.7 Projekt z cyklem trzech zadań pokazuje przy każdym z nich „Cykl zależności: zadania …” z numerami wszystkich trzech; zadanie tylko zależne od cyklu nie jest oznaczone
-- [x] 1.8 Zadanie na cyklu z dodatkowym problemem (np. nakład 0 albo nieistniejący poprzednik) pokazuje wszystkie powody
-- [x] 1.9 Projekt bez problemów pokazuje „Nie znaleziono problemów…” i nigdzie nie mówi „wszystko w porządku” ani o niesprawdzanych cyklach
-- [x] 1.10 Po usunięciu zależności zamykającej cykl (przez „Edytuj” zadania) ponowne otwarcie `/tasks/check` nie oznacza już tych zadań jako cykl
-- [x] 1.11 Sprawdzenie kilkudziesięciu zadań z kilkoma cyklami kończy się widocznym wynikiem w czasie poniżej 1 sekundy
+- [x] 1.7 Projekt z cyklem trzech zadań pokazuje przy każdym z nich „Cykl zależności: zadania …” z numerami wszystkich trzech; zadanie tylko zależne od cyklu nie jest oznaczone — 2e20a67
+- [x] 1.8 Zadanie na cyklu z dodatkowym problemem (np. nakład 0 albo nieistniejący poprzednik) pokazuje wszystkie powody — 2e20a67
+- [x] 1.9 Projekt bez problemów pokazuje „Nie znaleziono problemów…” i nigdzie nie mówi „wszystko w porządku” ani o niesprawdzanych cyklach — 2e20a67
+- [x] 1.10 Po usunięciu zależności zamykającej cykl (przez „Edytuj” zadania) ponowne otwarcie `/tasks/check` nie oznacza już tych zadań jako cykl — 2e20a67
+- [x] 1.11 Sprawdzenie kilkudziesięciu zadań z kilkoma cyklami kończy się widocznym wynikiem w czasie poniżej 1 sekundy — 2e20a67
