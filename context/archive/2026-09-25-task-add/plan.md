@@ -253,48 +253,48 @@ Zwykłe akcje mają kończyć się widocznym wynikiem poniżej 1 sekundy (NFR z 
 
 #### Automated
 
-- [x] 1.1 Migracja stosuje się na czystej bazie lokalnej: `npx supabase db reset` — 60c9565
-- [x] 1.2 Generowanie typów Astro i sprawdzenie typów przechodzi: `npx astro sync && npx astro check` — 60c9565
-- [x] 1.3 Lint przechodzi: `npm run lint` — 60c9565
-- [x] 1.4 Build przechodzi: `npm run build` — 60c9565
+- [x] 1.1 Migracja stosuje się na czystej bazie lokalnej: `npx supabase db reset` — c223174
+- [x] 1.2 Generowanie typów Astro i sprawdzenie typów przechodzi: `npx astro sync && npx astro check` — c223174
+- [x] 1.3 Lint przechodzi: `npm run lint` — c223174
+- [x] 1.4 Build przechodzi: `npm run build` — c223174
 
 #### Manual
 
-- [x] 1.5 W lokalnym Supabase (przez `psql`) obie tabele mają włączone RLS i polityki tylko dla `authenticated`, a `tasks` nie ma polityki `delete` — 60c9565
-- [x] 1.6 Dwa zadania z tym samym numerem w jednym projekcie kończą się błędem unikalności, a w dwóch różnych projektach są dozwolone — 60c9565
-- [x] 1.7 Zadanie ze specjalnością z innego projektu kończy się błędem klucza obcego; zadanie bez specjalności zapisuje się — 60c9565
-- [x] 1.8 Poprzednik równy numerowi zadania jest odrzucony przez wyzwalacz; `create_task` z błędnym poprzednikiem nie zostawia zadania w tabeli — 60c9565
-- [x] 1.9 Usunięcie projektu usuwa jego zadania i poprzedników (kaskada) — 60c9565
+- [x] 1.5 W lokalnym Supabase (przez `psql`) obie tabele mają włączone RLS i polityki tylko dla `authenticated`, a `tasks` nie ma polityki `delete` — c223174
+- [x] 1.6 Dwa zadania z tym samym numerem w jednym projekcie kończą się błędem unikalności, a w dwóch różnych projektach są dozwolone — c223174
+- [x] 1.7 Zadanie ze specjalnością z innego projektu kończy się błędem klucza obcego; zadanie bez specjalności zapisuje się — c223174
+- [x] 1.8 Poprzednik równy numerowi zadania jest odrzucony przez wyzwalacz; `create_task` z błędnym poprzednikiem nie zostawia zadania w tabeli — c223174
+- [x] 1.9 Usunięcie projektu usuwa jego zadania i poprzedników (kaskada) — c223174
 
 ### Phase 2: Warstwa serwera i ekrany
 
 #### Automated
 
-- [x] 2.1 Sprawdzenie typów przechodzi: `npx astro check` — 8027267
-- [x] 2.2 Lint przechodzi: `npm run lint` — 8027267
-- [x] 2.3 Build przechodzi: `npm run build` — 8027267
+- [x] 2.1 Sprawdzenie typów przechodzi: `npx astro check` — c223174
+- [x] 2.2 Lint przechodzi: `npm run lint` — c223174
+- [x] 2.3 Build przechodzi: `npm run build` — c223174
 
 #### Manual
 
-- [x] 2.4 Bez logowania `curl -i -X POST http://localhost:4321/api/tasks` odsyła 302 na `/auth/signin` — 8027267
-- [x] 2.5 Bez wybranego projektu `/tasks` pokazuje „Nie wybrano projektu" z linkiem do listy projektów — 8027267
-- [x] 2.6 Po wyborze projektu (przycisk „Zadania" przy projekcie) dodanie zadania z numerem, nazwą, specjalnością, nakładem i poprzednikami działa, a wiersz jest na liście w kolejności numerów — 8027267
-- [x] 2.7 Zadanie tylko z numerem i nazwą zapisuje się (specjalność i nakład puste), a lista pokazuje „—" — 8027267
-- [x] 2.8 Zajęty numer, poprzednik równy własnemu numerowi i nakład „abc" pokazują czytelne komunikaty, a wpisane wartości zostają w formularzu — 8027267
-- [x] 2.9 Poprzednik o nieistniejącym numerze (np. 99) zapisuje się i jest widoczny na liście — 8027267
-- [x] 2.10 Kursor jest od razu w polu numeru, a zwykłe akcje (zapis) kończą się widocznym wynikiem w czasie poniżej 1 sekundy — 8027267
+- [x] 2.4 Bez logowania `curl -i -X POST http://localhost:4321/api/tasks` odsyła 302 na `/auth/signin` — c223174
+- [x] 2.5 Bez wybranego projektu `/tasks` pokazuje „Nie wybrano projektu" z linkiem do listy projektów — c223174
+- [x] 2.6 Po wyborze projektu (przycisk „Zadania" przy projekcie) dodanie zadania z numerem, nazwą, specjalnością, nakładem i poprzednikami działa, a wiersz jest na liście w kolejności numerów — c223174
+- [x] 2.7 Zadanie tylko z numerem i nazwą zapisuje się (specjalność i nakład puste), a lista pokazuje „—" — c223174
+- [x] 2.8 Zajęty numer, poprzednik równy własnemu numerowi i nakład „abc" pokazują czytelne komunikaty, a wpisane wartości zostają w formularzu — c223174
+- [x] 2.9 Poprzednik o nieistniejącym numerze (np. 99) zapisuje się i jest widoczny na liście — c223174
+- [x] 2.10 Kursor jest od razu w polu numeru, a zwykłe akcje (zapis) kończą się widocznym wynikiem w czasie poniżej 1 sekundy — c223174
 
 ### Phase 3: Test smoke i weryfikacja
 
 #### Automated
 
-- [x] 3.1 Lint przechodzi (w tym `scripts/`): `npm run lint` — 952ccc0
-- [x] 3.2 Build przechodzi: `npm run build` — 952ccc0
-- [x] 3.3 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke` — 952ccc0
-- [x] 3.4 CI (`ci` i `smoke`) zielone na gałęzi z tą zmianą — 952ccc0
+- [x] 3.1 Lint przechodzi (w tym `scripts/`): `npm run lint` — c223174
+- [x] 3.2 Build przechodzi: `npm run build` — c223174
+- [x] 3.3 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke` — c223174
+- [x] 3.4 CI (`ci` i `smoke`) zielone na gałęzi z tą zmianą — c223174
 
 #### Manual
 
-- [x] 3.5 Ręczny przebieg z przeglądarki zgadza się z krokami smoke (dodanie, zajęty numer, poprzednicy, izolacja między kontami) — 952ccc0
-- [x] 3.6 Po usunięciu projektu jego zadania i poprzednicy znikają z bazy: `select count(*) from tasks where project_id = '<usunięty projekt>'` daje 0 — 952ccc0
-- [x] 3.7 Migracja jest zastosowana w docelowej bazie Supabase przed wdrożeniem kodu (`npx supabase db push`) — 952ccc0
+- [x] 3.5 Ręczny przebieg z przeglądarki zgadza się z krokami smoke (dodanie, zajęty numer, poprzednicy, izolacja między kontami) — c223174
+- [x] 3.6 Po usunięciu projektu jego zadania i poprzednicy znikają z bazy: `select count(*) from tasks where project_id = '<usunięty projekt>'` daje 0 — c223174
+- [x] 3.7 Migracja jest zastosowana w docelowej bazie Supabase przed wdrożeniem kodu (`npx supabase db push`) — c223174
