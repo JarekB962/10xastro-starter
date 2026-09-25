@@ -7,6 +7,9 @@ export const SPECIALTY_ERROR_MESSAGES: Record<ServiceError, string> = {
   duplicate_name: "Specjalność o takiej nazwie już istnieje.",
   not_found: "Nie znaleziono specjalności.",
   unexpected: "Coś poszło nie tak. Spróbuj ponownie.",
+  // Kody zadań; usługa specjalności ich nie zwraca.
+  duplicate_number: "Coś poszło nie tak. Spróbuj ponownie.",
+  invalid_specialty: "Coś poszło nie tak. Spróbuj ponownie.",
 };
 
 export const NO_PROJECT_SELECTED_MESSAGE = "Nie wybrano projektu.";
