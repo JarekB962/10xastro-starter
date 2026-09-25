@@ -34,7 +34,7 @@ export function formValues(form: FormData): Record<string, string> {
 }
 
 const TASK_SELECT =
-  "id, number, name, effort, created_at, updated_at, specialties(name), task_predecessors(predecessor_number)";
+  "id, project_id, number, name, effort, specialty_id, created_at, updated_at, specialties(name), task_predecessors(predecessor_number)";
 
 export async function listTasks(db: Db, projectId: string): Promise<ServiceResult<Task[], TaskServiceError>> {
   const { data, error } = await db.from("tasks").select(TASK_SELECT).eq("project_id", projectId).order("number");
@@ -42,9 +42,11 @@ export async function listTasks(db: Db, projectId: string): Promise<ServiceResul
 
   const tasks = data.map((row) => ({
     id: row.id,
+    project_id: row.project_id,
     number: row.number,
     name: row.name,
     effort: row.effort,
+    specialty_id: row.specialty_id,
     specialty: row.specialties?.name ?? null,
     predecessors: row.task_predecessors.map((p) => p.predecessor_number).sort((a, b) => a - b),
     created_at: row.created_at,
