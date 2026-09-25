@@ -318,58 +318,58 @@ Zmiany wprowadzone po napisaniu planu, na prośbę użytkownika w trakcie Fazy 3
 
 #### Automated
 
-- [x] 1.1 Migracja stosuje się na czystej bazie lokalnej: `npx supabase db reset` — 8c8c415
-- [x] 1.2 Generowanie typów Astro i sprawdzenie typów przechodzi: `npx astro sync && npx astro check` — 8c8c415
-- [x] 1.3 Lint przechodzi: `npm run lint` — 8c8c415
-- [x] 1.4 Build przechodzi: `npm run build` — 8c8c415
+- [x] 1.1 Migracja stosuje się na czystej bazie lokalnej: `npx supabase db reset` — 7fb6b07
+- [x] 1.2 Generowanie typów Astro i sprawdzenie typów przechodzi: `npx astro sync && npx astro check` — 7fb6b07
+- [x] 1.3 Lint przechodzi: `npm run lint` — 7fb6b07
+- [x] 1.4 Build przechodzi: `npm run build` — 7fb6b07
 
 #### Manual
 
-- [x] 1.5 W lokalnym Supabase Studio (lub przez `psql`) `specialties` ma włączone RLS oraz polityki `select`, `insert`, `update` dla `authenticated` (bez `delete`) — 8c8c415
-- [x] 1.6 Dwie specjalności o tej samej nazwie (różna wielkość liter) w jednym projekcie kończą się błędem unikalności, a w dwóch różnych projektach są dozwolone — 8c8c415
-- [x] 1.7 Usunięcie projektu usuwa jego specjalności (kaskada) — 8c8c415
+- [x] 1.5 W lokalnym Supabase Studio (lub przez `psql`) `specialties` ma włączone RLS oraz polityki `select`, `insert`, `update` dla `authenticated` (bez `delete`) — 7fb6b07
+- [x] 1.6 Dwie specjalności o tej samej nazwie (różna wielkość liter) w jednym projekcie kończą się błędem unikalności, a w dwóch różnych projektach są dozwolone — 7fb6b07
+- [x] 1.7 Usunięcie projektu usuwa jego specjalności (kaskada) — 7fb6b07
 
 ### Phase 2: Warstwa serwera
 
 #### Automated
 
-- [x] 2.1 Sprawdzenie typów przechodzi: `npx astro check` — 8e38b21
-- [x] 2.2 Lint przechodzi: `npm run lint` — 8e38b21
-- [x] 2.3 Build przechodzi: `npm run build` — 8e38b21
+- [x] 2.1 Sprawdzenie typów przechodzi: `npx astro check` — 7fb6b07
+- [x] 2.2 Lint przechodzi: `npm run lint` — 7fb6b07
+- [x] 2.3 Build przechodzi: `npm run build` — 7fb6b07
 
 #### Manual
 
-- [x] 2.4 Bez logowania `curl -i -X POST http://localhost:4321/api/specialties` odsyła 302 na `/auth/signin` — 8e38b21
-- [x] 2.5 Po zalogowaniu (ciasteczko z przeglądarki) `POST /api/specialties` z poprawną nazwą tworzy wiersz widoczny w Studio z `project_id` wybranego projektu — 8e38b21
+- [x] 2.4 Bez logowania `curl -i -X POST http://localhost:4321/api/specialties` odsyła 302 na `/auth/signin` — 7fb6b07
+- [x] 2.5 Po zalogowaniu (ciasteczko z przeglądarki) `POST /api/specialties` z poprawną nazwą tworzy wiersz widoczny w Studio z `project_id` wybranego projektu — 7fb6b07
 
 ### Phase 3: Ekrany specjalności po polsku
 
 #### Automated
 
-- [x] 3.1 Sprawdzenie typów przechodzi: `npx astro check` — 84d605b
-- [x] 3.2 Lint przechodzi: `npm run lint` — 84d605b
-- [x] 3.3 Build przechodzi: `npm run build` — 84d605b
+- [x] 3.1 Sprawdzenie typów przechodzi: `npx astro check` — 7fb6b07
+- [x] 3.2 Lint przechodzi: `npm run lint` — 7fb6b07
+- [x] 3.3 Build przechodzi: `npm run build` — 7fb6b07
 
 #### Manual
 
-- [x] 3.4 Bez wybranego projektu `/specialties` pokazuje pusty stan z linkiem do listy projektów — 84d605b
-- [x] 3.5 Po wyborze projektu dodanie specjalności działa, a nowa pozycja jest na liście (alfabetycznie) — 84d605b
-- [x] 3.6 Dodanie drugiej specjalności o tej samej nazwie (inna wielkość liter) pokazuje czytelny komunikat, a wpisana wartość zostaje w formularzu — 84d605b
-- [x] 3.7 Zmiana nazwy przez „Edytuj" działa, a kursor jest od razu w polu nazwy na stronach dodawania i edycji — 84d605b
-- [x] 3.8 Inny użytkownik wpisujący adres cudzego `/specialties/[id]/edit` dostaje 404 — 84d605b
-- [x] 3.9 Zwykłe akcje (zapis) kończą się widocznym wynikiem w czasie poniżej 1 sekundy — 84d605b
+- [x] 3.4 Bez wybranego projektu `/specialties` pokazuje pusty stan z linkiem do listy projektów — 7fb6b07
+- [x] 3.5 Po wyborze projektu dodanie specjalności działa, a nowa pozycja jest na liście (alfabetycznie) — 7fb6b07
+- [x] 3.6 Dodanie drugiej specjalności o tej samej nazwie (inna wielkość liter) pokazuje czytelny komunikat, a wpisana wartość zostaje w formularzu — 7fb6b07
+- [x] 3.7 Zmiana nazwy przez „Edytuj" działa, a kursor jest od razu w polu nazwy na stronach dodawania i edycji — 7fb6b07
+- [x] 3.8 Inny użytkownik wpisujący adres cudzego `/specialties/[id]/edit` dostaje 404 — 7fb6b07
+- [x] 3.9 Zwykłe akcje (zapis) kończą się widocznym wynikiem w czasie poniżej 1 sekundy — 7fb6b07
 
 ### Phase 4: Test smoke i weryfikacja
 
 #### Automated
 
-- [x] 4.1 Lint przechodzi (w tym `scripts/`): `npm run lint` — ce788c4
-- [x] 4.2 Build przechodzi: `npm run build` — ce788c4
-- [x] 4.3 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke` — ce788c4
+- [x] 4.1 Lint przechodzi (w tym `scripts/`): `npm run lint` — 7fb6b07
+- [x] 4.2 Build przechodzi: `npm run build` — 7fb6b07
+- [x] 4.3 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke` — 7fb6b07
 - [x] 4.4 CI (`ci` i `smoke`) zielone na gałęzi z tą zmianą
 
 #### Manual
 
-- [x] 4.5 Ręczny przebieg z przeglądarki zgadza się z krokami smoke (dodanie, duplikat, edycja, izolacja między kontami) — ce788c4
-- [x] 4.6 Po usunięciu projektu jego specjalności znikają z bazy: `select count(*) from specialties where project_id = '<usunięty projekt>'` daje 0 — ce788c4
+- [x] 4.5 Ręczny przebieg z przeglądarki zgadza się z krokami smoke (dodanie, duplikat, edycja, izolacja między kontami) — 7fb6b07
+- [x] 4.6 Po usunięciu projektu jego specjalności znikają z bazy: `select count(*) from specialties where project_id = '<usunięty projekt>'` daje 0 — 7fb6b07
 - [x] 4.7 Migracja jest zastosowana w docelowej bazie Supabase przed wdrożeniem kodu (`npx supabase db push`)
