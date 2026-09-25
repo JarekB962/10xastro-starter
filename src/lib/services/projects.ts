@@ -1,11 +1,11 @@
 import { fail, type Db } from "@/lib/services/db-errors";
-import type { Project, ServiceError, ProjectInput, ServiceResult } from "@/types";
+import type { CommonServiceError, Project, ProjectInput, ServiceResult } from "@/types";
 
 const PROJECT_COLUMNS = "id, name, description, created_at, updated_at";
 
 export const SUPABASE_NOT_CONFIGURED = "Supabase nie jest skonfigurowany";
 
-export const PROJECT_ERROR_MESSAGES: Record<ServiceError, string> = {
+export const PROJECT_ERROR_MESSAGES: Record<CommonServiceError, string> = {
   duplicate_name: "Projekt o takiej nazwie już istnieje.",
   not_found: "Nie znaleziono projektu.",
   unexpected: "Coś poszło nie tak. Spróbuj ponownie.",

@@ -77,6 +77,15 @@ const error = Astro.url.searchParams.get("error") ?? (projects?.ok ? selectedErr
                         Specjalności
                       </button>
                     </form>
+                    <form method="POST" action={`/api/projects/${project.id}/select`}>
+                      <input type="hidden" name="after_select" value="tasks" />
+                      <button
+                        type="submit"
+                        class="text-purple-300 transition-colors hover:text-purple-100 hover:underline"
+                      >
+                        Zadania
+                      </button>
+                    </form>
                     <a
                       href={`/projects/${project.id}/edit`}
                       class="text-purple-300 transition-colors hover:text-purple-100 hover:underline"

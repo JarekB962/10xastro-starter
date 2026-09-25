@@ -1,7 +1,15 @@
 import { defineMiddleware } from "astro:middleware";
 import { createClient } from "@/lib/supabase";
 
-const PROTECTED_ROUTES = ["/dashboard", "/projects", "/api/projects", "/specialties", "/api/specialties"];
+const PROTECTED_ROUTES = [
+  "/dashboard",
+  "/projects",
+  "/api/projects",
+  "/specialties",
+  "/api/specialties",
+  "/tasks",
+  "/api/tasks",
+];
 
 export const onRequest = defineMiddleware(async (context, next) => {
   // Jeden klient na żądanie: odświeżona sesja z getUser() jest widoczna też w trasach i stronach.

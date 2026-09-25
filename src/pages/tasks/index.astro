@@ -1,0 +1,103 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Topbar from "@/components/Topbar.astro";
+import TaskForm from "@/components/tasks/TaskForm";
+import { SUPABASE_NOT_CONFIGURED, getSelectedProject } from "@/lib/services/projects";
+import { listSpecialties } from "@/lib/services/specialties";
+import { listTasks } from "@/lib/services/tasks";
+
+const supabase = Astro.locals.supabase;
+const selected = supabase ? await getSelectedProject(supabase) : null;
+const project = selected?.ok ? selected.data : null;
+const [tasks, specialties] =
+  supabase && project
+    ? await Promise.all([listTasks(supabase, project.id), listSpecialties(supabase, project.id)])
+    : [null, null];
+
+const loadError = !supabase
+  ? SUPABASE_NOT_CONFIGURED
+  : selected && !selected.ok
+    ? "Nie udało się wczytać wybranego projektu."
+    : tasks && !tasks.ok
+      ? "Nie udało się wczytać zadań."
+      : specialties && !specialties.ok
+        ? "Nie udało się wczytać specjalności."
+        : null;
+const error = Astro.url.searchParams.get("error") ?? loadError;
+const params = Astro.url.searchParams;
+const initial = {
+  number: params.get("task_number") ?? "",
+  name: params.get("task_name") ?? "",
+  specialty: params.get("task_specialty") ?? "",
+  effort: params.get("task_effort") ?? "",
+  predecessors: params.get("task_predecessors") ?? "",
+};
+const specialtyOptions = specialties?.ok ? specialties.data.map(({ id, name }) => ({ id, name })) : [];
+---
+
+<Layout title="Zadania — Plan projektu (WBS)">
+  <div class="bg-cosmic min-h-screen p-4">
+    <div class="mx-auto max-w-2xl">
+      <Topbar />
+      <div class="rounded-2xl border border-white/10 bg-white/10 p-8 text-white backdrop-blur-xl">
+        <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-2xl font-bold text-transparent">
+          Zadania
+        </h1>
+        {project && <p class="mt-1 mb-6 text-sm break-words text-blue-100/60">Projekt: {project.name}</p>}
+        {!project && <div class="mb-6" />}
+
+        {error && (
+          <p class="mb-4 rounded-lg border border-red-500/30 bg-red-900/30 px-3 py-2 text-sm text-red-300">{error}</p>
+        )}
+
+        {supabase && selected?.ok && !project && (
+          <div>
+            <p class="text-blue-100/70">Nie wybrano projektu.</p>
+            <a href="/projects" class="mt-4 inline-block text-sm text-purple-300 hover:underline">
+              Przejdź do listy projektów
+            </a>
+          </div>
+        )}
+
+        {project && (
+          <>
+            <div class="mb-6">
+              <TaskForm
+                action="/api/tasks"
+                specialties={specialtyOptions}
+                initial={initial}
+                submitLabel="Dodaj zadanie"
+                client:load
+              />
+            </div>
+
+            {tasks?.ok && tasks.data.length === 0 && (
+              <p class="text-blue-100/70">Ten projekt nie ma jeszcze zadań. Dodaj pierwsze.</p>
+            )}
+
+            {tasks?.ok && tasks.data.length > 0 && (
+              <ul class="space-y-3">
+                {tasks.data.map((task) => (
+                  <li class="rounded-xl border border-white/10 bg-white/5 p-4">
+                    <h2 class="font-semibold break-words">
+                      <span class="mr-2 text-purple-300">{task.number}.</span>
+                      {task.name}
+                    </h2>
+                    <dl class="mt-2 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm text-blue-100/70">
+                      <dt>Specjalność</dt>
+                      <dd class="break-words">{task.specialty ?? "—"}</dd>
+                      <dt>Nakład</dt>
+                      <dd>{task.effort ?? "—"}</dd>
+                      <dt>Poprzednicy</dt>
+                      <dd>{task.predecessors.length > 0 ? task.predecessors.join(", ") : "—"}</dd>
+                    </dl>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  </div>
+</Layout>

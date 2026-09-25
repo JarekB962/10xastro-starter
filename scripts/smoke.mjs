@@ -52,6 +52,9 @@ let projectId = "";
 let specialtyId = "";
 const specialtyName = `Elektryk ${stamp}`;
 const renamedSpecialty = `Hydraulik ${stamp}`;
+const taskName = `Zadanie glowne ${stamp}`;
+const duplicateTaskName = `Zadanie duplikat ${stamp}`;
+const plainTaskName = `Zadanie proste ${stamp}`;
 
 const post = (form = {}) => ({ method: "POST", form });
 
@@ -68,6 +71,12 @@ const steps = [
   [
     "creating a specialty requires signin",
     () => anon("/api/specialties", post({ specialty_name: "Anon" })),
+    { status: 302, location: "/auth/signin" },
+  ],
+  ["tasks redirects anonymous user", () => anon("/tasks"), { status: 302, location: "/auth/signin" }],
+  [
+    "creating a task requires signin",
+    () => anon("/api/tasks", post({ task_number: "1", task_name: "Anon" })),
     { status: 302, location: "/auth/signin" },
   ],
   [
@@ -162,6 +171,52 @@ const steps = [
     { status: 302, locationIs: "/dashboard" },
   ],
   [
+    "A adds a task with a specialty, decimal effort and repeated predecessors",
+    () =>
+      userA(
+        "/api/tasks",
+        post({
+          task_number: "1",
+          task_name: taskName,
+          task_specialty: specialtyId,
+          task_effort: "2,5",
+          task_predecessors: "2, 2, 99",
+        }),
+      ),
+    { status: 302, locationIs: "/tasks" },
+  ],
+  [
+    "A's task list shows the task with its specialty, effort and deduplicated predecessors",
+    () => userA("/tasks"),
+    { status: 200, bodyIncludes: [taskName, renamedSpecialty, "2.5", "2, 99"], bodyExcludes: ["2, 2, 99"] },
+  ],
+  [
+    "A cannot add a task with a taken number and keeps the typed name",
+    () => userA("/api/tasks", post({ task_number: "1", task_name: duplicateTaskName })),
+    { status: 302, location: "/tasks?error=", locationIncludes: ["istnieje", "task_name=", String(stamp)] },
+  ],
+  [
+    "A cannot make a task its own predecessor",
+    () => userA("/api/tasks", post({ task_number: "4", task_name: `Nie ${stamp}`, task_predecessors: "4" })),
+    { status: 302, location: "/tasks?error=", locationIncludes: ["poprzednikiem"] },
+  ],
+  [
+    "A cannot add a task with a non-numeric effort",
+    () => userA("/api/tasks", post({ task_number: "5", task_name: `Nie ${stamp}`, task_effort: "abc" })),
+    { status: 302, location: "/tasks?error=" },
+  ],
+  [
+    "A adds a task with only a number and a name",
+    () => userA("/api/tasks", post({ task_number: "3", task_name: plainTaskName })),
+    { status: 302, locationIs: "/tasks" },
+  ],
+  ["A's task list shows the plain task", () => userA("/tasks"), { status: 200, bodyIncludes: [plainTaskName] }],
+  [
+    "selecting a project with after_select=tasks opens the tasks page",
+    () => userA(`/api/projects/${projectId}/select`, post({ after_select: "tasks" })),
+    { status: 302, locationIs: "/tasks" },
+  ],
+  [
     "signup creates account B",
     () => userB("/api/auth/signup", post({ email: emailB, password })),
     { status: 302, location: "/auth/confirm-email" },
@@ -194,6 +249,16 @@ const steps = [
     "B cannot edit A's specialty",
     () => userB(`/api/specialties/${specialtyId}`, post({ specialty_name: "Przejete" })),
     { status: 302, location: "/specialties?error=" },
+  ],
+  [
+    "B without a selected project sees the empty state on /tasks",
+    () => userB("/tasks"),
+    { status: 200, bodyIncludes: ["Nie wybrano projektu"], bodyExcludes: [taskName, plainTaskName] },
+  ],
+  [
+    "B cannot add a task without a selected project",
+    () => userB("/api/tasks", post({ task_number: "1", task_name: "Nie dla B" })),
+    { status: 302, location: "/tasks?error=" },
   ],
   [
     "A sees the delete confirmation page",
@@ -258,6 +323,9 @@ for (const [name, run, expected] of steps) {
   }
   if (expected.location !== undefined && !actual.location.startsWith(expected.location)) {
     problems.push(`location "${actual.location}", expected "${expected.location}"`);
+  }
+  for (const text of expected.locationIncludes ?? []) {
+    if (!actual.location.includes(text)) problems.push(`location "${actual.location.slice(0, 80)}" missing "${text}"`);
   }
   for (const text of expected.bodyIncludes ?? []) {
     if (!actual.body.includes(text)) problems.push(`body missing "${text}"`);
