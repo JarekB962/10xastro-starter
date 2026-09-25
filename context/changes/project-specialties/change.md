@@ -1,7 +1,7 @@
 ---
 change_id: project-specialties
 title: Specjalności wykonawców w projekcie
-status: implementing
+status: implemented
 created: 2026-09-25
 updated: 2026-09-25
 archived_at: null

@@ -363,13 +363,13 @@ Zmiany wprowadzone po napisaniu planu, na prośbę użytkownika w trakcie Fazy 3
 
 #### Automated
 
-- [x] 4.1 Lint przechodzi (w tym `scripts/`): `npm run lint`
-- [x] 4.2 Build przechodzi: `npm run build`
-- [x] 4.3 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke`
-- [ ] 4.4 CI (`ci` i `smoke`) zielone na gałęzi z tą zmianą
+- [x] 4.1 Lint przechodzi (w tym `scripts/`): `npm run lint` — ce788c4
+- [x] 4.2 Build przechodzi: `npm run build` — ce788c4
+- [x] 4.3 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke` — ce788c4
+- [x] 4.4 CI (`ci` i `smoke`) zielone na gałęzi z tą zmianą
 
 #### Manual
 
-- [x] 4.5 Ręczny przebieg z przeglądarki zgadza się z krokami smoke (dodanie, duplikat, edycja, izolacja między kontami)
-- [x] 4.6 Po usunięciu projektu jego specjalności znikają z bazy: `select count(*) from specialties where project_id = '<usunięty projekt>'` daje 0
-- [ ] 4.7 Migracja jest zastosowana w docelowej bazie Supabase przed wdrożeniem kodu (`npx supabase db push`)
+- [x] 4.5 Ręczny przebieg z przeglądarki zgadza się z krokami smoke (dodanie, duplikat, edycja, izolacja między kontami) — ce788c4
+- [x] 4.6 Po usunięciu projektu jego specjalności znikają z bazy: `select count(*) from specialties where project_id = '<usunięty projekt>'` daje 0 — ce788c4
+- [x] 4.7 Migracja jest zastosowana w docelowej bazie Supabase przed wdrożeniem kodu (`npx supabase db push`)
