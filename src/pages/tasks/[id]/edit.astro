@@ -1,0 +1,69 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Topbar from "@/components/Topbar.astro";
+import TaskForm from "@/components/tasks/TaskForm";
+import { SUPABASE_NOT_CONFIGURED } from "@/lib/services/projects";
+import { listSpecialties } from "@/lib/services/specialties";
+import { getTask } from "@/lib/services/tasks";
+import { parseTaskId } from "@/lib/validation/task";
+
+const supabase = Astro.locals.supabase;
+// Nieistniejące i cudze zadanie wyglądają tak samo: 404. Bez klienta Supabase: 503 z komunikatem o konfiguracji,
+// a błąd bazy przy odczycie: 500 (nie udajemy, że zadania nie ma).
+const id = parseTaskId(Astro.params.id);
+const result = supabase && id ? await getTask(supabase, id) : null;
+const task = result?.ok ? result.data : null;
+const specialtiesResult = supabase && task ? await listSpecialties(supabase, task.project_id) : null;
+const specialtyOptions = specialtiesResult?.ok ? specialtiesResult.data.map(({ id, name }) => ({ id, name })) : [];
+const loadFailed =
+  (result !== null && !result.ok && result.error !== "not_found") ||
+  (specialtiesResult !== null && !specialtiesResult.ok);
+const notFoundMessage = !supabase
+  ? SUPABASE_NOT_CONFIGURED
+  : loadFailed
+    ? "Nie udało się wczytać zadania"
+    : "Nie znaleziono zadania";
+const showForm = task !== null && !loadFailed;
+if (!showForm) Astro.response.status = !supabase ? 503 : loadFailed ? 500 : 404;
+
+const params = Astro.url.searchParams;
+const error = params.get("error");
+// Po błędzie serwera formularz wraca z tym, co użytkownik wpisał; bez błędu z zapisanymi wartościami zadania.
+const entered = error ? params : null;
+const initial = {
+  number: task ? String(task.number) : "",
+  name: entered?.get("task_name") ?? task?.name ?? "",
+  specialty: entered?.get("task_specialty") ?? task?.specialty_id ?? "",
+  effort: entered?.get("task_effort") ?? (task?.effort != null ? String(task.effort) : ""),
+  predecessors: entered?.get("task_predecessors") ?? task?.predecessors.join(", ") ?? "",
+};
+---
+
+<Layout title="Edycja zadania — Plan projektu (WBS)">
+  <div class="bg-cosmic min-h-screen p-4">
+    <div class="mx-auto max-w-md">
+      <Topbar />
+      <div class="rounded-2xl border border-white/10 bg-white/10 p-8 text-white backdrop-blur-xl">
+        <h1 class="mb-6 bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-center text-2xl font-bold text-transparent">
+          {showForm ? "Edycja zadania" : notFoundMessage}
+        </h1>
+        {showForm && (
+          <TaskForm
+            action={`/api/tasks/${task.id}`}
+            specialties={specialtyOptions}
+            initial={initial}
+            serverError={error}
+            submitLabel="Zapisz zmiany"
+            fixedNumber={task.number}
+            client:load
+          />
+        )}
+        <p class="mt-4 text-center text-sm text-blue-100/60">
+          <a href="/tasks" class="text-purple-300 hover:underline">
+            Wróć do listy zadań
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+</Layout>

@@ -219,33 +219,33 @@ Zwykłe akcje mają kończyć się widocznym wynikiem poniżej 1 sekundy (NFR z 
 
 #### Automated
 
-- [x] 1.1 Migracja stosuje się na czystej bazie lokalnej: `npx supabase db reset`
-- [x] 1.2 Generowanie typów Astro i sprawdzenie typów przechodzi: `npx astro sync && npx astro check`
-- [x] 1.3 Lint przechodzi: `npm run lint`
-- [x] 1.4 Build przechodzi: `npm run build`
+- [x] 1.1 Migracja stosuje się na czystej bazie lokalnej: `npx supabase db reset` — b3be97f
+- [x] 1.2 Generowanie typów Astro i sprawdzenie typów przechodzi: `npx astro sync && npx astro check` — b3be97f
+- [x] 1.3 Lint przechodzi: `npm run lint` — b3be97f
+- [x] 1.4 Build przechodzi: `npm run build` — b3be97f
 
 #### Manual
 
-- [x] 1.5 W lokalnym Supabase (przez `psql`) `task_predecessors` ma politykę `delete` dla `authenticated`, a `tasks` nadal nie ma polityki `delete`
-- [x] 1.6 `update tasks set number = number + 1` na istniejącym zadaniu kończy się błędem „Numer zadania jest niezmienny.”, a zmiana samej nazwy przechodzi
-- [x] 1.7 `update_task` zmienia nazwę, specjalność, nakład i zastępuje poprzedników jedną transakcją; z pustą tablicą czyści poprzedników; z poprzednikiem równym numerowi zadania kończy się błędem i nie zmienia ani zadania, ani poprzedników
-- [x] 1.8 `update_task` dla cudzego lub nieistniejącego zadania kończy się błędem `P0002`; specjalność z innego projektu kończy się błędem klucza obcego
+- [x] 1.5 W lokalnym Supabase (przez `psql`) `task_predecessors` ma politykę `delete` dla `authenticated`, a `tasks` nadal nie ma polityki `delete` — b3be97f
+- [x] 1.6 `update tasks set number = number + 1` na istniejącym zadaniu kończy się błędem „Numer zadania jest niezmienny.”, a zmiana samej nazwy przechodzi — b3be97f
+- [x] 1.7 `update_task` zmienia nazwę, specjalność, nakład i zastępuje poprzedników jedną transakcją; z pustą tablicą czyści poprzedników; z poprzednikiem równym numerowi zadania kończy się błędem i nie zmienia ani zadania, ani poprzedników — b3be97f
+- [x] 1.8 `update_task` dla cudzego lub nieistniejącego zadania kończy się błędem `P0002`; specjalność z innego projektu kończy się błędem klucza obcego — b3be97f
 
 ### Phase 2: Serwer, ekrany i smoke
 
 #### Automated
 
-- [ ] 2.1 Sprawdzenie typów przechodzi: `npx astro check`
-- [ ] 2.2 Lint przechodzi (w tym `scripts/`): `npm run lint`
-- [ ] 2.3 Build przechodzi: `npm run build`
-- [ ] 2.4 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke`
+- [x] 2.1 Sprawdzenie typów przechodzi: `npx astro check`
+- [x] 2.2 Lint przechodzi (w tym `scripts/`): `npm run lint`
+- [x] 2.3 Build przechodzi: `npm run build`
+- [x] 2.4 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke`
 - [ ] 2.5 CI (`ci` i `smoke`) zielone na gałęzi z tą zmianą
 
 #### Manual
 
-- [ ] 2.6 Na `/tasks` każde zadanie ma link „Edytuj”, a strona edycji pokazuje numer tylko do odczytu i aktualne wartości pól
-- [ ] 2.7 Zmiana nazwy, specjalności (także na „Bez specjalności”), nakładu (także na pusty) i poprzedników (także na pustych) działa, a lista pokazuje nowe wartości po powrocie
-- [ ] 2.8 Poprzednik równy numerowi zadania, nakład „abc” i pusta nazwa pokazują czytelne komunikaty, a wpisane wartości zostają w formularzu
-- [ ] 2.9 Inny użytkownik wpisujący adres cudzej edycji zadania dostaje 404
-- [ ] 2.10 Kursor jest od razu w polu nazwy, a zapis kończy się widocznym wynikiem w czasie poniżej 1 sekundy
+- [x] 2.6 Na `/tasks` każde zadanie ma link „Edytuj”, a strona edycji pokazuje numer tylko do odczytu i aktualne wartości pól
+- [x] 2.7 Zmiana nazwy, specjalności (także na „Bez specjalności”), nakładu (także na pusty) i poprzedników (także na pustych) działa, a lista pokazuje nowe wartości po powrocie
+- [x] 2.8 Poprzednik równy numerowi zadania, nakład „abc” i pusta nazwa pokazują czytelne komunikaty, a wpisane wartości zostają w formularzu
+- [x] 2.9 Inny użytkownik wpisujący adres cudzej edycji zadania dostaje 404
+- [x] 2.10 Kursor jest od razu w polu nazwy, a zapis kończy się widocznym wynikiem w czasie poniżej 1 sekundy
 - [ ] 2.11 Migracja jest zastosowana w docelowej bazie Supabase przed wdrożeniem kodu (`npx supabase db push`)
