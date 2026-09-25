@@ -42,7 +42,7 @@ Kierownik projektu na starcie dostaje listę zadań (specjalność wykonawcy, na
 | ID   | Change ID              | Outcome (user can …)                                                                                                       | Prerequisites | PRD refs               | Status   |
 | ---- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------- | ---------------------- | -------- |
 | S-04 | task-check-problems    | uruchomić sprawdzenie i zobaczyć zadania z nieistniejącym poprzednikiem, brakiem odpowiedzialności i duplikatem oraz powód | S-03 (done)   | FR-008, FR-009, US-01  | done |
-| S-05 | task-check-cycles      | zobaczyć w sprawdzeniu zadania leżące na cyklu zależności i dostać komunikat „nie znaleziono problemów” tylko wtedy, gdy ich naprawdę nie ma | S-04          | FR-008, FR-009, US-01  | in-progress |
+| S-05 | task-check-cycles      | zobaczyć w sprawdzeniu zadania leżące na cyklu zależności i dostać komunikat „nie znaleziono problemów” tylko wtedy, gdy ich naprawdę nie ma | S-04          | FR-008, FR-009, US-01  | done |
 | S-06 | project-verified-state | zobaczyć stan projektu (zweryfikowany lub niezweryfikowany), który cofa się po każdej zmianie danych                       | S-05          | FR-011, US-01          | proposed |
 | S-07 | task-delete            | usunąć zadanie, o ile nie jest poprzednikiem innego zadania                                                                | S-06          | FR-007, US-01          | proposed |
 | S-08 | task-renumber          | zmienić numer zadania, a aplikacja poprawi go automatycznie u zadań, które mają je jako poprzednika                        | S-06          | FR-007, US-01          | proposed |
@@ -99,7 +99,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Najtrudniejsze kryterium (wykrywanie cykli w grafie, w którym poprzednik może wskazywać nieistniejący numer); błąd daje fałszywe „OK”, czyli dokładnie to, przed czym PRD chroni. Idzie zaraz po S-04, żeby komunikat o braku problemów pojawił się dopiero, gdy wszystkie cztery kryteria działają.
-- **Status:** in-progress
+- **Status:** done
 
 ### S-06: Stan projektu
 
@@ -192,3 +192,4 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **S-02: kierownik dodaje zadanie (numer, nazwa, specjalność, nakład, poprzednicy jako numery) i widzi listę zadań projektu** — Archived 2026-09-25 → `context/archive/2026-09-25-task-add/`. Lesson: —.
 - **S-03: kierownik poprawia zadanie (nazwa, specjalność, nakład, poprzednicy)** — Archived 2026-09-25 → `context/archive/2026-09-25-task-edit/`. Lesson: —.
 - **S-04: kierownik uruchamia sprawdzenie listy zadań i widzi zadania z nieistniejącym poprzednikiem, brakiem odpowiedzialności i duplikatem nazwy wraz z powodem** — Archived 2026-09-25 → `context/archive/2026-09-25-task-check-problems/`. Lesson: —.
+- **S-05: kierownik widzi w sprawdzeniu wszystkie zadania leżące na cyklu zależności (co najmniej dwa zadania zależne od siebie bezpośrednio lub pośrednio) i dostaje komunikat „nie znaleziono problemów” wyłącznie wtedy, gdy żadne z czterech kryteriów nie znalazło problemu.** — Archived 2026-09-25 → `context/archive/2026-09-25-task-check-cycles/`. Lesson: —.
