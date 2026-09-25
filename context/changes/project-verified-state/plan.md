@@ -191,7 +191,7 @@ Każdy zapis zadania, poprzednika lub specjalności dokłada jedno upsertowe pod
 
 #### Manual
 
-- [ ] 1.8 Migracja zastosowana na produkcji przed wdrożeniem kodu: `npx supabase db push`
+- [x] 1.8 Migracja zastosowana na produkcji przed wdrożeniem kodu: `npx supabase db push` — 8a81018
 - [x] 1.9 Nowy projekt jest „niezweryfikowany”; po wejściu na `/tasks/check` w projekcie bez problemów stan przechodzi na „zweryfikowany” (pulpit i lista zadań) — 8a81018
 - [x] 1.10 Dodanie zadania, poprawa zadania (także tylko poprzedników) i każda zmiana specjalności (dodanie, nazwa) cofają stan do „niezweryfikowany”; kolejne sprawdzenie bez problemów przywraca „zweryfikowany” — 8a81018
 - [x] 1.11 Sprawdzenie projektu z problemami nie ustawia „zweryfikowany” — 8a81018
