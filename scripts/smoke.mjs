@@ -334,7 +334,13 @@ const steps = [
     () =>
       userA(
         "/api/tasks",
-        post({ task_number: "12", task_name: zeroEffortTaskName, task_specialty: specialtyId, task_effort: "0" }),
+        post({
+          task_number: "12",
+          task_name: zeroEffortTaskName,
+          task_specialty: specialtyId,
+          task_effort: "0",
+          task_predecessors: "998",
+        }),
       ),
     { status: 302, locationIs: "/tasks" },
   ],
@@ -393,10 +399,21 @@ const steps = [
       const page = await userA("/tasks/check");
       const at = page.body.indexOf(plainTaskName);
       const from = page.body.lastIndexOf("<li", at);
-      const to = page.body.indexOf("</li>", at);
+      const to = page.body.indexOf("</ul>", at);
       return { ...page, body: at < 0 ? "" : page.body.slice(from, to) };
     },
     { status: 200, bodyIncludes: [plainTaskName, "brak specjalno", "nak", "pusty"] },
+  ],
+  [
+    "A's check shows reasons from two categories as separate lines for one task",
+    async () => {
+      const page = await userA("/tasks/check");
+      const at = page.body.indexOf(zeroEffortTaskName);
+      const from = page.body.lastIndexOf("<li", at);
+      const to = page.body.indexOf("</ul>", at);
+      return { ...page, body: at < 0 ? "" : page.body.slice(from, to) };
+    },
+    { status: 200, bodyIncludes: [zeroEffortTaskName, "wny 0", "poprzednik: 998"], bodyExcludes: ["Duplikat"] },
   ],
   [
     "signup creates account B",
