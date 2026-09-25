@@ -1,10 +1,10 @@
 ---
 change_id: task-check-problems
 title: Sprawdzenie listy zadań: proste kryteria
-status: impl_reviewed
+status: archived
 created: 2026-09-25
 updated: 2026-09-25
-archived_at: null
+archived_at: 2026-09-25T19:04:45Z
 ---
 
 ## Notes
