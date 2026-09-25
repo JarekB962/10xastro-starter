@@ -156,17 +156,17 @@ Wymaganie z PRD: sprawdzenie kilkudziesięciu zadań w kilka do kilkunastu sekun
 
 #### Automated
 
-- [x] 1.1 Sprawdzenie typów przechodzi: `npx astro check`
-- [x] 1.2 Lint przechodzi (w tym `scripts/`): `npm run lint`
-- [x] 1.3 Build przechodzi: `npm run build`
-- [x] 1.4 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke`
-- [ ] 1.5 CI (`ci` i `smoke`) zielone na gałęzi z tą zmianą
+- [x] 1.1 Sprawdzenie typów przechodzi: `npx astro check` — e3c0f27
+- [x] 1.2 Lint przechodzi (w tym `scripts/`): `npm run lint` — e3c0f27
+- [x] 1.3 Build przechodzi: `npm run build` — e3c0f27
+- [x] 1.4 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke` — e3c0f27
+- [x] 1.5 CI (`ci` i `smoke`) zielone na gałęzi z tą zmianą — e3c0f27
 
 #### Manual
 
-- [x] 1.6 Na `/tasks` przy wybranym projekcie jest przycisk „Sprawdź listę zadań”, a bez wybranego projektu go nie ma
-- [x] 1.7 `/tasks/check` bez wybranego projektu pokazuje „Nie wybrano projektu” z linkiem do listy projektów
-- [x] 1.8 Dla projektu z zadaniami: nieistniejący poprzednik, brak specjalności, nakład pusty i równy 0 oraz duplikat nazwy w innej wielkości liter są widoczne z powodami; jedno zadanie z kilkoma problemami pokazuje wszystkie powody
-- [x] 1.9 Dla projektu bez problemów strona pokazuje neutralny komunikat z zastrzeżeniem o cyklach i nigdzie nie mówi „wszystko w porządku”
-- [x] 1.10 Link „Edytuj” przy zadaniu z problemem prowadzi do jego edycji, a po poprawce ponowne otwarcie `/tasks/check` nie pokazuje już tego problemu
-- [x] 1.11 Sprawdzenie kilkudziesięciu zadań kończy się widocznym wynikiem w czasie poniżej 1 sekundy
+- [x] 1.6 Na `/tasks` przy wybranym projekcie jest przycisk „Sprawdź listę zadań”, a bez wybranego projektu go nie ma — e3c0f27
+- [x] 1.7 `/tasks/check` bez wybranego projektu pokazuje „Nie wybrano projektu” z linkiem do listy projektów — e3c0f27
+- [x] 1.8 Dla projektu z zadaniami: nieistniejący poprzednik, brak specjalności, nakład pusty i równy 0 oraz duplikat nazwy w innej wielkości liter są widoczne z powodami; jedno zadanie z kilkoma problemami pokazuje wszystkie powody — e3c0f27
+- [x] 1.9 Dla projektu bez problemów strona pokazuje neutralny komunikat z zastrzeżeniem o cyklach i nigdzie nie mówi „wszystko w porządku” — e3c0f27
+- [x] 1.10 Link „Edytuj” przy zadaniu z problemem prowadzi do jego edycji, a po poprawce ponowne otwarcie `/tasks/check` nie pokazuje już tego problemu — e3c0f27
+- [x] 1.11 Sprawdzenie kilkudziesięciu zadań kończy się widocznym wynikiem w czasie poniżej 1 sekundy — e3c0f27
