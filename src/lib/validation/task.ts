@@ -1,41 +1,31 @@
 import { z } from "zod";
 import type { ParsedTaskInput } from "@/types";
-
-const MAX_NUMBER = 2147483647;
-const MAX_EFFORT = 99999999.99;
-const MAX_PREDECESSORS = 50;
-
-const NUMBER_REQUIRED = "Numer zadania jest wymagany.";
-const NUMBER_INVALID = "Numer zadania musi być liczbą całkowitą od 1.";
-const PREDECESSORS_INVALID = "Poprzednicy to numery zadań rozdzielone przecinkami.";
-const SELF_PREDECESSOR = "Zadanie nie może być własnym poprzednikiem.";
-const EFFORT_INVALID = "Nakład musi być liczbą nie mniejszą niż 0.";
-
-/** Numer zadania: same cyfry, 1..2147483647 (bez znaku, spacji i notacji naukowej). */
-function toTaskNumber(text: string): number | null {
-  if (!/^\d+$/.test(text)) return null;
-  const value = Number(text);
-  return value >= 1 && value <= MAX_NUMBER ? value : null;
-}
+import {
+  MAX_NAME_LENGTH,
+  TASK_FIELD_MESSAGES as MESSAGES,
+  parseEffort,
+  parsePredecessors,
+  toTaskNumber,
+} from "@/lib/validation/task-fields";
 
 const numberSchema = z
-  .string({ error: NUMBER_REQUIRED })
+  .string({ error: MESSAGES.numberRequired })
   .trim()
-  .min(1, NUMBER_REQUIRED)
+  .min(1, MESSAGES.numberRequired)
   .transform((text, ctx) => {
     const value = toTaskNumber(text);
     if (value === null) {
-      ctx.addIssue({ code: "custom", message: NUMBER_INVALID });
+      ctx.addIssue({ code: "custom", message: MESSAGES.numberInvalid });
       return z.NEVER;
     }
     return value;
   });
 
 const nameSchema = z
-  .string({ error: "Nazwa zadania jest wymagana." })
+  .string({ error: MESSAGES.nameRequired })
   .trim()
-  .min(1, "Nazwa zadania jest wymagana.")
-  .max(100, "Nazwa zadania może mieć najwyżej 100 znaków.");
+  .min(1, MESSAGES.nameRequired)
+  .max(MAX_NAME_LENGTH, MESSAGES.nameTooLong);
 
 const specialtySchema = z
   .string()
@@ -43,44 +33,23 @@ const specialtySchema = z
   .transform((text) => (text === "" ? null : text))
   .pipe(z.uuid({ error: "Wybrana specjalność jest niepoprawna." }).nullable());
 
-const effortSchema = z
-  .string()
-  .trim()
-  .transform((text, ctx) => {
-    if (text === "") return null;
-    const normalized = text.replace(",", ".");
-    if (!/^\d+(\.\d{1,2})?$/.test(normalized)) {
-      ctx.addIssue({ code: "custom", message: EFFORT_INVALID });
-      return z.NEVER;
-    }
-    const value = Number(normalized);
-    if (value > MAX_EFFORT) {
-      ctx.addIssue({ code: "custom", message: EFFORT_INVALID });
-      return z.NEVER;
-    }
-    return value;
-  });
+const effortSchema = z.string().transform((text, ctx) => {
+  const result = parseEffort(text);
+  if (!result.ok) {
+    ctx.addIssue({ code: "custom", message: MESSAGES.effortInvalid });
+    return z.NEVER;
+  }
+  return result.value;
+});
 
-const predecessorsSchema = z
-  .string()
-  .trim()
-  .transform((text, ctx) => {
-    if (text === "") return [];
-    const seen = new Set<number>();
-    for (const part of text.split(",")) {
-      const value = toTaskNumber(part.trim());
-      if (value === null) {
-        ctx.addIssue({ code: "custom", message: PREDECESSORS_INVALID });
-        return z.NEVER;
-      }
-      seen.add(value);
-    }
-    if (seen.size > MAX_PREDECESSORS) {
-      ctx.addIssue({ code: "custom", message: `Zadanie może mieć najwyżej ${String(MAX_PREDECESSORS)} poprzedników.` });
-      return z.NEVER;
-    }
-    return [...seen];
-  });
+const predecessorsSchema = z.string().transform((text, ctx) => {
+  const result = parsePredecessors(text);
+  if (!result.ok) {
+    ctx.addIssue({ code: "custom", message: result.message });
+    return z.NEVER;
+  }
+  return result.value;
+});
 
 function field(form: FormData, name: string): string {
   const value = form.get(name);
@@ -90,7 +59,7 @@ function field(form: FormData, name: string): string {
 /** Waliduje dane formularza zadania; pierwszy błąd (numer, nazwa, specjalność, nakład, poprzednicy) wraca jako tekst do `?error=`. */
 export function parseTaskInput(form: FormData): ParsedTaskInput {
   const number = numberSchema.safeParse(form.get("task_number"));
-  if (!number.success) return { ok: false, message: number.error.issues[0]?.message ?? NUMBER_INVALID };
+  if (!number.success) return { ok: false, message: number.error.issues[0]?.message ?? MESSAGES.numberInvalid };
 
   const name = nameSchema.safeParse(form.get("task_name"));
   if (!name.success) return { ok: false, message: name.error.issues[0]?.message ?? "Niepoprawna nazwa zadania." };
@@ -101,15 +70,15 @@ export function parseTaskInput(form: FormData): ParsedTaskInput {
   }
 
   const effort = effortSchema.safeParse(field(form, "task_effort"));
-  if (!effort.success) return { ok: false, message: effort.error.issues[0]?.message ?? EFFORT_INVALID };
+  if (!effort.success) return { ok: false, message: effort.error.issues[0]?.message ?? MESSAGES.effortInvalid };
 
   const predecessors = predecessorsSchema.safeParse(field(form, "task_predecessors"));
   if (!predecessors.success) {
-    return { ok: false, message: predecessors.error.issues[0]?.message ?? PREDECESSORS_INVALID };
+    return { ok: false, message: predecessors.error.issues[0]?.message ?? MESSAGES.predecessorsInvalid };
   }
 
   if (predecessors.data.includes(number.data)) {
-    return { ok: false, message: SELF_PREDECESSOR };
+    return { ok: false, message: MESSAGES.selfPredecessor };
   }
 
   return {

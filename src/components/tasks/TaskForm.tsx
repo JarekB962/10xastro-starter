@@ -4,14 +4,13 @@ import { FormField } from "@/components/auth/FormField";
 import { SubmitButton } from "@/components/auth/SubmitButton";
 import { ServerError } from "@/components/auth/ServerError";
 import { cn } from "@/lib/utils";
-
-const MAX_NAME_LENGTH = 100;
-const MAX_NUMBER = 2147483647;
-const MAX_EFFORT = 99999999.99;
-const MAX_PREDECESSORS = 50;
-
-const NUMBER_INVALID = "Numer zadania musi być liczbą całkowitą od 1.";
-const PREDECESSORS_INVALID = "Poprzednicy to numery zadań rozdzielone przecinkami.";
+import {
+  MAX_NAME_LENGTH,
+  TASK_FIELD_MESSAGES as MESSAGES,
+  parseEffort,
+  parsePredecessors,
+  toTaskNumber,
+} from "@/lib/validation/task-fields";
 
 interface TaskFormValues {
   number: string;
@@ -30,12 +29,6 @@ interface Props {
 }
 
 type Errors = Partial<Record<keyof TaskFormValues, string>>;
-
-function toTaskNumber(text: string): number | null {
-  if (!/^\d+$/.test(text)) return null;
-  const value = Number(text);
-  return value >= 1 && value <= MAX_NUMBER ? value : null;
-}
 
 const hintClass = "mt-1 text-xs text-white/40";
 
@@ -57,32 +50,26 @@ export default function TaskForm({ action, specialties, initial, serverError, su
     const numberText = number.trim();
     const parsedNumber = toTaskNumber(numberText);
     if (!numberText) {
-      next.number = "Numer zadania jest wymagany.";
+      next.number = MESSAGES.numberRequired;
     } else if (parsedNumber === null) {
-      next.number = NUMBER_INVALID;
+      next.number = MESSAGES.numberInvalid;
     }
 
     if (!name.trim()) {
-      next.name = "Nazwa zadania jest wymagana.";
+      next.name = MESSAGES.nameRequired;
     } else if (name.trim().length > MAX_NAME_LENGTH) {
-      next.name = `Nazwa zadania może mieć najwyżej ${String(MAX_NAME_LENGTH)} znaków.`;
+      next.name = MESSAGES.nameTooLong;
     }
 
-    const effortText = effort.trim().replace(",", ".");
-    if (effortText && (!/^\d+(\.\d{1,2})?$/.test(effortText) || Number(effortText) > MAX_EFFORT)) {
-      next.effort = "Nakład musi być liczbą nie mniejszą niż 0.";
+    if (!parseEffort(effort).ok) {
+      next.effort = MESSAGES.effortInvalid;
     }
 
-    const predecessorsText = predecessors.trim();
-    if (predecessorsText) {
-      const parts = predecessorsText.split(",").map((part) => toTaskNumber(part.trim()));
-      if (parts.includes(null)) {
-        next.predecessors = PREDECESSORS_INVALID;
-      } else if (new Set(parts).size > MAX_PREDECESSORS) {
-        next.predecessors = `Zadanie może mieć najwyżej ${String(MAX_PREDECESSORS)} poprzedników.`;
-      } else if (parsedNumber !== null && parts.includes(parsedNumber)) {
-        next.predecessors = "Zadanie nie może być własnym poprzednikiem.";
-      }
+    const parsedPredecessors = parsePredecessors(predecessors);
+    if (!parsedPredecessors.ok) {
+      next.predecessors = parsedPredecessors.message;
+    } else if (parsedNumber !== null && parsedPredecessors.value.includes(parsedNumber)) {
+      next.predecessors = MESSAGES.selfPredecessor;
     }
 
     setErrors(next);

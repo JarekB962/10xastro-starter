@@ -1,15 +1,12 @@
 import { fail, type Db } from "@/lib/services/db-errors";
-import type { ServiceError, ServiceResult, Specialty, SpecialtyInput } from "@/types";
+import type { CommonServiceError, ServiceResult, Specialty, SpecialtyInput } from "@/types";
 
 const SPECIALTY_COLUMNS = "id, name, created_at, updated_at";
 
-export const SPECIALTY_ERROR_MESSAGES: Record<ServiceError, string> = {
+export const SPECIALTY_ERROR_MESSAGES: Record<CommonServiceError, string> = {
   duplicate_name: "Specjalność o takiej nazwie już istnieje.",
   not_found: "Nie znaleziono specjalności.",
   unexpected: "Coś poszło nie tak. Spróbuj ponownie.",
-  // Kody zadań; usługa specjalności ich nie zwraca.
-  duplicate_number: "Coś poszło nie tak. Spróbuj ponownie.",
-  invalid_specialty: "Coś poszło nie tak. Spróbuj ponownie.",
 };
 
 export const NO_PROJECT_SELECTED_MESSAGE = "Nie wybrano projektu.";

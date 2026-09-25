@@ -1,12 +1,12 @@
 import type { createClient } from "@/lib/supabase";
-import type { ServiceError } from "@/types";
+import type { CommonServiceError, ServiceError } from "@/types";
 
 export type Db = NonNullable<ReturnType<typeof createClient>>;
 
 // Kody Postgres/PostgREST: 23505 unikalność, 23503 klucz obcy, 42501 naruszenie RLS, PGRST116 brak wiersza.
 // Cudzy lub nieistniejący projekt wygląda tak samo: baza ukrywa cudze wiersze, więc to "nie znaleziono".
 // Wyjątek: przy dodawaniu nie ma czego szukać, więc 23503/42501 (np. usunięty użytkownik z ważnym tokenem) to błąd niespodziewany.
-function toError(error: { code?: string }, creating: boolean): ServiceError {
+function toError(error: { code?: string }, creating: boolean): CommonServiceError {
   switch (error.code) {
     case "23505":
       return "duplicate_name";
@@ -24,11 +24,11 @@ function toError(error: { code?: string }, creating: boolean): ServiceError {
  * Wariant `fail` z własnym mapowaniem kodów bazy na `ServiceError` (np. zadania: 23505 to zajęty numer).
  * Kod spoza mapy i wynik `unexpected` trafiają do logu serwera.
  */
-export function failWith(
+export function failWith<E extends ServiceError>(
   scope: string,
   error: { code?: string; message?: string },
-  codes: Readonly<Record<string, ServiceError>>,
-): { ok: false; error: ServiceError } {
+  codes: Readonly<Record<string, E>>,
+): { ok: false; error: E | "unexpected" } {
   const code = error.code;
   const mapped = code !== undefined && Object.hasOwn(codes, code) ? codes[code] : undefined;
   if (mapped && mapped !== "unexpected") {
@@ -44,7 +44,7 @@ export function fail(
   scope: string,
   error: { code?: string; message?: string },
   creating = false,
-): { ok: false; error: ServiceError } {
+): { ok: false; error: CommonServiceError } {
   const result = toError(error, creating);
   if (result === "unexpected") {
     // eslint-disable-next-line no-console -- surowy błąd bazy trafia do logów serwera, użytkownik dostaje ogólny komunikat

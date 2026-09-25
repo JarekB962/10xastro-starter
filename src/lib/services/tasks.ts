@@ -1,20 +1,18 @@
 import { failWith, type Db } from "@/lib/services/db-errors";
-import type { ServiceError, ServiceResult, Task, TaskInput } from "@/types";
+import type { ServiceResult, Task, TaskInput, TaskServiceError } from "@/types";
 
 export { NO_PROJECT_SELECTED_MESSAGE } from "@/lib/services/specialties";
 
-export const TASK_ERROR_MESSAGES: Record<ServiceError, string> = {
+export const TASK_ERROR_MESSAGES: Record<TaskServiceError, string> = {
   duplicate_number: "Zadanie o takim numerze już istnieje.",
   invalid_specialty: "Wybrana specjalność nie istnieje w tym projekcie.",
   not_found: "Nie znaleziono projektu.",
   unexpected: "Coś poszło nie tak. Spróbuj ponownie.",
-  // Kod projektów i specjalności; usługa zadań go nie zwraca.
-  duplicate_name: "Coś poszło nie tak. Spróbuj ponownie.",
 };
 
 // 23505 zajęty numer, 23503 specjalność spoza projektu, 23514 wyzwalacz "własny poprzednik" (zod łapie to wcześniej),
 // 42501 cudzy projekt (RLS).
-const TASK_DB_ERRORS: Record<string, ServiceError> = {
+const TASK_DB_ERRORS: Record<string, TaskServiceError> = {
   "23505": "duplicate_number",
   "23503": "invalid_specialty",
   "23514": "unexpected",
@@ -38,7 +36,7 @@ export function formValues(form: FormData): Record<string, string> {
 const TASK_SELECT =
   "id, number, name, effort, created_at, updated_at, specialties(name), task_predecessors(predecessor_number)";
 
-export async function listTasks(db: Db, projectId: string): Promise<ServiceResult<Task[]>> {
+export async function listTasks(db: Db, projectId: string): Promise<ServiceResult<Task[], TaskServiceError>> {
   const { data, error } = await db.from("tasks").select(TASK_SELECT).eq("project_id", projectId).order("number");
   if (error) return failWith("tasks", error, TASK_DB_ERRORS);
 
@@ -55,7 +53,11 @@ export async function listTasks(db: Db, projectId: string): Promise<ServiceResul
   return { ok: true, data: tasks };
 }
 
-export async function createTask(db: Db, projectId: string, input: TaskInput): Promise<ServiceResult<{ id: string }>> {
+export async function createTask(
+  db: Db,
+  projectId: string,
+  input: TaskInput,
+): Promise<ServiceResult<{ id: string }, TaskServiceError>> {
   const { data, error } = await db.rpc("create_task", {
     p_project_id: projectId,
     p_number: input.number,

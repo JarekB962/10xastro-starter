@@ -190,9 +190,14 @@ export interface ProjectInput {
   description: string | null;
 }
 
-/** Wynik operacji usługi (projekty, specjalności): dane albo jednoznaczny kod błędu. */
-export type ServiceError = "duplicate_name" | "duplicate_number" | "invalid_specialty" | "not_found" | "unexpected";
-export type ServiceResult<T> = { ok: true; data: T } | { ok: false; error: ServiceError };
+/** Kody błędów usług: wspólne (projekty, specjalności) i zadań; każda usługa zwraca tylko swój podzbiór. */
+export type CommonServiceError = "duplicate_name" | "not_found" | "unexpected";
+export type TaskServiceError = "duplicate_number" | "invalid_specialty" | "not_found" | "unexpected";
+export type ServiceError = CommonServiceError | TaskServiceError;
+
+/** Wynik operacji usługi: dane albo jednoznaczny kod błędu (domyślnie wspólny zestaw). */
+export type ServiceResult<T, E extends ServiceError = CommonServiceError> =
+  { ok: true; data: T } | { ok: false; error: E };
 
 /** Wynik walidacji formularza projektu: dane albo pierwszy komunikat błędu. */
 export type ParsedProjectInput = { ok: true; data: ProjectInput } | { ok: false; message: string };
