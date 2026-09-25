@@ -288,13 +288,13 @@ Zwykłe akcje mają kończyć się widocznym wynikiem poniżej 1 sekundy (NFR z 
 
 #### Automated
 
-- [x] 3.1 Lint przechodzi (w tym `scripts/`): `npm run lint`
-- [x] 3.2 Build przechodzi: `npm run build`
-- [x] 3.3 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke`
-- [ ] 3.4 CI (`ci` i `smoke`) zielone na gałęzi z tą zmianą
+- [x] 3.1 Lint przechodzi (w tym `scripts/`): `npm run lint` — 952ccc0
+- [x] 3.2 Build przechodzi: `npm run build` — 952ccc0
+- [x] 3.3 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke` — 952ccc0
+- [x] 3.4 CI (`ci` i `smoke`) zielone na gałęzi z tą zmianą — 952ccc0
 
 #### Manual
 
-- [x] 3.5 Ręczny przebieg z przeglądarki zgadza się z krokami smoke (dodanie, zajęty numer, poprzednicy, izolacja między kontami)
-- [x] 3.6 Po usunięciu projektu jego zadania i poprzednicy znikają z bazy: `select count(*) from tasks where project_id = '<usunięty projekt>'` daje 0
-- [ ] 3.7 Migracja jest zastosowana w docelowej bazie Supabase przed wdrożeniem kodu (`npx supabase db push`)
+- [x] 3.5 Ręczny przebieg z przeglądarki zgadza się z krokami smoke (dodanie, zajęty numer, poprzednicy, izolacja między kontami) — 952ccc0
+- [x] 3.6 Po usunięciu projektu jego zadania i poprzednicy znikają z bazy: `select count(*) from tasks where project_id = '<usunięty projekt>'` daje 0 — 952ccc0
+- [x] 3.7 Migracja jest zastosowana w docelowej bazie Supabase przed wdrożeniem kodu (`npx supabase db push`) — 952ccc0
