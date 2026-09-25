@@ -187,7 +187,7 @@ Każdy zapis zadania, poprzednika lub specjalności dokłada jedno upsertowe pod
 - [x] 1.4 Lint przechodzi: `npm run lint` — 8a81018
 - [x] 1.5 Build przechodzi: `npm run build` — 8a81018
 - [x] 1.6 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke` — 8a81018
-- [ ] 1.7 CI (`ci` i `smoke`) zielone na gałęzi z tą zmianą
+- [x] 1.7 CI (`ci` i `smoke`) zielone na gałęzi z tą zmianą — 8a81018
 
 #### Manual
 
