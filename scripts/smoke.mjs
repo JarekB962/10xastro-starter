@@ -84,6 +84,8 @@ let cycleTaskId = "";
 let outsideTaskId = "";
 const thirdTaskNameB = `Zadanie B trzecie ${stamp}`;
 let thirdTaskIdB = "";
+const unusedSpecialtyName = `Zbedna ${stamp}`;
+let unusedSpecialtyId = "";
 
 const post = (form = {}) => ({ method: "POST", form });
 
@@ -854,6 +856,116 @@ const steps = [
     "the deleted third task is gone from B's list",
     () => userB("/tasks"),
     { status: 200, bodyExcludes: [thirdTaskNameB] },
+  ],
+  [
+    "A's specialties list links to the delete page of the used specialty",
+    () => userA("/specialties"),
+    () => ({ status: 200, bodyIncludes: [renamedSpecialty, `/specialties/${specialtyId}/delete`, "Usu"] }),
+  ],
+  [
+    "A's specialty edit page links to the delete page",
+    () => userA(`/specialties/${specialtyId}/edit`),
+    () => ({ status: 200, bodyIncludes: [`/specialties/${specialtyId}/delete`, "Usu"] }),
+  ],
+  [
+    "the delete confirmation of a specialty used by tasks is blocked: it lists them and has no delete button",
+    () => userA(`/specialties/${specialtyId}/delete`),
+    () => ({
+      status: 200,
+      bodyIncludes: ["Nie mo", "zmie", validTaskName, cycleTaskNames[20], "Edytuj", "/edit"],
+      bodyExcludes: [`/api/specialties/${specialtyId}/delete`, "Anuluj", plainTaskName],
+    }),
+  ],
+  [
+    "A cannot delete a specialty used by tasks and is sent back to the confirmation page",
+    () => userA(`/api/specialties/${specialtyId}/delete`, post()),
+    () => ({
+      status: 302,
+      location: `/specialties/${specialtyId}/delete?error=`,
+      locationIncludes: ["zadaniach"],
+    }),
+  ],
+  [
+    "the used specialty is still on A's list after the blocked delete",
+    () => userA("/specialties"),
+    { status: 200, bodyIncludes: [renamedSpecialty] },
+  ],
+  [
+    "A adds a specialty that no task uses",
+    () => userA("/api/specialties", post({ specialty_name: unusedSpecialtyName })),
+    { status: 302, locationIs: "/specialties" },
+  ],
+  [
+    "A finds the id of the unused specialty on the list",
+    async () => {
+      const list = await userA("/specialties");
+      const start = list.body.indexOf(unusedSpecialtyName);
+      unusedSpecialtyId =
+        /\/specialties\/([0-9a-f-]{36})\/edit/.exec(start < 0 ? "" : list.body.slice(start))?.[1] ?? "";
+      return { ...list, status: unusedSpecialtyId ? list.status : 0 };
+    },
+    { status: 200 },
+  ],
+  [
+    "the delete confirmation of the unused specialty has a delete button and no task list",
+    () => userA(`/specialties/${unusedSpecialtyId}/delete`),
+    () => ({
+      status: 200,
+      bodyIncludes: [unusedSpecialtyName, `/api/specialties/${unusedSpecialtyId}/delete`, "Anuluj"],
+      bodyExcludes: ["zmie", "Nie mo"],
+    }),
+  ],
+  [
+    "B gets 404 on the delete page of A's specialty",
+    () => userB(`/specialties/${unusedSpecialtyId}/delete`),
+    { status: 404 },
+  ],
+  [
+    "B cannot delete A's specialty",
+    () => userB(`/api/specialties/${unusedSpecialtyId}/delete`, post()),
+    { status: 302, location: "/specialties?error=", locationIncludes: ["znaleziono"] },
+  ],
+  [
+    "A's unused specialty is still on A's list after B's delete attempt",
+    () => userA("/specialties"),
+    { status: 200, bodyIncludes: [unusedSpecialtyName] },
+  ],
+  [
+    "A deletes the unused specialty",
+    () => userA(`/api/specialties/${unusedSpecialtyId}/delete`, post()),
+    { status: 302, locationIs: "/specialties" },
+  ],
+  [
+    "the deleted specialty is gone from A's list while the used one stays",
+    () => userA("/specialties"),
+    { status: 200, bodyIncludes: [renamedSpecialty], bodyExcludes: [unusedSpecialtyName] },
+  ],
+  [
+    "the delete confirmation of the deleted specialty is 404",
+    () => userA(`/specialties/${unusedSpecialtyId}/delete`),
+    { status: 404 },
+  ],
+  [
+    "deleting the already deleted specialty counts as not found",
+    () => userA(`/api/specialties/${unusedSpecialtyId}/delete`, post()),
+    { status: 302, location: "/specialties?error=" },
+  ],
+  [
+    "a malformed specialty id counts as not found on delete",
+    () => userA("/api/specialties/nie-uuid/delete", post()),
+    { status: 302, location: "/specialties?error=" },
+  ],
+  [
+    "B deletes the unused second specialty",
+    () => userB(`/api/specialties/${secondSpecialtyIdB}/delete`, post()),
+    { status: 302, locationIs: "/specialties" },
+  ],
+  ...unverifiedAfter("deleting a specialty"),
+  ...verifiedAfterCheck("deleting a specialty"),
+  [
+    "the deleted second specialty is gone from B's list while the used one stays",
+    () => userB("/specialties"),
+    { status: 200, bodyIncludes: [specialtyNameB], bodyExcludes: [renamedSecondSpecialtyB] },
   ],
   [
     "A's check with problems leaves the project unverified",

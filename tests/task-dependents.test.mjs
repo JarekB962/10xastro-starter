@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { findDependents } from "../src/lib/task-dependents.ts";
+import { findDependents, findTasksWithSpecialty } from "../src/lib/task-dependents.ts";
 
 // Zadanie o podanym numerze i poprzednikach; reszta pól nie ma znaczenia dla wyszukiwania.
 function task(number, predecessors = [], overrides = {}) {
@@ -62,5 +62,39 @@ describe("findDependents", () => {
   it("zwraca zadania listy, nie kopie pól", () => {
     const tasks = [task(1), task(2, [1])];
     assert.equal(findDependents(tasks, 1)[0], tasks[1]);
+  });
+});
+
+describe("findTasksWithSpecialty", () => {
+  const inSpec = (number, specialtyId) => task(number, [], { specialty_id: specialtyId });
+
+  it("pusta lista nie ma zadań ze specjalnością", () => {
+    assert.deepEqual(findTasksWithSpecialty([], "spec"), []);
+  });
+
+  it("brak zadań ze specjalnością, gdy nikt jej nie używa", () => {
+    assert.deepEqual(findTasksWithSpecialty([inSpec(1, "a"), inSpec(2, "b")], "c"), []);
+  });
+
+  it("jedno zadanie ze specjalnością", () => {
+    assert.deepEqual(numbers(findTasksWithSpecialty([inSpec(1, "a"), inSpec(2, "b")], "b")), [2]);
+  });
+
+  it("kilka zadań posortowanych rosnąco po numerze", () => {
+    const tasks = [inSpec(7, "a"), inSpec(1, "a"), inSpec(5, "b"), inSpec(3, "a")];
+    assert.deepEqual(numbers(findTasksWithSpecialty(tasks, "a")), [1, 3, 7]);
+  });
+
+  it("pomija zadania bez specjalności (null)", () => {
+    assert.deepEqual(numbers(findTasksWithSpecialty([inSpec(1, null), inSpec(2, "a")], "a")), [2]);
+  });
+
+  it("pomija zadania innej specjalności", () => {
+    assert.deepEqual(findTasksWithSpecialty([inSpec(1, "b"), inSpec(2, "c")], "a"), []);
+  });
+
+  it("zwraca zadania listy, nie kopie pól", () => {
+    const tasks = [inSpec(1, "b"), inSpec(2, "a")];
+    assert.equal(findTasksWithSpecialty(tasks, "a")[0], tasks[1]);
   });
 });

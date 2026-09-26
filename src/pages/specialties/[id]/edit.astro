@@ -44,10 +44,15 @@ const initial = { name: entered?.get("specialty_name") ?? specialty?.name ?? "" 
             client:load
           />
         )}
-        <p class="mt-4 text-center text-sm text-blue-100/60">
+        <p class="mt-4 flex items-center justify-center gap-4 text-center text-sm text-blue-100/60">
           <a href="/specialties" class="text-purple-300 hover:underline">
             Wróć do listy specjalności
           </a>
+          {specialty && (
+            <a href={`/specialties/${specialty.id}/delete`} class="text-red-300 hover:text-red-200 hover:underline">
+              Usuń specjalność
+            </a>
+          )}
         </p>
       </div>
     </div>
