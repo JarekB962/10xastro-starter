@@ -228,7 +228,7 @@ export interface ProjectInput {
 
 /** Kody błędów usług: wspólne (projekty, specjalności) i zadań; każda usługa zwraca tylko swój podzbiór. */
 export type CommonServiceError = "duplicate_name" | "not_found" | "unexpected";
-export type TaskServiceError = "duplicate_number" | "invalid_specialty" | "not_found" | "unexpected";
+export type TaskServiceError = "duplicate_number" | "has_dependents" | "invalid_specialty" | "not_found" | "unexpected";
 export type ServiceError = CommonServiceError | TaskServiceError;
 
 /** Wynik operacji usługi: dane albo jednoznaczny kod błędu (domyślnie wspólny zestaw). */
@@ -307,7 +307,13 @@ export interface TaskUpdateInput {
 /** Wynik walidacji formularza poprawki zadania: dane albo pierwszy komunikat błędu. */
 export type ParsedTaskUpdateInput = { ok: true; data: TaskUpdateInput } | { ok: false; message: string };
 
-/** Stan projektu: `revision` to licznik zmian danych z chwili odczytu, `verified` to sprawdzenie bez problemów po ostatniej zmianie danych. */
+/** Wynik usunięcia zadania: przy blokadzie `dependents` to zadania, które mają je za poprzednika (rosnąco po numerze). */
+export type DeleteTaskResult =
+  | { ok: true; data: null }
+  | { ok: false; error: "not_found" | "unexpected" }
+  | { ok: false; error: "has_dependents"; dependents: Task[] };
+
+/** Stan projektu:`revision` to licznik zmian danych z chwili odczytu, `verified` to sprawdzenie bez problemów po ostatniej zmianie danych. */
 export interface ProjectState {
   revision: number;
   verified: boolean;

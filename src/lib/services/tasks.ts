@@ -1,5 +1,6 @@
 import { failWith, type Db } from "@/lib/services/db-errors";
-import type { ServiceResult, Task, TaskInput, TaskServiceError, TaskUpdateInput } from "@/types";
+import { findDependents } from "@/lib/task-dependents";
+import type { DeleteTaskResult, ServiceResult, Task, TaskInput, TaskServiceError, TaskUpdateInput } from "@/types";
 
 export { NO_PROJECT_SELECTED_MESSAGE } from "@/lib/services/specialties";
 
@@ -7,17 +8,25 @@ export const TASK_NOT_FOUND_MESSAGE = "Nie znaleziono zadania.";
 
 export const TASK_ERROR_MESSAGES: Record<TaskServiceError, string> = {
   duplicate_number: "Zadanie o takim numerze już istnieje.",
+  has_dependents: "Zadanie nie może zostać usunięte: jest poprzednikiem innych zadań.",
   invalid_specialty: "Wybrana specjalność nie istnieje w tym projekcie.",
   not_found: "Nie znaleziono projektu.",
   unexpected: "Coś poszło nie tak. Spróbuj ponownie.",
 };
 
+/** Komunikat o zadaniach blokujących usunięcie, np. „Zadanie nie może zostać usunięte: jest poprzednikiem zadań 3, 5, 7.” */
+export function taskHasDependentsMessage(dependents: Task[]): string {
+  if (dependents.length === 0) return TASK_ERROR_MESSAGES.has_dependents;
+  return `Zadanie nie może zostać usunięte: jest poprzednikiem zadań ${dependents.map((task) => task.number).join(", ")}.`;
+}
+
 // 23505 zajęty numer, 23503 specjalność spoza projektu, 23514 wyzwalacz "własny poprzednik" (zod łapie to wcześniej),
-// 42501 cudzy projekt (RLS), P0002 brak zadania w `update_task`.
+// 23001 wyzwalacz blokady usunięcia poprzednika, 42501 cudzy projekt (RLS), P0002 brak zadania w `update_task`.
 const TASK_DB_ERRORS: Record<string, TaskServiceError> = {
   "23505": "duplicate_number",
   "23503": "invalid_specialty",
   "23514": "unexpected",
+  "23001": "has_dependents",
   "42501": "not_found",
   P0002: "not_found",
 };
@@ -83,6 +92,33 @@ export async function getTask(db: Db, id: string): Promise<ServiceResult<Task, T
   if (error) return failWith("tasks", error, TASK_DB_ERRORS);
   if (!data) return { ok: false, error: "not_found" };
   return { ok: true, data: toTask(data) };
+}
+
+/**
+ * Usuwa zadanie, o ile żadne inne zadanie projektu nie ma go za poprzednika; inaczej `has_dependents` z ich listą.
+ * Blokadę pilnuje też wyzwalacz w bazie (23001), który łapie wyścig między sprawdzeniem a usunięciem.
+ */
+export async function deleteTask(db: Db, id: string): Promise<DeleteTaskResult> {
+  const task = await getTask(db, id);
+  if (!task.ok) return { ok: false, error: task.error === "not_found" ? "not_found" : "unexpected" };
+
+  const tasks = await listTasks(db, task.data.project_id);
+  if (!tasks.ok) return { ok: false, error: "unexpected" };
+  const dependents = findDependents(tasks.data, task.data.number);
+  if (dependents.length > 0) return { ok: false, error: "has_dependents", dependents };
+
+  const { data, error } = await db.from("tasks").delete().eq("id", id).select("id");
+  if (error) {
+    if (error.code === "23001") {
+      const fresh = await listTasks(db, task.data.project_id);
+      if (!fresh.ok) return { ok: false, error: "unexpected" };
+      return { ok: false, error: "has_dependents", dependents: findDependents(fresh.data, task.data.number) };
+    }
+    const failure = failWith("tasks", error, TASK_DB_ERRORS);
+    return { ok: false, error: failure.error === "not_found" ? "not_found" : "unexpected" };
+  }
+  if (data.length === 0) return { ok: false, error: "not_found" };
+  return { ok: true, data: null };
 }
 
 export async function updateTask(

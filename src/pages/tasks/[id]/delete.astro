@@ -1,0 +1,102 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Topbar from "@/components/Topbar.astro";
+import { SUPABASE_NOT_CONFIGURED } from "@/lib/services/projects";
+import { getTask, listTasks } from "@/lib/services/tasks";
+import { findDependents } from "@/lib/task-dependents";
+import { parseTaskId } from "@/lib/validation/task";
+
+const supabase = Astro.locals.supabase;
+// Nieistniejące i cudze zadanie wyglądają tak samo: 404. Bez klienta Supabase: 503 z komunikatem o konfiguracji,
+// a błąd bazy przy odczycie: 500 (nie udajemy, że zadania nie ma).
+const id = parseTaskId(Astro.params.id);
+const result = supabase && id ? await getTask(supabase, id) : null;
+const task = result?.ok ? result.data : null;
+const listResult = supabase && task ? await listTasks(supabase, task.project_id) : null;
+const dependents = task && listResult?.ok ? findDependents(listResult.data, task.number) : [];
+const loadFailed =
+  (result !== null && !result.ok && result.error !== "not_found") || (listResult !== null && !listResult.ok);
+const notFoundMessage = !supabase
+  ? SUPABASE_NOT_CONFIGURED
+  : loadFailed
+    ? "Nie udało się wczytać zadania"
+    : "Nie znaleziono zadania";
+const showTask = task !== null && !loadFailed;
+if (!showTask) Astro.response.status = !supabase ? 503 : loadFailed ? 500 : 404;
+
+const error = Astro.url.searchParams.get("error");
+---
+
+<Layout title="Usuwanie zadania — Plan projektu (WBS)">
+  <div class="bg-cosmic min-h-screen p-4">
+    <div class="mx-auto max-w-md">
+      <Topbar />
+      <div class="rounded-2xl border border-white/10 bg-white/10 p-8 text-white backdrop-blur-xl">
+        <h1 class="mb-4 bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-center text-2xl font-bold text-transparent">
+          {showTask ? (dependents.length === 0 ? "Usunąć zadanie?" : "Nie można usunąć zadania") : notFoundMessage}
+        </h1>
+        {error && (
+          <p class="mb-4 rounded-lg border border-red-500/30 bg-red-900/30 px-3 py-2 text-sm text-red-300">{error}</p>
+        )}
+        {showTask && dependents.length === 0 && (
+          <>
+            <p class="text-center text-blue-100/80">
+              Zadanie{" "}
+              <span class="font-semibold break-words text-white">
+                {task.number}. {task.name}
+              </span>{" "}
+              zostanie usunięte na stałe.
+            </p>
+            <p class="mt-2 text-center text-sm text-blue-100/60">
+              Usunięte zostanie tylko to zadanie (razem z zapisaną listą jego poprzedników); zadania wskazane jako jego
+              poprzednicy zostają. Tej operacji nie można cofnąć.
+            </p>
+            <form
+              method="POST"
+              action={`/api/tasks/${task.id}/delete`}
+              class="mt-6 flex items-center justify-center gap-4"
+            >
+              <button
+                type="submit"
+                class="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium transition-colors hover:bg-red-500"
+              >
+                Usuń zadanie
+              </button>
+              <a href="/tasks" class="text-sm text-purple-300 hover:underline">
+                Anuluj
+              </a>
+            </form>
+          </>
+        )}
+        {showTask && dependents.length > 0 && (
+          <>
+            <p class="text-center text-blue-100/80">Aby móc je usunąć usuń je z poprzedników poniższych zadań:</p>
+            <ul class="mt-4 space-y-2">
+              {dependents.map((dependent) => (
+                <li class="flex items-start justify-between gap-4 rounded-xl border border-white/10 bg-white/5 p-3">
+                  <span class="min-w-0 text-sm break-words">
+                    <span class="mr-2 text-purple-300">{dependent.number}.</span>
+                    {dependent.name}
+                  </span>
+                  <a
+                    href={`/tasks/${dependent.id}/edit`}
+                    class="shrink-0 text-sm text-purple-300 transition-colors hover:text-purple-100 hover:underline"
+                  >
+                    Edytuj
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+        {!(showTask && dependents.length === 0) && (
+          <p class="mt-4 text-center text-sm text-blue-100/60">
+            <a href="/tasks" class="text-purple-300 hover:underline">
+              Wróć do listy zadań
+            </a>
+          </p>
+        )}
+      </div>
+    </div>
+  </div>
+</Layout>
