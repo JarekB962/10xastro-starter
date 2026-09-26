@@ -194,6 +194,7 @@ export type Database = {
       update_task: {
         Args: {
           p_id: string;
+          p_number: number;
           p_name: string;
           p_specialty_id: string | null;
           p_effort: number | null;
@@ -228,7 +229,14 @@ export interface ProjectInput {
 
 /** Kody błędów usług: wspólne (projekty, specjalności) i zadań; każda usługa zwraca tylko swój podzbiór. */
 export type CommonServiceError = "duplicate_name" | "not_found" | "unexpected";
-export type TaskServiceError = "duplicate_number" | "has_dependents" | "invalid_specialty" | "not_found" | "unexpected";
+export type TaskServiceError =
+  | "duplicate_number"
+  | "has_dependents"
+  | "invalid_specialty"
+  | "not_found"
+  | "number_referenced"
+  | "self_predecessor"
+  | "unexpected";
 export type ServiceError = CommonServiceError | TaskServiceError;
 
 /** Wynik operacji usługi: dane albo jednoznaczny kod błędu (domyślnie wspólny zestaw). */
@@ -296,8 +304,9 @@ export interface TaskCheckResult {
   problems: TaskProblem[];
 }
 
-/** Dane poprawki zadania po walidacji (bez numeru, który jest niezmienny). */
+/** Dane poprawki zadania po walidacji (z nowym albo dotychczasowym numerem). */
 export interface TaskUpdateInput {
+  number: number;
   name: string;
   specialtyId: string | null;
   effort: number | null;
@@ -306,6 +315,12 @@ export interface TaskUpdateInput {
 
 /** Wynik walidacji formularza poprawki zadania: dane albo pierwszy komunikat błędu. */
 export type ParsedTaskUpdateInput = { ok: true; data: TaskUpdateInput } | { ok: false; message: string };
+
+/** Wynik poprawki zadania: przy odrzuceniu numeru `dependents` to zadania, które mają go już wpisany jako poprzednika (rosnąco po numerze). */
+export type UpdateTaskResult =
+  | { ok: true; data: { id: string } }
+  | { ok: false; error: Exclude<TaskServiceError, "number_referenced"> }
+  | { ok: false; error: "number_referenced"; dependents: Task[] };
 
 /** Wynik usunięcia zadania: przy blokadzie `dependents` to zadania, które mają je za poprzednika (rosnąco po numerze). */
 export type DeleteTaskResult =
