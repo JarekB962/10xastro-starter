@@ -179,7 +179,7 @@ Usunięcie to jedno zapytanie o zadania projektu (kilkadziesiąt wierszy), jedno
 - [x] 1.4 Lint przechodzi: `npm run lint` — 2d9ca2a
 - [x] 1.5 Build przechodzi: `npm run build` — 2d9ca2a
 - [x] 1.6 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke` — 2d9ca2a
-- [ ] 1.7 CI (`ci` i `smoke`) zielone na gałęzi z tą zmianą
+- [x] 1.7 CI (`ci` i `smoke`) zielone na gałęzi z tą zmianą — 2d9ca2a
 
 #### Manual
 
