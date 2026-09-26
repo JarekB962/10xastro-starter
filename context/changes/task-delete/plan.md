@@ -182,7 +182,7 @@ Usunięcie to jedno zapytanie o zadania projektu (lista zadań, kilkadziesiąt w
 - [x] 1.4 Lint przechodzi: `npm run lint` — 7d3e5f0
 - [x] 1.5 Build przechodzi: `npm run build` — 7d3e5f0
 - [x] 1.6 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke` — 7d3e5f0
-- [ ] 1.7 CI (`ci` i `smoke`) zielone na gałęzi z tą zmianą
+- [x] 1.7 CI (`ci` i `smoke`) zielone na gałęzi z tą zmianą — 7d3e5f0
 
 #### Manual
 
