@@ -182,7 +182,7 @@ Zmiana numeru to jedna transakcja: usunięcie i wstawienie poprzedników edytowa
 - [x] 1.4 Lint przechodzi: `npm run lint` — ecde3ba
 - [x] 1.5 Build przechodzi: `npm run build` — ecde3ba
 - [x] 1.6 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke` — ecde3ba
-- [ ] 1.7 CI (`ci` i `smoke`) zielone na gałęzi z tą zmianą
+- [x] 1.7 CI (`ci` i `smoke`) zielone na gałęzi z tą zmianą — ecde3ba
 
 #### Manual
 
