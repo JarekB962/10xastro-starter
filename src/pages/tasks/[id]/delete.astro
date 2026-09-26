@@ -48,8 +48,9 @@ const error = Astro.url.searchParams.get("error");
               zostanie usunięte na stałe.
             </p>
             <p class="mt-2 text-center text-sm text-blue-100/60">
-              Usunięte zostanie tylko to zadanie (razem z zapisaną listą jego poprzedników); zadania wskazane jako jego
-              poprzednicy zostają. Tej operacji nie można cofnąć.
+              {task.predecessors.length > 0 &&
+                "Usunięte zostanie tylko to zadanie (razem z zapisaną listą jego poprzedników); zadania wskazane jako jego poprzednicy zostają. "}
+              Tej operacji nie można cofnąć.
             </p>
             <form
               method="POST"
@@ -70,7 +71,7 @@ const error = Astro.url.searchParams.get("error");
         )}
         {showTask && dependents.length > 0 && (
           <>
-            <p class="text-center text-blue-100/80">Aby móc je usunąć usuń je z poprzedników poniższych zadań:</p>
+            <p class="text-center text-blue-100/80">Aby było to możliwe, usuń je z poprzedników poniższych zadań:</p>
             <ul class="mt-4 space-y-2">
               {dependents.map((dependent) => (
                 <li class="flex items-start justify-between gap-4 rounded-xl border border-white/10 bg-white/5 p-3">
