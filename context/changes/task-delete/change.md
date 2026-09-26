@@ -1,7 +1,7 @@
 ---
 change_id: task-delete
 title: Usunięcie zadania
-status: implementing
+status: implemented
 created: 2026-09-26
 updated: 2026-09-26
 archived_at: null

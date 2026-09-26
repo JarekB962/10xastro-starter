@@ -193,4 +193,4 @@ Usunięcie to jedno zapytanie o zadania projektu (lista zadań, kilkadziesiąt w
 - [x] 1.12 Bezpośredni `POST` usunięcia zadania blokowanego nie usuwa go (zadanie zostaje na liście) — 7d3e5f0
 - [x] 1.13 Zalogowany użytkownik nie usunie cudzego zadania (404 na stronie, „nie znaleziono” przy POST) — 7d3e5f0
 - [x] 1.14 Usunięcie projektu z zadaniami wskazującymi na siebie działa jak dotąd (kaskada nie jest blokowana) — 7d3e5f0
-- [ ] 1.15 Po wdrożeniu na produkcji ten sam cykl działa na prawdziwych danych
+- [x] 1.15 Po wdrożeniu na produkcji ten sam cykl działa na prawdziwych danych — 7d3e5f0
