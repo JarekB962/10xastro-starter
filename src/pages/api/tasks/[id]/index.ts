@@ -2,7 +2,14 @@ import type { APIRoute } from "astro";
 import { INVALID_FORM_MESSAGE, errorUrl, readForm } from "@/lib/forms";
 import { requireSupabase } from "@/lib/services/project-routes";
 import { requireTaskId } from "@/lib/services/task-routes";
-import { TASK_ERROR_MESSAGES, TASK_NOT_FOUND_MESSAGE, editFormValues, getTask, updateTask } from "@/lib/services/tasks";
+import {
+  TASK_ERROR_MESSAGES,
+  TASK_NOT_FOUND_MESSAGE,
+  formValues,
+  getTask,
+  taskNumberReferencedMessage,
+  updateTask,
+} from "@/lib/services/tasks";
 import { parseTaskUpdateInput } from "@/lib/validation/task";
 
 export const prerender = false;
@@ -20,23 +27,27 @@ export const POST: APIRoute = async (context) => {
     return context.redirect(errorUrl(back, INVALID_FORM_MESSAGE));
   }
 
-  // Numer bierzemy z zapisanego zadania, nie z formularza.
+  // Nieistniejące i cudze zadanie: 404 jak na stronie edycji (baza ukrywa cudze wiersze).
   const task = await getTask(supabase, id);
   if (!task.ok) {
     return task.error === "not_found"
       ? notFound()
-      : context.redirect(errorUrl(back, TASK_ERROR_MESSAGES[task.error], editFormValues(form)));
+      : context.redirect(errorUrl(back, TASK_ERROR_MESSAGES[task.error], formValues(form)));
   }
 
-  const parsed = parseTaskUpdateInput(form, task.data.number);
+  const parsed = parseTaskUpdateInput(form);
   if (!parsed.ok) {
-    return context.redirect(errorUrl(back, parsed.message, editFormValues(form)));
+    return context.redirect(errorUrl(back, parsed.message, formValues(form)));
   }
 
   const result = await updateTask(supabase, id, parsed.data);
   if (!result.ok) {
     if (result.error === "not_found") return notFound();
-    return context.redirect(errorUrl(back, TASK_ERROR_MESSAGES[result.error], editFormValues(form)));
+    const message =
+      result.error === "number_referenced"
+        ? taskNumberReferencedMessage(parsed.data.number, result.dependents)
+        : TASK_ERROR_MESSAGES[result.error];
+    return context.redirect(errorUrl(back, message, formValues(form)));
   }
 
   return context.redirect("/tasks");

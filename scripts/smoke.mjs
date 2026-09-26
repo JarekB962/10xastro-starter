@@ -84,10 +84,21 @@ let cycleTaskId = "";
 let outsideTaskId = "";
 const thirdTaskNameB = `Zadanie B trzecie ${stamp}`;
 let thirdTaskIdB = "";
+let renumberTaskId = "";
+let firstTaskIdB = "";
 const unusedSpecialtyName = `Zbedna ${stamp}`;
 let unusedSpecialtyId = "";
 
 const post = (form = {}) => ({ method: "POST", form });
+
+// Fragment listy zadań z jednym zadaniem (element <li> po nazwie), do asercji na jego numerze i poprzednikach.
+const taskItem = (session, name) => async () => {
+  const list = await session("/tasks");
+  const at = list.body.indexOf(name);
+  const from = list.body.lastIndexOf("<li", at);
+  const to = list.body.indexOf("</li>", at);
+  return { ...list, body: at < 0 ? "" : list.body.slice(from, to) };
+};
 
 // B sprawdza listę i oczekuje stanu zweryfikowanego; pulpit i lista zadań pokazują ten sam stan.
 const unverifiedAfter = (name) => [
@@ -300,17 +311,17 @@ const steps = [
     { status: 200 },
   ],
   [
-    "A opens the task edit page with the current name and a fixed number",
+    "A opens the task edit page with the current name and an editable number",
     () => userA(`/tasks/${taskId}/edit`),
-    { status: 200, bodyIncludes: [taskName, "Numer zadania"] },
+    { status: 200, bodyIncludes: [taskName, "Numer zadania", 'name="task_number"', 'value="1"'] },
   ],
   [
-    "A edits the task: new name, no specialty, effort 7, predecessor 3, number in the form ignored",
+    "A edits the task: new name, no specialty, effort 7, predecessor 3, the current number kept",
     () =>
       userA(
         `/api/tasks/${taskId}`,
         post({
-          task_number: "99",
+          task_number: "1",
           task_name: editedTaskName,
           task_specialty: "",
           task_effort: "7",
@@ -337,7 +348,7 @@ const steps = [
   ["the old task name is gone from A's list", () => userA("/tasks"), { status: 200, bodyExcludes: [taskName] }],
   [
     "A cannot make a task its own predecessor on edit and keeps the typed name",
-    () => userA(`/api/tasks/${taskId}`, post({ task_name: `Nie ${stamp}`, task_predecessors: "1" })),
+    () => userA(`/api/tasks/${taskId}`, post({ task_number: "1", task_name: `Nie ${stamp}`, task_predecessors: "1" })),
     {
       status: 302,
       location: "/tasks/",
@@ -346,12 +357,12 @@ const steps = [
   ],
   [
     "A cannot save a task with a non-numeric effort and keeps the typed name",
-    () => userA(`/api/tasks/${taskId}`, post({ task_name: `Nie ${stamp}`, task_effort: "abc" })),
+    () => userA(`/api/tasks/${taskId}`, post({ task_number: "1", task_name: `Nie ${stamp}`, task_effort: "abc" })),
     { status: 302, location: "/tasks/", locationIncludes: ["/edit?error=", "task_name=", String(stamp)] },
   ],
   [
     "A cannot save a task with an empty name",
-    () => userA(`/api/tasks/${taskId}`, post({ task_name: "" })),
+    () => userA(`/api/tasks/${taskId}`, post({ task_number: "1", task_name: "" })),
     { status: 302, location: "/tasks/", locationIncludes: ["/edit?error=", "wymagana", "task_name="] },
   ],
   [
@@ -619,6 +630,93 @@ const steps = [
     { status: 302, location: "/tasks?error=" },
   ],
   [
+    "A finds the id of task 10 on the list",
+    async () => {
+      const list = await userA("/tasks");
+      const start = list.body.indexOf(dupTaskName);
+      renumberTaskId = /\/tasks\/([0-9a-f-]{36})\/edit/.exec(start < 0 ? "" : list.body.slice(start))?.[1] ?? "";
+      return { ...list, status: renumberTaskId ? list.status : 0 };
+    },
+    { status: 200 },
+  ],
+  [
+    "A renumbers task 10 to 15, which task 14 has as its predecessor",
+    () =>
+      userA(
+        `/api/tasks/${renumberTaskId}`,
+        post({ task_number: "15", task_name: dupTaskName, task_specialty: specialtyId, task_effort: "1" }),
+      ),
+    { status: 302, locationIs: "/tasks" },
+  ],
+  [
+    "A's list shows task 15 instead of task 10",
+    taskItem(userA, dupTaskName),
+    { status: 200, bodyIncludes: [dupTaskName, ">15.</span>"], bodyExcludes: [">10.</span>"] },
+  ],
+  [
+    "task 14 now has the new number 15 as its predecessor",
+    taskItem(userA, validTaskName),
+    { status: 200, bodyIncludes: [validTaskName, "<dd>15</dd>"], bodyExcludes: ["<dd>10</dd>"] },
+  ],
+  [
+    "A's check does not report a missing predecessor for the renumbered task and labels the duplicates with the new number",
+    () => userA("/tasks/check"),
+    {
+      status: 200,
+      bodyIncludes: ["Duplikat nazwy: zadania 15", "Duplikat nazwy: zadania 11"],
+      bodyExcludes: [validTaskName, "poprzednik: 10", "poprzednik: 15", "Duplikat nazwy: zadania 10"],
+    },
+  ],
+  [
+    "A cannot renumber task 15 to the taken number 3 and keeps the typed number",
+    () =>
+      userA(
+        `/api/tasks/${renumberTaskId}`,
+        post({ task_number: "3", task_name: dupTaskName, task_specialty: specialtyId, task_effort: "1" }),
+      ),
+    () => ({
+      status: 302,
+      location: `/tasks/${renumberTaskId}/edit?error=`,
+      locationIncludes: ["istnieje", "task_number=3"],
+    }),
+  ],
+  [
+    "A cannot renumber task 15 to 998, which task 12 already has as a predecessor, and gets the list of those tasks",
+    () =>
+      userA(
+        `/api/tasks/${renumberTaskId}`,
+        post({ task_number: "998", task_name: dupTaskName, task_specialty: specialtyId, task_effort: "1" }),
+      ),
+    () => ({
+      status: 302,
+      location: `/tasks/${renumberTaskId}/edit?error=`,
+      locationIncludes: ["998", "wpisany", "zadaniach%3A+12", "task_number=998"],
+    }),
+  ],
+  [
+    "A cannot renumber a task to the number of its own predecessor",
+    () =>
+      userA(
+        `/api/tasks/${renumberTaskId}`,
+        post({ task_number: "3", task_name: dupTaskName, task_specialty: specialtyId, task_predecessors: "3" }),
+      ),
+    () => ({
+      status: 302,
+      location: `/tasks/${renumberTaskId}/edit?error=`,
+      locationIncludes: ["poprzednikiem", "task_number=3"],
+    }),
+  ],
+  [
+    "the rejected renumbers left task 15 with its number",
+    taskItem(userA, dupTaskName),
+    { status: 200, bodyIncludes: [dupTaskName, ">15.</span>"], bodyExcludes: [">3.</span>", ">998.</span>"] },
+  ],
+  [
+    "the edit page after a rejected renumber keeps the typed number",
+    () => userA(`/tasks/${renumberTaskId}/edit?error=x&task_number=998&task_name=${encodeURIComponent(dupTaskName)}`),
+    { status: 200, bodyIncludes: ['value="998"'] },
+  ],
+  [
     "signup creates account B",
     () => userB("/api/auth/signup", post({ email: emailB, password })),
     { status: 302, location: "/auth/confirm-email" },
@@ -778,6 +876,7 @@ const steps = [
       userB(
         `/api/tasks/${secondTaskIdB}`,
         post({
+          task_number: "2",
           task_name: secondTaskNameB,
           task_specialty: specialtyIdB,
           task_effort: "1",
@@ -856,6 +955,51 @@ const steps = [
     "the deleted third task is gone from B's list",
     () => userB("/tasks"),
     { status: 200, bodyExcludes: [thirdTaskNameB] },
+  ],
+  [
+    "B finds the id of its first task on the list",
+    async () => {
+      const list = await userB("/tasks");
+      const start = list.body.indexOf(validTaskNameB);
+      firstTaskIdB = /\/tasks\/([0-9a-f-]{36})\/edit/.exec(start < 0 ? "" : list.body.slice(start))?.[1] ?? "";
+      return { ...list, status: firstTaskIdB ? list.status : 0 };
+    },
+    { status: 200 },
+  ],
+  [
+    "B renumbers its first task from 1 to 5",
+    () =>
+      userB(
+        `/api/tasks/${firstTaskIdB}`,
+        post({ task_number: "5", task_name: validTaskNameB, task_specialty: specialtyIdB, task_effort: "2" }),
+      ),
+    { status: 302, locationIs: "/tasks" },
+  ],
+  ...unverifiedAfter("renumbering a task"),
+  [
+    "B's second task now has the new number 5 as its predecessor",
+    async () => {
+      const item = await taskItem(userB, secondTaskNameB)();
+      // Poprzednicy to trzeci wiersz opisu; nakład zadania też może wynosić 1, więc czytamy tylko tę wartość.
+      const predecessors = /Poprzednicy<\/dt>\s*<dd[^>]*>([^<]*)<\/dd>/.exec(item.body)?.[1] ?? "";
+      return { ...item, body: `${secondTaskNameB} predecessors=[${predecessors}]` };
+    },
+    { status: 200, bodyIncludes: [secondTaskNameB, "predecessors=[5]"] },
+  ],
+  ...verifiedAfterCheck("renumbering a task"),
+  [
+    "B cannot renumber A's task",
+    () =>
+      userB(
+        `/api/tasks/${renumberTaskId}`,
+        post({ task_number: "77", task_name: "Przejete", task_specialty: "", task_effort: "1" }),
+      ),
+    { status: 302, location: "/tasks?error=", locationIncludes: ["znaleziono"] },
+  ],
+  [
+    "A's renumbered task is unchanged after B's renumber attempt",
+    taskItem(userA, dupTaskName),
+    { status: 200, bodyIncludes: [dupTaskName, ">15.</span>"], bodyExcludes: [">77.</span>"] },
   ],
   [
     "A's specialties list links to the delete page of the used specialty",

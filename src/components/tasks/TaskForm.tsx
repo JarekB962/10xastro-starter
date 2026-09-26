@@ -26,15 +26,15 @@ interface Props {
   initial?: TaskFormValues;
   serverError?: string | null;
   submitLabel: string;
-  /** Numer zapisanego zadania przy poprawce: pokazany jako tekst, nie wysyłany w formularzu. */
-  fixedNumber?: number;
+  /** Przy poprawce fokus startuje w polu nazwy, a nie numeru (numer zwykle zostaje bez zmian). */
+  focusName?: boolean;
 }
 
 type Errors = Partial<Record<keyof TaskFormValues, string>>;
 
 const hintClass = "mt-1 text-xs text-white/40";
 
-export default function TaskForm({ action, specialties, initial, serverError, submitLabel, fixedNumber }: Props) {
+export default function TaskForm({ action, specialties, initial, serverError, submitLabel, focusName }: Props) {
   const [number, setNumber] = useState(initial?.number ?? "");
   const [name, setName] = useState(initial?.name ?? "");
   const [specialty, setSpecialty] = useState(initial?.specialty ?? "");
@@ -49,15 +49,12 @@ export default function TaskForm({ action, specialties, initial, serverError, su
   function validate() {
     const next: Errors = {};
 
-    // Przy poprawce numer jest niezmienny i nie ma pola do sprawdzenia.
     const numberText = number.trim();
-    const parsedNumber = fixedNumber ?? toTaskNumber(numberText);
-    if (fixedNumber === undefined) {
-      if (!numberText) {
-        next.number = MESSAGES.numberRequired;
-      } else if (parsedNumber === null) {
-        next.number = MESSAGES.numberInvalid;
-      }
+    const parsedNumber = toTaskNumber(numberText);
+    if (!numberText) {
+      next.number = MESSAGES.numberRequired;
+    } else if (parsedNumber === null) {
+      next.number = MESSAGES.numberInvalid;
     }
 
     if (!name.trim()) {
@@ -89,28 +86,21 @@ export default function TaskForm({ action, specialties, initial, serverError, su
 
   return (
     <form method="POST" action={action} className="space-y-4" onSubmit={handleSubmit} noValidate>
-      {fixedNumber === undefined ? (
-        <FormField
-          id="task_number"
-          label="Numer zadania"
-          value={number}
-          onChange={(v) => {
-            setNumber(v);
-            clear("number");
-          }}
-          placeholder="np. 1"
-          autoComplete="off"
-          inputMode="numeric"
-          autoFocus
-          error={errors.number}
-          icon={<Hash className="size-4" />}
-        />
-      ) : (
-        <p className="flex items-center gap-2 text-sm text-blue-100/80">
-          <Hash className="size-4 text-white/40" />
-          Numer zadania: {fixedNumber}
-        </p>
-      )}
+      <FormField
+        id="task_number"
+        label="Numer zadania"
+        value={number}
+        onChange={(v) => {
+          setNumber(v);
+          clear("number");
+        }}
+        placeholder="np. 1"
+        autoComplete="off"
+        inputMode="numeric"
+        autoFocus={!focusName}
+        error={errors.number}
+        icon={<Hash className="size-4" />}
+      />
 
       <FormField
         id="task_name"
@@ -122,7 +112,7 @@ export default function TaskForm({ action, specialties, initial, serverError, su
         }}
         placeholder="np. Montaż instalacji"
         autoComplete="off"
-        autoFocus={fixedNumber !== undefined}
+        autoFocus={focusName}
         error={errors.name}
         icon={<ListChecks className="size-4" />}
       />

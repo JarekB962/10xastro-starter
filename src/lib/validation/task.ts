@@ -60,7 +60,7 @@ function field(form: FormData, name: string): string {
 function parseSharedFields(
   form: FormData,
   number: number,
-): { ok: true; data: TaskUpdateInput } | { ok: false; message: string } {
+): { ok: true; data: Omit<TaskUpdateInput, "number"> } | { ok: false; message: string } {
   const name = nameSchema.safeParse(form.get("task_name"));
   if (!name.success) return { ok: false, message: name.error.issues[0]?.message ?? "Niepoprawna nazwa zadania." };
 
@@ -102,9 +102,14 @@ export function parseTaskInput(form: FormData): ParsedTaskInput {
   return { ok: true, data: { number: number.data, ...fields.data } };
 }
 
-/** Waliduje poprawkę zadania: pole `task_number` jest ignorowane, `taskNumber` to numer zapisanego zadania. */
-export function parseTaskUpdateInput(form: FormData, taskNumber: number): ParsedTaskUpdateInput {
-  return parseSharedFields(form, taskNumber);
+/** Waliduje poprawkę zadania: jak dodawanie, numer (nowy albo dotychczasowy) czytany z pola `task_number`. */
+export function parseTaskUpdateInput(form: FormData): ParsedTaskUpdateInput {
+  const number = numberSchema.safeParse(form.get("task_number"));
+  if (!number.success) return { ok: false, message: number.error.issues[0]?.message ?? MESSAGES.numberInvalid };
+
+  const fields = parseSharedFields(form, number.data);
+  if (!fields.ok) return fields;
+  return { ok: true, data: { number: number.data, ...fields.data } };
 }
 
 const taskIdSchema = z.uuid();

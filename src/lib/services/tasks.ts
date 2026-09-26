@@ -1,6 +1,15 @@
 import { failWith, type Db } from "@/lib/services/db-errors";
 import { findDependents } from "@/lib/task-dependents";
-import type { DeleteTaskResult, ServiceResult, Task, TaskInput, TaskServiceError, TaskUpdateInput } from "@/types";
+import { TASK_FIELD_MESSAGES } from "@/lib/validation/task-fields";
+import type {
+  DeleteTaskResult,
+  ServiceResult,
+  Task,
+  TaskInput,
+  TaskServiceError,
+  TaskUpdateInput,
+  UpdateTaskResult,
+} from "@/types";
 
 export { NO_PROJECT_SELECTED_MESSAGE } from "@/lib/services/specialties";
 
@@ -11,6 +20,8 @@ export const TASK_ERROR_MESSAGES: Record<TaskServiceError, string> = {
   has_dependents: "Zadanie nie może zostać usunięte: jest poprzednikiem innych zadań.",
   invalid_specialty: "Wybrana specjalność nie istnieje w tym projekcie.",
   not_found: "Nie znaleziono projektu.",
+  number_referenced: "Ten numer jest już wpisany jako poprzednik w innych zadaniach.",
+  self_predecessor: TASK_FIELD_MESSAGES.selfPredecessor,
   unexpected: "Coś poszło nie tak. Spróbuj ponownie.",
 };
 
@@ -20,16 +31,23 @@ export function taskHasDependentsMessage(dependents: Task[]): string {
   return `Zadanie nie może zostać usunięte: jest poprzednikiem zadań ${dependents.map((task) => task.number).join(", ")}.`;
 }
 
-// 23505 zajęty numer, 23503 specjalność spoza projektu, 23514 wyzwalacz "własny poprzednik" (zod łapie to wcześniej),
-// 23001 wyzwalacz blokady usunięcia poprzednika, 42501 cudzy projekt (RLS), P0002 brak zadania w `update_task`.
-const TASK_DB_ERRORS: Record<string, TaskServiceError> = {
+// 23505 zajęty numer, 23503 specjalność spoza projektu, 23514 wyzwalacz "własny poprzednik" (zod łapie to wcześniej;
+// przy zmianie numeru wyzwalacz sprawdza jeszcze zapisane dane), 23001 wyzwalacz blokady usunięcia poprzednika
+// (przy zmianie numeru `updateTask` mapuje go na `number_referenced`), 42501 cudzy projekt (RLS), P0002 brak zadania w `update_task`.
+const TASK_DB_ERRORS: Record<string, Exclude<TaskServiceError, "number_referenced">> = {
   "23505": "duplicate_number",
   "23503": "invalid_specialty",
-  "23514": "unexpected",
+  "23514": "self_predecessor",
   "23001": "has_dependents",
   "42501": "not_found",
   P0002: "not_found",
 };
+
+/** Komunikat o zadaniach blokujących zmianę numeru, np. „Numer 7 jest już wpisany jako poprzednik w zadaniach: 3, 5. Popraw ich poprzedników i spróbuj ponownie.” */
+export function taskNumberReferencedMessage(number: number, dependents: Task[]): string {
+  if (dependents.length === 0) return TASK_ERROR_MESSAGES.number_referenced;
+  return `Numer ${String(number)} jest już wpisany jako poprzednik w zadaniach: ${dependents.map((task) => task.number).join(", ")}. Popraw ich poprzedników i spróbuj ponownie.`;
+}
 
 // Limit z zapasem ponad walidację, żeby adres przekierowania nie urósł bez końca.
 const KEPT_FIELD_LENGTH = 200;
@@ -42,13 +60,6 @@ export function formValues(form: FormData): Record<string, string> {
     const value = form.get(name);
     values[name] = typeof value === "string" ? value.slice(0, KEPT_FIELD_LENGTH) : "";
   }
-  return values;
-}
-
-/** Jak `formValues`, ale bez numeru: numer zadania jest przy poprawce niezmienny. */
-export function editFormValues(form: FormData): Record<string, string> {
-  const values = formValues(form);
-  delete values.task_number;
   return values;
 }
 
@@ -127,19 +138,37 @@ export async function deleteTask(db: Db, id: string): Promise<DeleteTaskResult> 
   return { ok: true, data: null };
 }
 
-export async function updateTask(
-  db: Db,
-  id: string,
-  input: TaskUpdateInput,
-): Promise<ServiceResult<{ id: string }, TaskServiceError>> {
+/**
+ * Zapisuje poprawkę zadania razem z numerem; zmiana numeru przepisuje poprzedników w bazie (wyzwalacz). Numer zajęty
+ * to `duplicate_number`, a numer wpisany już jako poprzednik w innych zadaniach to `number_referenced` z ich listą.
+ */
+export async function updateTask(db: Db, id: string, input: TaskUpdateInput): Promise<UpdateTaskResult> {
   const { data, error } = await db.rpc("update_task", {
     p_id: id,
+    p_number: input.number,
     p_name: input.name,
     p_specialty_id: input.specialtyId,
     p_effort: input.effort,
     p_predecessors: input.predecessors,
   });
-  if (error) return failWith("tasks", error, TASK_DB_ERRORS);
+  if (error) {
+    if (error.code === "23001") {
+      const task = await getTask(db, id);
+      if (!task.ok) return { ok: false, error: task.error === "not_found" ? "not_found" : "unexpected" };
+      const fresh = await listTasks(db, task.data.project_id);
+      if (!fresh.ok) return { ok: false, error: "unexpected" };
+      const dependents = findDependents(
+        fresh.data.filter((t) => t.id !== id),
+        input.number,
+      );
+      // Zależne zadania zniknęły w międzyczasie: nie ma czego pokazać, więc zwykły błąd do ponowienia.
+      return dependents.length > 0
+        ? { ok: false, error: "number_referenced", dependents }
+        : { ok: false, error: "unexpected" };
+    }
+    const failure = failWith("tasks", error, TASK_DB_ERRORS);
+    return { ok: false, error: failure.error };
+  }
   return { ok: true, data: { id: data.id } };
 }
 
