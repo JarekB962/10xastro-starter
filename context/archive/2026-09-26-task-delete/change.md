@@ -1,10 +1,10 @@
 ---
 change_id: task-delete
 title: Usunięcie zadania
-status: impl_reviewed
+status: archived
 created: 2026-09-26
 updated: 2026-09-26
-archived_at: null
+archived_at: 2026-09-26T13:53:43Z
 ---
 
 ## Notes
