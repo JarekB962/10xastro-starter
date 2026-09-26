@@ -313,6 +313,12 @@ export type DeleteTaskResult =
   | { ok: false; error: "not_found" | "unexpected" }
   | { ok: false; error: "has_dependents"; dependents: Task[] };
 
+/** Wynik usunięcia specjalności: przy blokadzie `tasks` to zadania, które jej używają (rosnąco po numerze). */
+export type DeleteSpecialtyResult =
+  | { ok: true; data: null }
+  | { ok: false; error: "not_found" | "unexpected" }
+  | { ok: false; error: "in_use"; tasks: Task[] };
+
 /** Stan projektu: `revision` to licznik zmian danych z chwili odczytu, `verified` to sprawdzenie bez problemów po ostatniej zmianie danych. */
 export interface ProjectState {
   revision: number;

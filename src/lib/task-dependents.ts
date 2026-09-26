@@ -8,3 +8,8 @@ export function findDependents(tasks: Task[], number: number): Task[] {
     .filter((task) => task.number !== number && task.predecessors.includes(number))
     .sort((a, b) => a.number - b.number);
 }
+
+/** Zadania z listy, które mają daną specjalność (blokują jej usunięcie), rosnąco po numerze. */
+export function findTasksWithSpecialty(tasks: Task[], specialtyId: string): Task[] {
+  return tasks.filter((task) => task.specialty_id === specialtyId).sort((a, b) => a.number - b.number);
+}
