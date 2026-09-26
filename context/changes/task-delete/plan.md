@@ -176,21 +176,21 @@ Usunięcie to jedno zapytanie o zadania projektu (lista zadań, kilkadziesiąt w
 
 #### Automated
 
-- [x] 1.1 Migracja stosuje się na czystej lokalnej bazie: `npx supabase db reset`
-- [x] 1.2 Testy jednostkowe (w tym `findDependents`) przechodzą: `npm run test:unit`
-- [x] 1.3 Sprawdzenie typów przechodzi: `npx astro check`
-- [x] 1.4 Lint przechodzi: `npm run lint`
-- [x] 1.5 Build przechodzi: `npm run build`
-- [x] 1.6 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke`
+- [x] 1.1 Migracja stosuje się na czystej lokalnej bazie: `npx supabase db reset` — 7d3e5f0
+- [x] 1.2 Testy jednostkowe (w tym `findDependents`) przechodzą: `npm run test:unit` — 7d3e5f0
+- [x] 1.3 Sprawdzenie typów przechodzi: `npx astro check` — 7d3e5f0
+- [x] 1.4 Lint przechodzi: `npm run lint` — 7d3e5f0
+- [x] 1.5 Build przechodzi: `npm run build` — 7d3e5f0
+- [x] 1.6 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke` — 7d3e5f0
 - [ ] 1.7 CI (`ci` i `smoke`) zielone na gałęzi z tą zmianą
 
 #### Manual
 
-- [x] 1.8 Migracja zastosowana na produkcji przed wdrożeniem kodu: `npx supabase db push`
-- [x] 1.9 Usunięcie zadania, które nie jest niczyim poprzednikiem, działa (link „Usuń” na liście i na edycji, strona potwierdzenia, powrót na listę) i cofa stan projektu do „niezweryfikowany”
-- [x] 1.10 Próba usunięcia zadania, na które wskazują inne, pokazuje komunikat z numerami tych zadań i listę z linkami „Edytuj”, bez przycisku usunięcia
-- [x] 1.11 Po usunięciu zależności (przez „Edytuj” zadań blokujących) to samo zadanie da się usunąć
-- [x] 1.12 Bezpośredni `POST` usunięcia zadania blokowanego nie usuwa go (zadanie zostaje na liście)
-- [x] 1.13 Zalogowany użytkownik nie usunie cudzego zadania (404 na stronie, „nie znaleziono” przy POST)
-- [x] 1.14 Usunięcie projektu z zadaniami wskazującymi na siebie działa jak dotąd (kaskada nie jest blokowana)
+- [x] 1.8 Migracja zastosowana na produkcji przed wdrożeniem kodu: `npx supabase db push` — 7d3e5f0
+- [x] 1.9 Usunięcie zadania, które nie jest niczyim poprzednikiem, działa (link „Usuń” na liście i na edycji, strona potwierdzenia, powrót na listę) i cofa stan projektu do „niezweryfikowany” — 7d3e5f0
+- [x] 1.10 Próba usunięcia zadania, na które wskazują inne, pokazuje komunikat z numerami tych zadań i listę z linkami „Edytuj”, bez przycisku usunięcia — 7d3e5f0
+- [x] 1.11 Po usunięciu zależności (przez „Edytuj” zadań blokujących) to samo zadanie da się usunąć — 7d3e5f0
+- [x] 1.12 Bezpośredni `POST` usunięcia zadania blokowanego nie usuwa go (zadanie zostaje na liście) — 7d3e5f0
+- [x] 1.13 Zalogowany użytkownik nie usunie cudzego zadania (404 na stronie, „nie znaleziono” przy POST) — 7d3e5f0
+- [x] 1.14 Usunięcie projektu z zadaniami wskazującymi na siebie działa jak dotąd (kaskada nie jest blokowana) — 7d3e5f0
 - [ ] 1.15 Po wdrożeniu na produkcji ten sam cykl działa na prawdziwych danych
