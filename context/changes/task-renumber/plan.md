@@ -176,22 +176,22 @@ Zmiana numeru to jedna transakcja: usunięcie i wstawienie poprzedników edytowa
 
 #### Automated
 
-- [x] 1.1 Migracja stosuje się na czystej lokalnej bazie: `npx supabase db reset`
-- [x] 1.2 Testy jednostkowe (regresja): `npm run test:unit`
-- [x] 1.3 Sprawdzenie typów przechodzi: `npx astro check`
-- [x] 1.4 Lint przechodzi: `npm run lint`
-- [x] 1.5 Build przechodzi: `npm run build`
-- [x] 1.6 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke`
+- [x] 1.1 Migracja stosuje się na czystej lokalnej bazie: `npx supabase db reset` — ecde3ba
+- [x] 1.2 Testy jednostkowe (regresja): `npm run test:unit` — ecde3ba
+- [x] 1.3 Sprawdzenie typów przechodzi: `npx astro check` — ecde3ba
+- [x] 1.4 Lint przechodzi: `npm run lint` — ecde3ba
+- [x] 1.5 Build przechodzi: `npm run build` — ecde3ba
+- [x] 1.6 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke` — ecde3ba
 - [ ] 1.7 CI (`ci` i `smoke`) zielone na gałęzi z tą zmianą
 
 #### Manual
 
-- [x] 1.8 Migracja zastosowana na produkcji przed wdrożeniem kodu: `npx supabase db push`
-- [x] 1.9 Zmiana numeru zadania w formularzu edycji działa: zadania, które miały je jako poprzednika, mają nowy numer w poprzednikach, a sprawdzenie nie zgłasza z tego powodu problemu
-- [x] 1.10 Zmiana na numer zajęty przez inne zadanie jest odrzucona komunikatem, a numer zostaje
-- [x] 1.11 Zmiana na numer, który inne zadanie ma wpisany jako poprzednika (np. literówka), jest odrzucona komunikatem z numerami tych zadań; po poprawie ich poprzedników zmiana się udaje
-- [x] 1.12 Zmiana numeru na numer własnego poprzednika jest odrzucona („własny poprzednik”)
-- [x] 1.13 Zmiana numeru cofa stan projektu do „niezweryfikowany”, a sprawdzenie bez problemów przywraca „zweryfikowany”
-- [x] 1.14 Cudzego zadania nie da się przenumerować (404 na stronie, „nie znaleziono” przy POST)
-- [x] 1.15 Zwykła poprawka zadania bez zmiany numeru działa jak dotąd, a usuwanie zadania i projektu działa jak dotąd
+- [x] 1.8 Migracja zastosowana na produkcji przed wdrożeniem kodu: `npx supabase db push` — ecde3ba
+- [x] 1.9 Zmiana numeru zadania w formularzu edycji działa: zadania, które miały je jako poprzednika, mają nowy numer w poprzednikach, a sprawdzenie nie zgłasza z tego powodu problemu — ecde3ba
+- [x] 1.10 Zmiana na numer zajęty przez inne zadanie jest odrzucona komunikatem, a numer zostaje — ecde3ba
+- [x] 1.11 Zmiana na numer, który inne zadanie ma wpisany jako poprzednika (np. literówka), jest odrzucona komunikatem z numerami tych zadań; po poprawie ich poprzedników zmiana się udaje — ecde3ba
+- [x] 1.12 Zmiana numeru na numer własnego poprzednika jest odrzucona („własny poprzednik”) — ecde3ba
+- [x] 1.13 Zmiana numeru cofa stan projektu do „niezweryfikowany”, a sprawdzenie bez problemów przywraca „zweryfikowany” — ecde3ba
+- [x] 1.14 Cudzego zadania nie da się przenumerować (404 na stronie, „nie znaleziono” przy POST) — ecde3ba
+- [x] 1.15 Zwykła poprawka zadania bez zmiany numeru działa jak dotąd, a usuwanie zadania i projektu działa jak dotąd — ecde3ba
 - [ ] 1.16 Po wdrożeniu na produkcji ten sam cykl działa na prawdziwych danych
