@@ -1,7 +1,7 @@
 ---
 change_id: task-renumber
 title: Zmiana numeru zadania
-status: implementing
+status: impl_reviewed
 created: 2026-09-26
 updated: 2026-09-26
 archived_at: null

@@ -85,6 +85,7 @@ let outsideTaskId = "";
 const thirdTaskNameB = `Zadanie B trzecie ${stamp}`;
 let thirdTaskIdB = "";
 let renumberTaskId = "";
+let danglingTaskId = "";
 let firstTaskIdB = "";
 const unusedSpecialtyName = `Zbedna ${stamp}`;
 let unusedSpecialtyId = "";
@@ -690,7 +691,7 @@ const steps = [
     () => ({
       status: 302,
       location: `/tasks/${renumberTaskId}/edit?error=`,
-      locationIncludes: ["998", "wpisany", "zadaniach%3A+12", "task_number=998"],
+      locationIncludes: ["998", "wpisany", "zadaniach%3A+12.", "task_number=998"],
     }),
   ],
   [
@@ -715,6 +716,36 @@ const steps = [
     "the edit page after a rejected renumber keeps the typed number",
     () => userA(`/tasks/${renumberTaskId}/edit?error=x&task_number=998&task_name=${encodeURIComponent(dupTaskName)}`),
     { status: 200, bodyIncludes: ['value="998"'] },
+  ],
+  [
+    "A finds the id of the task that has the dangling predecessor 998",
+    async () => {
+      const list = await userA("/tasks");
+      const start = list.body.indexOf(zeroEffortTaskName);
+      danglingTaskId = /\/tasks\/([0-9a-f-]{36})\/edit/.exec(start < 0 ? "" : list.body.slice(start))?.[1] ?? "";
+      return { ...list, status: danglingTaskId ? list.status : 0 };
+    },
+    { status: 200 },
+  ],
+  [
+    "A renumbers that task to 998 while removing the predecessor 998 in the same save",
+    () =>
+      userA(
+        `/api/tasks/${danglingTaskId}`,
+        post({
+          task_number: "998",
+          task_name: zeroEffortTaskName,
+          task_specialty: specialtyId,
+          task_effort: "0",
+          task_predecessors: "",
+        }),
+      ),
+    { status: 302, locationIs: "/tasks" },
+  ],
+  [
+    "the task now has the number 998 on A's list",
+    taskItem(userA, zeroEffortTaskName),
+    { status: 200, bodyIncludes: [zeroEffortTaskName, ">998.</span>"], bodyExcludes: [">12.</span>"] },
   ],
   [
     "signup creates account B",

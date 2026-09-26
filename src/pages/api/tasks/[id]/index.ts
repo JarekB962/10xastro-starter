@@ -27,7 +27,7 @@ export const POST: APIRoute = async (context) => {
     return context.redirect(errorUrl(back, INVALID_FORM_MESSAGE));
   }
 
-  // Nieistniejące i cudze zadanie: 404 jak na stronie edycji (baza ukrywa cudze wiersze).
+  // Nieistniejące i cudze zadanie kończy się przekierowaniem „nie znaleziono” (baza ukrywa cudze wiersze).
   const task = await getTask(supabase, id);
   if (!task.ok) {
     return task.error === "not_found"

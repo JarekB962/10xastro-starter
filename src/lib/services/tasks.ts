@@ -141,6 +141,9 @@ export async function deleteTask(db: Db, id: string): Promise<DeleteTaskResult> 
 /**
  * Zapisuje poprawkę zadania razem z numerem; zmiana numeru przepisuje poprzedników w bazie (wyzwalacz). Numer zajęty
  * to `duplicate_number`, a numer wpisany już jako poprzednik w innych zadaniach to `number_referenced` z ich listą.
+ * Wyzwalacz nie serializuje się względem równoległych zapisów poprzedników: równoczesne dodanie poprzednika o starym
+ * lub nowym numerze może dać mylny komunikat albo wiszące odwołanie, które wykryje sprawdzenie listy zadań (znany,
+ * akceptowany wyścig, jak przy usuwaniu zadania).
  */
 export async function updateTask(db: Db, id: string, input: TaskUpdateInput): Promise<UpdateTaskResult> {
   const { data, error } = await db.rpc("update_task", {
