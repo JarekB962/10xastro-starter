@@ -1,10 +1,10 @@
 ---
 change_id: specialty-delete
 title: Usunięcie specjalności
-status: implementing
+status: archived
 created: 2026-09-26
 updated: 2026-09-26
-archived_at: null
+archived_at: 2026-09-26T15:28:30Z
 ---
 
 ## Notes

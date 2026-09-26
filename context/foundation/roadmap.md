@@ -46,7 +46,7 @@ Kierownik projektu na starcie dostaje listę zadań (specjalność wykonawcy, na
 | S-06 | project-verified-state | zobaczyć stan projektu (zweryfikowany lub niezweryfikowany), który cofa się po każdej zmianie danych                       | S-05          | FR-011, US-01          | done |
 | S-07 | task-delete            | usunąć zadanie, o ile nie jest poprzednikiem innego zadania                                                                | S-06          | FR-007, US-01          | done |
 | S-08 | task-renumber          | zmienić numer zadania, a aplikacja poprawi go automatycznie u zadań, które mają je jako poprzednika                        | S-06          | FR-007, US-01          | planning |
-| S-09 | specialty-delete       | usunąć specjalność, o ile nie występuje w zadaniach tego projektu                                                          | S-06          | FR-005, US-01          | in-progress |
+| S-09 | specialty-delete       | usunąć specjalność, o ile nie występuje w zadaniach tego projektu                                                          | S-06          | FR-005, US-01          | done |
 
 ## Streams
 
@@ -149,7 +149,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Najmniejszy wycinek; baza już blokuje usunięcie używanej specjalności, więc ryzykiem jest tylko brakująca polityka usuwania i cofnięcie stanu projektu (S-06).
-- **Status:** in-progress
+- **Status:** done
 
 ## Backlog Handoff
 
@@ -195,3 +195,4 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **S-05: kierownik widzi w sprawdzeniu wszystkie zadania leżące na cyklu zależności (co najmniej dwa zadania zależne od siebie bezpośrednio lub pośrednio) i dostaje komunikat „nie znaleziono problemów” wyłącznie wtedy, gdy żadne z czterech kryteriów nie znalazło problemu.** — Archived 2026-09-25 → `context/archive/2026-09-25-task-check-cycles/`. Lesson: —.
 - **S-06: kierownik widzi stan projektu: „zweryfikowany” wyłącznie wtedy, gdy ostatnie sprawdzenie nie znalazło problemów, w przeciwnym razie „niezweryfikowany”; każda zmiana danych po sprawdzeniu (dodanie lub poprawa zadania, zmiana specjalności) cofa projekt do „niezweryfikowany”.** — Archived 2026-09-25 → `context/archive/2026-09-25-project-verified-state/`. Lesson: —.
 - **S-07: kierownik usuwa zadanie, jeśli nie jest ono poprzednikiem innego zadania; próba usunięcia takiego zadania kończy się komunikatem, które zadania na nie wskazują.** — Archived 2026-09-26 → `context/archive/2026-09-26-task-delete/`. Lesson: —.
+- **S-09: kierownik usuwa specjalność, jeśli nie występuje w zadaniach tego projektu; użyta specjalność zostaje w projekcie z czytelnym komunikatem.** — Archived 2026-09-26 → `context/archive/2026-09-26-specialty-delete/`. Lesson: —.

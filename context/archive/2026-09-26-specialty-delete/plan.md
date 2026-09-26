@@ -190,4 +190,4 @@ Usunięcie to jedno zapytanie o zadania projektu (kilkadziesiąt wierszy), jedno
 - [x] 1.12 Bezpośredni `POST` usunięcia używanej specjalności nie usuwa jej (specjalność zostaje na liście) — 2d9ca2a
 - [x] 1.13 Zalogowany użytkownik nie usunie cudzej specjalności (404 na stronie, „nie znaleziono” przy POST) — 2d9ca2a
 - [x] 1.14 Usunięcie projektu z zadaniami i specjalnościami działa jak dotąd — 2d9ca2a
-- [ ] 1.15 Po wdrożeniu na produkcji ten sam cykl działa na prawdziwych danych
+- [x] 1.15 Po wdrożeniu na produkcji ten sam cykl działa na prawdziwych danych — 2d9ca2a
