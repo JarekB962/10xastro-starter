@@ -173,21 +173,21 @@ Usunięcie to jedno zapytanie o zadania projektu (kilkadziesiąt wierszy), jedno
 
 #### Automated
 
-- [x] 1.1 Migracja stosuje się na czystej lokalnej bazie: `npx supabase db reset`
-- [x] 1.2 Testy jednostkowe (w tym `findTasksWithSpecialty`) przechodzą: `npm run test:unit`
-- [x] 1.3 Sprawdzenie typów przechodzi: `npx astro check`
-- [x] 1.4 Lint przechodzi: `npm run lint`
-- [x] 1.5 Build przechodzi: `npm run build`
-- [x] 1.6 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke`
+- [x] 1.1 Migracja stosuje się na czystej lokalnej bazie: `npx supabase db reset` — 2d9ca2a
+- [x] 1.2 Testy jednostkowe (w tym `findTasksWithSpecialty`) przechodzą: `npm run test:unit` — 2d9ca2a
+- [x] 1.3 Sprawdzenie typów przechodzi: `npx astro check` — 2d9ca2a
+- [x] 1.4 Lint przechodzi: `npm run lint` — 2d9ca2a
+- [x] 1.5 Build przechodzi: `npm run build` — 2d9ca2a
+- [x] 1.6 Smoke przechodzi na lokalnym Supabase i serwerze podglądu: `npm run smoke` — 2d9ca2a
 - [ ] 1.7 CI (`ci` i `smoke`) zielone na gałęzi z tą zmianą
 
 #### Manual
 
-- [x] 1.8 Migracja zastosowana na produkcji przed wdrożeniem kodu: `npx supabase db push`
-- [x] 1.9 Usunięcie specjalności, której nie używa żadne zadanie, działa (link „Usuń” na liście i na edycji, strona potwierdzenia, powrót na listę) i cofa stan projektu do „niezweryfikowany”
-- [x] 1.10 Próba usunięcia specjalności używanej w zadaniach pokazuje komunikat z listą tych zadań i linkami „Edytuj”, bez przycisku usunięcia
-- [x] 1.11 Po zmianie specjalności tych zadań (przez „Edytuj”) ta sama specjalność da się usunąć
-- [x] 1.12 Bezpośredni `POST` usunięcia używanej specjalności nie usuwa jej (specjalność zostaje na liście)
-- [x] 1.13 Zalogowany użytkownik nie usunie cudzej specjalności (404 na stronie, „nie znaleziono” przy POST)
-- [x] 1.14 Usunięcie projektu z zadaniami i specjalnościami działa jak dotąd
+- [x] 1.8 Migracja zastosowana na produkcji przed wdrożeniem kodu: `npx supabase db push` — 2d9ca2a
+- [x] 1.9 Usunięcie specjalności, której nie używa żadne zadanie, działa (link „Usuń” na liście i na edycji, strona potwierdzenia, powrót na listę) i cofa stan projektu do „niezweryfikowany” — 2d9ca2a
+- [x] 1.10 Próba usunięcia specjalności używanej w zadaniach pokazuje komunikat z listą tych zadań i linkami „Edytuj”, bez przycisku usunięcia — 2d9ca2a
+- [x] 1.11 Po zmianie specjalności tych zadań (przez „Edytuj”) ta sama specjalność da się usunąć — 2d9ca2a
+- [x] 1.12 Bezpośredni `POST` usunięcia używanej specjalności nie usuwa jej (specjalność zostaje na liście) — 2d9ca2a
+- [x] 1.13 Zalogowany użytkownik nie usunie cudzej specjalności (404 na stronie, „nie znaleziono” przy POST) — 2d9ca2a
+- [x] 1.14 Usunięcie projektu z zadaniami i specjalnościami działa jak dotąd — 2d9ca2a
 - [ ] 1.15 Po wdrożeniu na produkcji ten sam cykl działa na prawdziwych danych
