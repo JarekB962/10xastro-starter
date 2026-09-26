@@ -194,4 +194,4 @@ Zmiana numeru to jedna transakcja: usunięcie i wstawienie poprzedników edytowa
 - [x] 1.13 Zmiana numeru cofa stan projektu do „niezweryfikowany”, a sprawdzenie bez problemów przywraca „zweryfikowany” — ecde3ba
 - [x] 1.14 Cudzego zadania nie da się przenumerować (404 na stronie, „nie znaleziono” przy POST) — ecde3ba
 - [x] 1.15 Zwykła poprawka zadania bez zmiany numeru działa jak dotąd, a usuwanie zadania i projektu działa jak dotąd — ecde3ba
-- [ ] 1.16 Po wdrożeniu na produkcji ten sam cykl działa na prawdziwych danych
+- [x] 1.16 Po wdrożeniu na produkcji ten sam cykl działa na prawdziwych danych — ecde3ba

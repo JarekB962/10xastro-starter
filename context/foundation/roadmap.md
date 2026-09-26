@@ -45,7 +45,7 @@ Kierownik projektu na starcie dostaje listę zadań (specjalność wykonawcy, na
 | S-05 | task-check-cycles      | zobaczyć w sprawdzeniu zadania leżące na cyklu zależności i dostać komunikat „nie znaleziono problemów” tylko wtedy, gdy ich naprawdę nie ma | S-04          | FR-008, FR-009, US-01  | done |
 | S-06 | project-verified-state | zobaczyć stan projektu (zweryfikowany lub niezweryfikowany), który cofa się po każdej zmianie danych                       | S-05          | FR-011, US-01          | done |
 | S-07 | task-delete            | usunąć zadanie, o ile nie jest poprzednikiem innego zadania                                                                | S-06          | FR-007, US-01          | done |
-| S-08 | task-renumber          | zmienić numer zadania, a aplikacja poprawi go automatycznie u zadań, które mają je jako poprzednika                        | S-06          | FR-007, US-01          | in-progress |
+| S-08 | task-renumber          | zmienić numer zadania, a aplikacja poprawi go automatycznie u zadań, które mają je jako poprzednika                        | S-06          | FR-007, US-01          | done |
 | S-09 | specialty-delete       | usunąć specjalność, o ile nie występuje w zadaniach tego projektu                                                          | S-06          | FR-005, US-01          | done |
 
 ## Streams
@@ -137,7 +137,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - Co, gdy nowy numer jest wpisany jako „nieistniejący poprzednik” u innych zadań (literówka, która po zmianie numeru zaczęłaby wskazywać to zadanie)? Poprawiać tylko poprzedników, którzy wskazywali stary numer, czy też przepinać te? — Owner: user. Block: no.
 - **Risk:** Zdejmuje zabezpieczenie z S-03 (wyzwalacz niezmienności numeru), więc zmiana numeru i poprawa poprzedników muszą zapisać się razem albo wcale, bez wiszących odwołań; błąd daje zadania wskazujące na niewłaściwe zadanie.
-- **Status:** in-progress
+- **Status:** done
 
 ### S-09: Usunięcie specjalności
 
@@ -196,3 +196,4 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **S-06: kierownik widzi stan projektu: „zweryfikowany” wyłącznie wtedy, gdy ostatnie sprawdzenie nie znalazło problemów, w przeciwnym razie „niezweryfikowany”; każda zmiana danych po sprawdzeniu (dodanie lub poprawa zadania, zmiana specjalności) cofa projekt do „niezweryfikowany”.** — Archived 2026-09-25 → `context/archive/2026-09-25-project-verified-state/`. Lesson: —.
 - **S-07: kierownik usuwa zadanie, jeśli nie jest ono poprzednikiem innego zadania; próba usunięcia takiego zadania kończy się komunikatem, które zadania na nie wskazują.** — Archived 2026-09-26 → `context/archive/2026-09-26-task-delete/`. Lesson: —.
 - **S-09: kierownik usuwa specjalność, jeśli nie występuje w zadaniach tego projektu; użyta specjalność zostaje w projekcie z czytelnym komunikatem.** — Archived 2026-09-26 → `context/archive/2026-09-26-specialty-delete/`. Lesson: —.
+- **S-08: kierownik zmienia numer zadania, a aplikacja automatycznie poprawia ten numer u wszystkich zadań, które mają je jako poprzednika; zajęty numer jest odrzucany.** — Archived 2026-09-26 → `context/archive/2026-09-26-task-renumber/`. Lesson: —.
