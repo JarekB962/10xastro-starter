@@ -80,6 +80,10 @@ const secondSpecialtyNameB = `Murarz ${stamp}`;
 const renamedSecondSpecialtyB = `Tynkarz ${stamp}`;
 let secondTaskIdB = "";
 let secondSpecialtyIdB = "";
+let cycleTaskId = "";
+let outsideTaskId = "";
+const thirdTaskNameB = `Zadanie B trzecie ${stamp}`;
+let thirdTaskIdB = "";
 
 const post = (form = {}) => ({ method: "POST", form });
 
@@ -545,6 +549,74 @@ const steps = [
     { status: 200, bodyIncludes: [cycleTaskNames[22], "wny 0", "Cykl zale", "ci: zadania 20, 21, 22"] },
   ],
   [
+    "A finds the id of cycle task 20 on the list",
+    async () => {
+      const list = await userA("/tasks");
+      const start = list.body.indexOf(cycleTaskNames[20]);
+      cycleTaskId = /\/tasks\/([0-9a-f-]{36})\/edit/.exec(start < 0 ? "" : list.body.slice(start))?.[1] ?? "";
+      return { ...list, status: cycleTaskId ? list.status : 0 };
+    },
+    { status: 200, bodyIncludes: ["/delete"] },
+  ],
+  [
+    "A finds the id of task 23 on the list",
+    async () => {
+      const list = await userA("/tasks");
+      const start = list.body.indexOf(outsideCycleTaskName);
+      outsideTaskId = /\/tasks\/([0-9a-f-]{36})\/edit/.exec(start < 0 ? "" : list.body.slice(start))?.[1] ?? "";
+      return { ...list, status: outsideTaskId ? list.status : 0 };
+    },
+    { status: 200 },
+  ],
+  [
+    "the delete confirmation of task 20 is blocked: it lists tasks 21 and 23 and has no delete button",
+    () => userA(`/tasks/${cycleTaskId}/delete`),
+    () => ({
+      status: 200,
+      bodyIncludes: ["je z poprzednik", cycleTaskNames[21], outsideCycleTaskName, "Edytuj", "/edit"],
+      bodyExcludes: [`/api/tasks/${cycleTaskId}/delete`, cycleTaskNames[22]],
+    }),
+  ],
+  [
+    "A cannot delete task 20 while others depend on it and is sent back to the confirmation page",
+    () => userA(`/api/tasks/${cycleTaskId}/delete`, post()),
+    () => ({ status: 302, location: `/tasks/${cycleTaskId}/delete?error=`, locationIncludes: ["poprzednikiem"] }),
+  ],
+  [
+    "task 20 is still on A's list after the blocked delete",
+    () => userA("/tasks"),
+    { status: 200, bodyIncludes: [cycleTaskNames[20], cycleTaskNames[21], outsideCycleTaskName] },
+  ],
+  [
+    "the delete confirmation of task 23 has a delete button and no dependents",
+    () => userA(`/tasks/${outsideTaskId}/delete`),
+    () => ({
+      status: 200,
+      bodyIncludes: [outsideCycleTaskName, `/api/tasks/${outsideTaskId}/delete`, "Anuluj"],
+      bodyExcludes: ["je z poprzednik"],
+    }),
+  ],
+  [
+    "A deletes task 23, which nothing depends on",
+    () => userA(`/api/tasks/${outsideTaskId}/delete`, post()),
+    { status: 302, locationIs: "/tasks" },
+  ],
+  [
+    "task 23 is gone from A's list while the cycle tasks stay",
+    () => userA("/tasks"),
+    { status: 200, bodyIncludes: [cycleTaskNames[20], cycleTaskNames[21]], bodyExcludes: [outsideCycleTaskName] },
+  ],
+  [
+    "the delete confirmation of the deleted task 23 is 404",
+    () => userA(`/tasks/${outsideTaskId}/delete`),
+    { status: 404 },
+  ],
+  [
+    "deleting the already deleted task 23 counts as not found",
+    () => userA(`/api/tasks/${outsideTaskId}/delete`, post()),
+    { status: 302, location: "/tasks?error=" },
+  ],
+  [
     "signup creates account B",
     () => userB("/api/auth/signup", post({ email: emailB, password })),
     { status: 302, location: "/auth/confirm-email" },
@@ -593,6 +665,17 @@ const steps = [
     "B cannot edit A's task",
     () => userB(`/api/tasks/${taskId}`, post({ task_name: "Przejete" })),
     { status: 302, location: "/tasks?error=" },
+  ],
+  ["B gets 404 on A's task delete page", () => userB(`/tasks/${taskId}/delete`), { status: 404 }],
+  [
+    "B cannot delete A's task",
+    () => userB(`/api/tasks/${taskId}/delete`, post()),
+    { status: 302, location: "/tasks?error=", locationIncludes: ["znaleziono"] },
+  ],
+  [
+    "A's task is still on A's list after B's delete attempt",
+    () => userA("/tasks"),
+    { status: 200, bodyIncludes: [editedTaskName] },
   ],
   [
     "B without a selected project sees the empty state on /tasks/check",
@@ -729,6 +812,50 @@ const steps = [
   ...unverifiedAfter("renaming a specialty"),
   ...verifiedAfterCheck("renaming a specialty"),
   [
+    "B adds a third task to delete",
+    () =>
+      userB(
+        "/api/tasks",
+        post({ task_number: "3", task_name: thirdTaskNameB, task_specialty: specialtyIdB, task_effort: "1" }),
+      ),
+    { status: 302, locationIs: "/tasks" },
+  ],
+  ...unverifiedAfter("adding a third task"),
+  ...verifiedAfterCheck("adding a third task"),
+  [
+    "B finds the third task id on the list",
+    async () => {
+      const list = await userB("/tasks");
+      const start = list.body.indexOf(thirdTaskNameB);
+      thirdTaskIdB = /\/tasks\/([0-9a-f-]{36})\/edit/.exec(start < 0 ? "" : list.body.slice(start))?.[1] ?? "";
+      return { ...list, status: thirdTaskIdB ? list.status : 0 };
+    },
+    { status: 200 },
+  ],
+  [
+    "B's first task is blocked from deletion because the second task depends on it",
+    async () => {
+      const list = await userB("/tasks");
+      const start = list.body.indexOf(validTaskNameB);
+      const firstTaskIdB = /\/tasks\/([0-9a-f-]{36})\/edit/.exec(start < 0 ? "" : list.body.slice(start))?.[1] ?? "";
+      const page = await userB(`/tasks/${firstTaskIdB}/delete`);
+      return { ...page, status: firstTaskIdB ? page.status : 0 };
+    },
+    { status: 200, bodyIncludes: ["je z poprzednik", secondTaskNameB] },
+  ],
+  [
+    "B deletes the third task, which nothing depends on",
+    () => userB(`/api/tasks/${thirdTaskIdB}/delete`, post()),
+    { status: 302, locationIs: "/tasks" },
+  ],
+  ...unverifiedAfter("deleting a task"),
+  ...verifiedAfterCheck("deleting a task"),
+  [
+    "the deleted third task is gone from B's list",
+    () => userB("/tasks"),
+    { status: 200, bodyExcludes: [thirdTaskNameB] },
+  ],
+  [
     "A's check with problems leaves the project unverified",
     () => userA("/tasks/check"),
     { status: 200, bodyIncludes: [UNVERIFIED, "Zadania z problemami"], bodyExcludes: [VERIFIED] },
@@ -793,8 +920,10 @@ const steps = [
 ];
 
 let failed = 0;
-for (const [name, run, expected] of steps) {
+for (const [name, run, spec] of steps) {
   const actual = await run();
+  // Oczekiwania zależne od identyfikatorów znalezionych w trakcie scenariusza podaje się jako funkcję (liczoną po kroku).
+  const expected = typeof spec === "function" ? spec() : spec;
   const problems = [];
   if (actual.status !== expected.status) problems.push(`status ${actual.status}, expected ${expected.status}`);
   if (expected.locationIs !== undefined && actual.location !== expected.locationIs) {

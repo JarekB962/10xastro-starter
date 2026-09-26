@@ -58,10 +58,15 @@ const initial = {
             client:load
           />
         )}
-        <p class="mt-4 text-center text-sm text-blue-100/60">
+        <p class="mt-4 flex items-center justify-center gap-4 text-center text-sm text-blue-100/60">
           <a href="/tasks" class="text-purple-300 hover:underline">
             Wróć do listy zadań
           </a>
+          {showForm && (
+            <a href={`/tasks/${task.id}/delete`} class="text-red-300 hover:text-red-200 hover:underline">
+              Usuń zadanie
+            </a>
+          )}
         </p>
       </div>
     </div>
