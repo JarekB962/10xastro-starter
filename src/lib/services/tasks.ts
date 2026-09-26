@@ -96,7 +96,9 @@ export async function getTask(db: Db, id: string): Promise<ServiceResult<Task, T
 
 /**
  * Usuwa zadanie, o ile żadne inne zadanie projektu nie ma go za poprzednika; inaczej `has_dependents` z ich listą.
- * Blokadę pilnuje też wyzwalacz w bazie (23001), który łapie wyścig między sprawdzeniem a usunięciem.
+ * Blokadę pilnuje też wyzwalacz w bazie (23001), który zabezpiecza bezpośrednie wywołania API. Wyścig z dodaniem
+ * poprzednika wskazującego na usuwane zadanie nie jest blokowany: zostaje wtedy „nieistniejący poprzednik”, który
+ * wykrywa sprawdzenie listy zadań (PRD dopuszcza takie odwołania).
  */
 export async function deleteTask(db: Db, id: string): Promise<DeleteTaskResult> {
   const task = await getTask(db, id);
@@ -112,7 +114,11 @@ export async function deleteTask(db: Db, id: string): Promise<DeleteTaskResult> 
     if (error.code === "23001") {
       const fresh = await listTasks(db, task.data.project_id);
       if (!fresh.ok) return { ok: false, error: "unexpected" };
-      return { ok: false, error: "has_dependents", dependents: findDependents(fresh.data, task.data.number) };
+      const dependents = findDependents(fresh.data, task.data.number);
+      // Zależne zadania zniknęły w międzyczasie: nie ma czego pokazać, więc zwykły błąd do ponowienia.
+      return dependents.length > 0
+        ? { ok: false, error: "has_dependents", dependents }
+        : { ok: false, error: "unexpected" };
     }
     const failure = failWith("tasks", error, TASK_DB_ERRORS);
     return { ok: false, error: failure.error === "not_found" ? "not_found" : "unexpected" };
