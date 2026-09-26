@@ -1,10 +1,10 @@
 ---
 change_id: task-renumber
 title: Zmiana numeru zadania
-status: implemented
+status: archived
 created: 2026-09-26
 updated: 2026-09-26
-archived_at: null
+archived_at: 2026-09-26T17:31:35Z
 ---
 
 ## Notes
